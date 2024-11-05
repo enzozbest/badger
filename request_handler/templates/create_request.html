@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create a Tutorial Request</title>
+</head>
+<body>
+    <p>Fill in the details in the following form to create a Tutoring Request </p>
+    <p>
+        <form action = "{% url 'create_request' %}" method = 'POST'>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type = "submit" value = "Submit"></input>
+    </form>
+    </p>
+</body>
+</html>

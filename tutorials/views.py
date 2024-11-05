@@ -9,6 +9,7 @@ from django.views import View
 from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
 from tutorials.forms import LogInForm, PasswordForm, UserForm, SignUpForm
+from django.http import HttpRequest, HttpResponse
 from tutorials.helpers import login_prohibited
 
 
@@ -25,7 +26,6 @@ def home(request):
     """Display the application's start/home screen."""
 
     return render(request, 'home.html')
-
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""

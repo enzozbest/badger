@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate
 from django.core.validators import RegexValidator
 from .models import User
 
+
 class LogInForm(forms.Form):
     """Form enabling registered users to log in."""
 
@@ -46,7 +47,6 @@ class NewPasswordMixin(forms.Form):
 
     def clean(self):
         """Form mixing for new_password and password_confirmation fields."""
-
         super().clean()
         new_password = self.cleaned_data.get('new_password')
         password_confirmation = self.cleaned_data.get('password_confirmation')
