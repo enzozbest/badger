@@ -11,10 +11,17 @@ def create_request(request: HttpRequest) -> HttpResponse:
         form = RequestForm(request.POST)
         if form.is_valid():
             try:
-                form.save()
+                request_instance = form.save(commit=False)
+                request_instance.student = request.user
+                request_instance.save()
+
+                #Manually add selected days to Request instance, as the automatic method is not working.
+                for day in form.cleaned_data['available_days']:
+                    request_instance.availability.add(day)
+
                 return redirect('request_success')
-            except :
-                form.add_error(error='There was an error submitting this form!', field='term')
+            except Exception as e:
+                form.add_error(error=f'There was an error submitting this form! {e}', field='term')
     else:
         form = RequestForm()
     return render(request, 'create_request.html', {'form': form})
