@@ -1,5 +1,6 @@
 from zoneinfo import available_timezones
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from tutorials.models import User
 # Create your models here.
@@ -25,13 +26,17 @@ class Request(models.Model):
 
     @property
     def student_email(self):
-        return self.student.email
+        if self.student:
+            return self.student.email
+        else:
+            return None
 
     def __str__(self):
+        available = 'No availability set!'
         if self.pk and self.availability.exists():
-            available = ', '.join(str(day) for day in self.availability.all())
-        else:
-            available = 'No availability set!'
+            available_days = self.availability.all()
+            if available_days.exists():
+                available = ', '.join(str(day) for day in self.availability.all())
 
         return (f'Student: {self.student_email}'
                 f'\n Knowledge_area: {self.knowledge_area}'
@@ -39,3 +44,9 @@ class Request(models.Model):
                 f'\n Term: {self.term}'
                 f'\n Frequency: {self.frequency}'
                 f'\n Duration: {self.duration}')
+
+    def clean(self):
+        if self.pk and not self.availability.exists():
+            raise ValidationError({"availability": "No availability set!"})
+        if self.pk and not self.venue_preference.exists():
+            raise ValidationError({"venue_preference": "No venue_preference set!"})

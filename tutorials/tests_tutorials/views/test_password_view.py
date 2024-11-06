@@ -5,13 +5,13 @@ from django.test import TestCase
 from django.urls import reverse
 from tutorials.forms import PasswordForm
 from tutorials.models import User
-from tutorials.tests.helpers import reverse_with_next
+from tutorials.tests_tutorials.helpers import reverse_with_next
 
 class PasswordViewTest(TestCase):
     """Test suite for the password view."""
 
     fixtures = [
-        'tutorials/tests/fixtures/default_user.json'
+        'tutorials/tests_tutorials/fixtures/default_user.json'
     ]
 
     def setUp(self):
@@ -49,7 +49,7 @@ class PasswordViewTest(TestCase):
         is_password_correct = check_password('NewPassword123', self.user.password)
         self.assertTrue(is_password_correct)
 
-    def test_password_change_unsuccesful_without_correct_old_password(self):
+    def test_password_change_unsuccessful_without_correct_old_password(self):
         self.client.login(username=self.user.username, password='Password123')
         self.form_input['password'] = 'WrongPassword123'
         response = self.client.post(self.url, self.form_input, follow=True)

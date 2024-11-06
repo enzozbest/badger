@@ -4,12 +4,12 @@ from django.test import TestCase
 from django.urls import reverse
 from tutorials.forms import SignUpForm
 from tutorials.models import User
-from tutorials.tests.helpers import LogInTester
+from tutorials.tests_tutorials.helpers import LogInTester
 
 class SignUpViewTestCase(TestCase, LogInTester):
     """Tests of the sign up view."""
 
-    fixtures = ['tutorials/tests/fixtures/default_user.json']
+    fixtures = ['tutorials/tests_tutorials/fixtures/default_user.json']
 
     def setUp(self):
         self.url = reverse('sign_up')
