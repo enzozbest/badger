@@ -9,7 +9,7 @@ def reverse_with_next(url_name, next_url):
 
 
 class LogInTester:
-    """Class support login in tests."""
+    """Class support login in tests_tutorials."""
  
     def _is_logged_in(self):
         """Returns True if a user is logged in.  False otherwise."""
@@ -17,7 +17,7 @@ class LogInTester:
         return '_auth_user_id' in self.client.session.keys()
 
 class MenuTesterMixin(AssertHTMLMixin):
-    """Class to extend tests with tools to check the presents of menu items."""
+    """Class to extend tests_tutorials with tools to check the presents of menu items."""
 
     menu_urls = [
         reverse('password'), reverse('profile'), reverse('log_out')

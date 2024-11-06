@@ -18,16 +18,18 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
-from tutorials import views
-
+from tutorials import views as tutorial_views
+from request_handler import views as request_handler_views
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home, name='home'),
-    path('dashboard/', views.dashboard, name='dashboard'),
-    path('log_in/', views.LogInView.as_view(), name='log_in'),
-    path('log_out/', views.log_out, name='log_out'),
-    path('password/', views.PasswordView.as_view(), name='password'),
-    path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
-    path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
+    path('', tutorial_views.home, name='home'),
+    path('dashboard/', tutorial_views.dashboard, name='dashboard'),
+    path('log_in/', tutorial_views.LogInView.as_view(), name='log_in'),
+    path('log_out/', tutorial_views.log_out, name='log_out'),
+    path('password/', tutorial_views.PasswordView.as_view(), name='password'),
+    path('profile/', tutorial_views.ProfileUpdateView.as_view(), name='profile'),
+    path('sign_up/', tutorial_views.SignUpView.as_view(), name='sign_up'),
+    path('create_request/', request_handler_views.create_request, name="create_request"),
+    path('request_success/', request_handler_views.request_success, name="request_success"),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

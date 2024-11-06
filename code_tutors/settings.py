@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'widget_tweaks',
     'tutorials',
+    'request_handler',
 ]
 
 MIDDLEWARE = [

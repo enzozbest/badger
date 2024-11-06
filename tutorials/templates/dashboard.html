@@ -5,6 +5,9 @@
     <div class="col-12">
       <h1>Welcome to your dashboard {{ user.username }}</h1>
     </div>
+    <div class="col-12">
+      <a href = "{% url 'create_request' %}">Click here to create a lesson request</a>
+    </div>
   </div>
 </div>
 {% endblock %}

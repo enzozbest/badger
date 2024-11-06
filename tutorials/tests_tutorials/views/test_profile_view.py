@@ -4,14 +4,14 @@ from django.test import TestCase
 from django.urls import reverse
 from tutorials.forms import UserForm
 from tutorials.models import User
-from tutorials.tests.helpers import reverse_with_next
+from tutorials.tests_tutorials.helpers import reverse_with_next
 
 class ProfileViewTest(TestCase):
     """Test suite for the profile view."""
 
     fixtures = [
-        'tutorials/tests/fixtures/default_user.json',
-        'tutorials/tests/fixtures/other_users.json'
+        'tutorials/tests_tutorials/fixtures/default_user.json',
+        'tutorials/tests_tutorials/fixtures/other_users.json'
     ]
 
     def setUp(self):
