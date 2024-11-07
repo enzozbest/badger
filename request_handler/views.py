@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
 from .forms import RequestForm
 from django.shortcuts import redirect
+from request_handler.models import Request
 
 def create_request(request: HttpRequest) -> HttpResponse:
     if not request.user.is_authenticated:
@@ -28,3 +29,15 @@ def create_request(request: HttpRequest) -> HttpResponse:
 
 def request_success(request: HttpRequest) -> HttpResponse:
     return render(request, 'request_success.html')
+
+def view_requests(request: HttpRequest) -> HttpResponse:
+    if not request.user.is_authenticated:
+        return redirect('log_in')
+    try:
+        #Change to filter
+        context = {'requests':list(Request.objects.filter(student = request.user))}
+        print(context)
+    except Request.DoesNotExist:
+        context = {'requests':"You have no current requests"}
+
+    return render(request,'view_requests.html',context )
