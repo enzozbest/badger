@@ -9,7 +9,7 @@
         <a href = "{% url 'dashboard' %}">Dashboard</a>
     </div>
     <!--Should we show venue preference too?-->
-    <p>View each of your open tutoring requests below </p>
+    {% if requests  %}<p>View each of your open tutoring requests below </p>
     {% for request in requests %}
     <p>Knowledge area: {{request.knowledge_area}}</p>
     <p>Availability:</p>
@@ -25,6 +25,8 @@
     <a href="{% url 'confirm_delete_request' request.id %}" class="text-danger">Delete</a>
 
     <hr>
-    {% endfor %}
+    {% endfor %}{% else %}
+        <p>You have no current requests</p>
+    {% endif %}
 </body>
 </html>

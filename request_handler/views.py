@@ -32,16 +32,14 @@ def create_request(request: HttpRequest) -> HttpResponse:
 def request_success(request: HttpRequest) -> HttpResponse:
     return render(request, 'request_success.html')
 
+# Provides a list of all requests made by the signed in student 
 def view_requests(request: HttpRequest) -> HttpResponse:
     if not request.user.is_authenticated:
         return redirect('log_in')
     try:
-        #Change to filter
         context = {'requests':list(Request.objects.filter(student = request.user))}
-        print(context)
     except Request.DoesNotExist:
         context = {'requests':"You have no current requests"}
-
     return render(request,'view_requests.html',context )
 
 def delete_request(request, pk):
