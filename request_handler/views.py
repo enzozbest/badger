@@ -1,8 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpRequest, HttpResponse
 from .forms import RequestForm
 from django.shortcuts import redirect
 from request_handler.models import Request
+
+from django.contrib import messages
 
 def create_request(request: HttpRequest) -> HttpResponse:
     if not request.user.is_authenticated:
@@ -41,3 +43,25 @@ def view_requests(request: HttpRequest) -> HttpResponse:
         context = {'requests':"You have no current requests"}
 
     return render(request,'view_requests.html',context )
+
+def delete_request(request, pk):
+    if not request.user.is_authenticated:
+        return redirect('log_in')
+    try:
+        request_instance = get_object_or_404(Request, pk=pk, student=request.user)
+        request_instance.delete()
+        messages.success(request, "Request deleted successfully. ")
+        return redirect('view_requests')
+    except Request.DoesNotExist:
+        messages.error(request, "Request cannot be found or deleted. ")
+        return redirect('view_requests')
+    except Exception as e: # handle unexpected exceptions
+        messages.error(request, f'There was an error deleting this request: {str(e)}')
+        return redirect('view_requests')
+
+def confirm_delete_request(request, pk):
+    request_instance = get_object_or_404(Request, pk=pk)
+    if request.method == "POST":
+        request_instance.delete()
+        return redirect('view_requests')
+    return render(request, 'confirm_delete_request.html', {'request_instance': request_instance})
