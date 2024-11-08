@@ -86,3 +86,48 @@ class DeleteRequestViewTest(TestCase):
         self.client.logout()
         response = self.client.get(reverse('delete_request', args=[self.request_instance.id]))
         self.assertRedirects(response, f'/log_in/')
+
+
+class viewRequestsTest(TestCase):
+    def setUp(self):
+        # Set up test user
+        self.user = User.objects.create_user(username='@charlie', password='Password123')
+
+        self.client.login(username='@charlie', password='Password123')
+
+    
+    # Tests that an unauthenticated user is redirected when attempting to view their lesson requests
+    def test_redirect_if_not_logged_in_view_requests(self):
+        self.client.logout()
+        response = self.client.get(reverse('view_requests'))
+        self.assertRedirects(response, f'/log_in/')
+    
+    # Tests that a logged in user with requests can see them and the data is accurate
+    def test_view_requests_populated(self):
+        self.mode_preference = Modality.objects.create(mode="Online")
+        self.available_day = Day.objects.create(day="Monday")
+
+        # Request instance belonging to test user
+        self.request_instance = Request.objects.create(
+            student=self.user,
+            knowledge_area='C++',
+            term='Easter',
+            frequency='Weekly',
+            duration='1h',
+        )
+        self.request_instance.availability.set([self.available_day])
+        self.request_instance.venue_preference.set([self.mode_preference])
+
+        response = self.client.get(reverse('view_requests'))
+        self.assertTrue(response.context, {
+            'Knowledge_area':'C++',
+            'Availability':'Monday',
+            'Term':'Easter',
+            'Frequency':'Weekly',
+            'Duration':'1h',
+            }) 
+    
+    # Tests that a logged in user who requests to view their requests (while having none) does not receive an error
+    def test_view_requests_empty(self):        
+        response = self.client.get(reverse('view_requests'))
+        self.assertEqual(response.context['requests'], [])

@@ -33,13 +33,17 @@ def request_success(request: HttpRequest) -> HttpResponse:
     return render(request, 'request_success.html')
 
 # Provides a list of all requests made by the signed in student 
+# Redirects user to login page if they aren't authenticated
 def view_requests(request: HttpRequest) -> HttpResponse:
     if not request.user.is_authenticated:
         return redirect('log_in')
-    try:
-        context = {'requests':list(Request.objects.filter(student = request.user))}
-    except Request.DoesNotExist:
-        context = {'requests':"You have no current requests"}
+    
+    userRequest = list(Request.objects.filter(student = request.user))
+    
+    if(not userRequest):
+        context = {'requests':[]}
+    else:
+        context = {'requests':userRequest}
     return render(request,'view_requests.html',context )
 
 def edit_request(request: HttpRequest, pk: int) -> HttpResponse:
