@@ -28,9 +28,10 @@ This Model represents a request made by a student for lessons. It contains all t
 contact the student and formalise arrangements. These details include: the student's user information, which knowledge areas
 they would like tutoring for, which days of the week they are available, their preferred mode of attendance, etc.
 """
+
 class Request(models.Model):
     student = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
-    knowledge_area = models.CharField(max_length=255,blank=False) #Allow one for now, extend later.
+    knowledge_area = models.CharField(max_length=255, blank=False)
     availability = models.ManyToManyField(Day, blank=False)
     venue_preference = models.ManyToManyField(Modality, blank=False)
     term = models.CharField(max_length=255)
@@ -39,17 +40,14 @@ class Request(models.Model):
 
     @property
     def student_email(self):
-        if self.student:
-            return self.student.email
-        else:
-            return None
+        return self.student.email if self.student else None
 
     def __str__(self):
         available = 'No availability set!'
         if self.pk and self.availability.exists():
             available_days = self.availability.all()
             if available_days.exists():
-                available = ', '.join(str(day) for day in self.availability.all())
+                available = ', '.join(str(day) for day in available_days)
 
         return (f'Student: {self.student_email}'
                 f'\n Knowledge_area: {self.knowledge_area}'
@@ -59,7 +57,8 @@ class Request(models.Model):
                 f'\n Duration: {self.duration}')
 
     def clean(self):
+        super().clean()
         if self.pk and not self.availability.exists():
             raise ValidationError({"availability": "No availability set!"})
         if self.pk and not self.venue_preference.exists():
-            raise ValidationError({"venue_preference": "No venue_preference set!"})
+            raise ValidationError({"venue_preference": "No venue preference set!"})

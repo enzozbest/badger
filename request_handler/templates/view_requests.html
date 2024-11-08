@@ -22,6 +22,7 @@
     <p>Frequency: {{request.frequency}}</p>
     <p>Duration: {{request.duration}}</p>
 
+    <a href="{% url 'edit_request' request.id %}" class="text-danger">Update</a>
     <a href="{% url 'confirm_delete_request' request.id %}" class="text-danger">Delete</a>
 
     <hr>

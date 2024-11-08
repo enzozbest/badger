@@ -19,7 +19,7 @@ def create_request(request: HttpRequest) -> HttpResponse:
                 request_instance.save()
 
                 #Manually add selected days to Request instance, as the automatic method is not working.
-                for day in form.cleaned_data['available_days']:
+                for day in form.cleaned_data['availability']:
                     request_instance.availability.add(day)
 
                 return redirect('request_success')
@@ -41,6 +41,22 @@ def view_requests(request: HttpRequest) -> HttpResponse:
     except Request.DoesNotExist:
         context = {'requests':"You have no current requests"}
     return render(request,'view_requests.html',context )
+
+def edit_request(request: HttpRequest, pk: int) -> HttpResponse:
+    request_instance = get_object_or_404(Request, pk=pk)
+    form = RequestForm(request.POST or None, instance=request_instance)
+
+    if request.method == "POST" and form.is_valid():
+        request_instance = form.save(commit=False)
+        request_instance.save()
+        form.save_m2m()
+
+        if not request_instance.venue_preference.exists():
+            form.add_error('venue_preference', "No venue preference set!")
+        else:
+            return redirect('view_requests')
+
+    return render(request, 'edit_request.html', {'form': form, 'request_instance': request_instance})
 
 def delete_request(request, pk):
     if not request.user.is_authenticated:
