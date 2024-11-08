@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth import get_user_model
+from tutorials.models import User
 from request_handler.models import Request, Modality, Day
 
 INVALID_REQUEST_ID = 999
@@ -10,8 +10,7 @@ class DeleteRequestViewTest(TestCase):
     def setUp(self):
 
         # Set up test user
-        user_model = get_user_model()
-        self.user = user_model.objects.create_user(username='testuser', password='testpassword')
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
 
         self.mode_preference = Modality.objects.create(mode="Online")
         self.available_day = Day.objects.create(day="Monday")
@@ -54,7 +53,7 @@ class DeleteRequestViewTest(TestCase):
     def test_post_with_valid_pk(self):
         self.client.login(username='testuser', password='testpassword')
         before_count = Request.objects.count()
-        response = self.client.post(self.url) # removed follow=True here
+        response = self.client.post(self.url)
         after_count = Request.objects.count()
 
         self.assertEqual(after_count, before_count - 1)
