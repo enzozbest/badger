@@ -23,12 +23,12 @@ class TestViews(TestCase):
     def test_create_request_with_valid_data(self):
         self.client.login(username='@johndoe', password='Password123')
         data = {
-            'available_days': [self.monday.id,],
+            'available_days': [self.monday.pk],
             'term': 'Easter',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
             'duration': '1h',
-            'mode_preference': [self.online.id,],
+            'mode_preference': [self.online.pk],
         }
         response = self.client.post(self.url, data, follow=True)
         self.assertRedirects(response, reverse('request_success'), status_code=302, target_status_code=200)
