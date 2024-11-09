@@ -4,7 +4,7 @@
 The members of the team are:
 - Eeshal Malik
 - Enzo Bestetti
-- Isabella McLeean
+- Isabella McLean
 - Jiale She
 - Lucia Garces Gutierrez
 
