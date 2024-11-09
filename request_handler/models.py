@@ -30,7 +30,9 @@ they would like tutoring for, which days of the week they are available, their p
 """
 
 class Request(models.Model):
-    student = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+    student = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name='student')
+    allocated = models.BooleanField(default=False, blank=True)
+    tutor = models.OneToOneField(User, null=True, on_delete=models.CASCADE, blank=True, related_name='tutor')
     knowledge_area = models.CharField(max_length=255, blank=False)
     availability = models.ManyToManyField(Day, blank=False)
     venue_preference = models.ManyToManyField(Modality, blank=False)
@@ -41,6 +43,10 @@ class Request(models.Model):
     @property
     def student_email(self):
         return self.student.email if self.student else None
+
+    @property
+    def tutor_name(self):
+        return self.tutor.first_name + self.tutor.last_name if self.tutor else None
 
     def __str__(self):
         available = 'No availability set!'
@@ -61,7 +67,10 @@ class Request(models.Model):
                 f'\n Term: {self.term}'
                 f'\n Frequency: {self.frequency}'
                 f'\n Duration: {self.duration}'
-                f'\n Venue Preference: {venue}')
+                f'\n Venue Preference: {venue}'
+                f'\n Allocated?: {'Yes' if self.allocated else 'No'}'
+                f'\n Tutor: {self.tutor_name if self.allocated else '-'}'
+                )
 
     def clean(self):
         super().clean()

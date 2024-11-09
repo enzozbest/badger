@@ -1,16 +1,13 @@
 from django.core.management.base import BaseCommand, CommandError
 from tutorials.models import User
 
-User.objects.all().delete()
 
+class Command(BaseCommand):
+    """Build automation command to unseed the database."""
 
-# class Command(BaseCommand):
-#     """Build automation command to unseed the database."""
-#
-#     help = 'Seeds the database with sample data'
-#
-#     def handle(self, *args, **options):
-#         """Unseed the database."""
-#
-# #User.objects.filter(is_staff=False).delete()
+    help = 'Unseeds the database'
+
+    def handle(self, *args, **options):
+        User.objects.all().delete()
+
 

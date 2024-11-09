@@ -6,34 +6,6 @@ from request_handler.models import Request
 
 from django.contrib import messages
 
-def create_request(request: HttpRequest) -> HttpResponse:
-    if not request.user.is_authenticated:
-        return redirect('log_in')
-
-    if request.method == 'POST':
-        form = RequestForm(request.POST)
-        if form.is_valid():
-            try:
-                request_instance = form.save(commit=False)
-                request_instance.student = request.user
-                request_instance.save()
-
-
-                #Manually add selected days to Request instance.
-                for day in form.cleaned_data['availability']:
-                    request_instance.availability.add(day)
-
-                # Manually add selected venues to Request instance.
-                for mode in form.cleaned_data['venue_preference']:
-                    request_instance.venue_preference.add(mode)
-
-                return redirect('request_success')
-            except Exception as e:
-                form.add_error(error=f'There was an error submitting this form! {e}', field='term')
-    else:
-        form = RequestForm()
-    return render(request, 'create_request.html', {'form': form})
-
 def request_success(request: HttpRequest) -> HttpResponse:
     return render(request, 'request_success.html')
 
@@ -42,16 +14,19 @@ def request_success(request: HttpRequest) -> HttpResponse:
 def view_requests(request: HttpRequest) -> HttpResponse:
     if not request.user.is_authenticated:
         return redirect('log_in')
-    
-    userRequest = list(Request.objects.filter(student = request.user))
-    
-    if(not userRequest):
-        context = {'requests':[]}
-    else:
-        context = {'requests':userRequest}
-    return render(request,'view_requests.html',context )
+
+    if request.user.user_type == 'Student':
+        userRequest = list(Request.objects.filter(student = request.user))
+        if(not userRequest):
+            context = {'requests':[]}
+        else:
+            context = {'requests':userRequest}
+        return render(request,'view_requests.html',context )
 
 def edit_request(request: HttpRequest, pk: int) -> HttpResponse:
+    if request.user.user_type != 'Student':
+        return redirect('permission_denied')
+
     request_instance = get_object_or_404(Request, pk=pk)
     form = RequestForm(request.POST or None, instance=request_instance)
 
@@ -81,6 +56,10 @@ def delete_request(request, pk):
     except Exception as e: # handle unexpected exceptions
         messages.error(request, f'There was an error deleting this request: {str(e)}')
         return redirect('view_requests')
+
+
+def permission_denied(request: HttpRequest) -> HttpResponse:
+    return render(request, 'permission_denied.html')
 
 def confirm_delete_request(request, pk):
     request_instance = get_object_or_404(Request, pk=pk)
