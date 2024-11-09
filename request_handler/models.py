@@ -44,17 +44,24 @@ class Request(models.Model):
 
     def __str__(self):
         available = 'No availability set!'
+        venue = "No venue preference set!"
+
         if self.pk and self.availability.exists():
             available_days = self.availability.all()
             if available_days.exists():
                 available = ', '.join(str(day) for day in available_days)
 
+        if self.pk and self.venue_preference.exists():
+            preferences = self.venue_preference.all()
+            venue = ', '.join(str(pref) for pref in preferences)
+
         return (f'Student: {self.student_email}'
-                f'\n Knowledge_area: {self.knowledge_area}'
+                f'\n Knowledge Area: {self.knowledge_area}'
                 f'\n Availability: {available}'
                 f'\n Term: {self.term}'
                 f'\n Frequency: {self.frequency}'
-                f'\n Duration: {self.duration}')
+                f'\n Duration: {self.duration}'
+                f'\n Venue Preference: {venue}')
 
     def clean(self):
         super().clean()

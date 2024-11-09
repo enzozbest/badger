@@ -16,6 +16,57 @@ class RequestModelTest(TestCase):
         self.request.availability.add(self.monday, self.wednesday)
         self.request.venue_preference.add(self.in_person, self.online)
 
+    def test_str_method_availability_exists(self):
+        s  = str(self.request)
+        self.assertEqual(s, (f'Student: johndoe@example.org'
+                f'\n Knowledge Area: Scala'
+                f'\n Availability: Monday, Wednesday'
+                f'\n Term: Easter'
+                f'\n Frequency: Weekly'
+                f'\n Duration: 1h'
+                f'\n Venue Preference: In Person, Online'))
+
+    def test_str_method_availability_blank(self):
+        self.request.availability.clear()
+        s  = str(self.request)
+        self.assertEqual(s, (f'Student: johndoe@example.org'
+                f'\n Knowledge Area: Scala'
+                f'\n Availability: No availability set!'
+                f'\n Term: Easter'
+                f'\n Frequency: Weekly'
+                f'\n Duration: 1h'
+                f'\n Venue Preference: In Person, Online'))
+
+    def test_str_method_venue_preference_exists(self):
+        s  = str(self.request)
+        self.assertEqual(s, (f'Student: johndoe@example.org'
+                f'\n Knowledge Area: Scala'
+                f'\n Availability: Monday, Wednesday'
+                f'\n Term: Easter'
+                f'\n Frequency: Weekly'
+                f'\n Duration: 1h'
+                f'\n Venue Preference: In Person, Online'))
+
+    def test_str_method_venue_preference_blank(self):
+        self.request.venue_preference.clear()
+        s = str(self.request)
+        self.assertEqual(s, (f'Student: johndoe@example.org'
+                f'\n Knowledge Area: Scala'
+                f'\n Availability: Monday, Wednesday'
+                f'\n Term: Easter'
+                f'\n Frequency: Weekly'
+                f'\n Duration: 1h'
+                f'\n Venue Preference: No venue preference set!'))
+
+    def test_student_email_student_is_none(self):
+        self.request.student = None
+        s_email = self.request.student_email
+        self.assertIsNone(s_email)
+
+    def test_student_email_student_exists(self):
+        s_email = self.request.student_email
+        self.assertEqual(s_email, 'johndoe@example.org')
+
     def test_valid_model(self):
         try:
             self.request.full_clean()

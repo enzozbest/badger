@@ -18,9 +18,14 @@ def create_request(request: HttpRequest) -> HttpResponse:
                 request_instance.student = request.user
                 request_instance.save()
 
-                #Manually add selected days to Request instance, as the automatic method is not working.
+
+                #Manually add selected days to Request instance.
                 for day in form.cleaned_data['availability']:
                     request_instance.availability.add(day)
+
+                # Manually add selected venues to Request instance.
+                for mode in form.cleaned_data['mode_preference']:
+                    request_instance.venue_preference.add(mode)
 
                 return redirect('request_success')
             except Exception as e:
