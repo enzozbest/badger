@@ -24,7 +24,7 @@ def create_request(request: HttpRequest) -> HttpResponse:
                     request_instance.availability.add(day)
 
                 # Manually add selected venues to Request instance.
-                for mode in form.cleaned_data['mode_preference']:
+                for mode in form.cleaned_data['venue_preference']:
                     request_instance.venue_preference.add(mode)
 
                 return redirect('request_success')

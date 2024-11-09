@@ -151,12 +151,12 @@ class TestViews(TestCase):
     def test_create_request_with_valid_data(self):
         self.client.login(username='@johndoe', password='Password123')
         data = {
-            'available_days': [self.monday.pk],
+            'availability': [self.monday.pk],
             'term': 'Easter',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
             'duration': '1h',
-            'mode_preference': [self.online.pk],
+            'venue_preference': [self.online.pk],
         }
         response = self.client.post(self.url, data, follow=True)
         self.assertRedirects(response, reverse('request_success'), status_code=302, target_status_code=200)
@@ -165,12 +165,12 @@ class TestViews(TestCase):
         self.client.login(username='@johndoe', password='Password123')
         #Blank 'term' field!
         data = {
-            'available_days': [self.monday.id,],
+            'availability': [self.monday.id,],
             'term': '',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
             'duration': '1h',
-            'mode_preference': [self.online.id,]
+            'venue_preference': [self.online.id,]
         }
         self.client.post(self.url, data)
         self.assertRaises(ValueError)
