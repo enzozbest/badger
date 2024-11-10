@@ -6,7 +6,6 @@ from request_handler.models import Request, Modality, Day
 INVALID_REQUEST_ID = 999
 
 class DeleteRequestViewTest(TestCase):
-
     def setUp(self):
 
         # Set up test user
@@ -84,7 +83,7 @@ class DeleteRequestViewTest(TestCase):
     # Tests that an unauthenticated user is redirected when attempting to delete a request
     def test_redirect_if_not_logged_in(self):
         self.client.logout()
-        response = self.client.get(reverse('delete_request', args=[self.request_instance.id]))
+        response = self.client.post(reverse('delete_request', args=[self.request_instance.id]))
         self.assertRedirects(response, f'/log_in/')
 
 
