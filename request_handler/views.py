@@ -1,9 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpRequest, HttpResponse
-from .forms import RequestForm
+from request_handler.forms import RequestForm
 from django.shortcuts import redirect
 from request_handler.models import Request
-
 from django.contrib import messages
 
 def request_success(request: HttpRequest) -> HttpResponse:
@@ -11,21 +10,11 @@ def request_success(request: HttpRequest) -> HttpResponse:
 
 # Provides a list of all requests made by the signed in student 
 # Redirects user to login page if they aren't authenticated
-def view_requests(request: HttpRequest) -> HttpResponse:
-    if not request.user.is_authenticated:
-        return redirect('log_in')
 
-    if request.user.user_type == 'Student':
-        userRequest = list(Request.objects.filter(student = request.user))
-        if(not userRequest):
-            context = {'requests':[]}
-        else:
-            context = {'requests':userRequest}
-        return render(request,'view_requests.html',context )
 
 def edit_request(request: HttpRequest, pk: int) -> HttpResponse:
-    if request.user.user_type != 'Student':
-        return redirect('permission_denied')
+    if request.user.user_type == 'Tutor':
+        return redirect('permission_denied', {'user_type': 'Tutor'})
 
     request_instance = get_object_or_404(Request, pk=pk)
     form = RequestForm(request.POST or None, instance=request_instance)

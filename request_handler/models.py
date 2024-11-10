@@ -61,6 +61,14 @@ class Request(models.Model):
             preferences = self.venue_preference.all()
             venue = ', '.join(str(pref) for pref in preferences)
 
+        allocated = 'No'
+        if self.allocated:
+            allocated = 'Yes'
+
+        tutor_s = '-'
+        if self.tutor:
+            tutor_s = self.tutor.name
+
         return (f'Student: {self.student_email}'
                 f'\n Knowledge Area: {self.knowledge_area}'
                 f'\n Availability: {available}'
@@ -68,8 +76,8 @@ class Request(models.Model):
                 f'\n Frequency: {self.frequency}'
                 f'\n Duration: {self.duration}'
                 f'\n Venue Preference: {venue}'
-                f'\n Allocated?: {'Yes' if self.allocated else 'No'}'
-                f'\n Tutor: {self.tutor_name if self.allocated else '-'}'
+                f'\n Allocated?: {allocated}'
+                f'\n Tutor: {tutor_s}'
                 )
 
     def clean(self):

@@ -21,6 +21,7 @@ from django.urls import path
 from tutorials import views as tutorial_views
 from request_handler import views as request_handler_views
 from request_handler.views_dir import create_request as create_request_view
+from request_handler.views_dir import view_request as view_requests_view
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', tutorial_views.home, name='home'),
@@ -30,9 +31,9 @@ urlpatterns = [
     path('password/', tutorial_views.PasswordView.as_view(), name='password'),
     path('profile/', tutorial_views.ProfileUpdateView.as_view(), name='profile'),
     path('sign_up/', tutorial_views.SignUpView.as_view(), name='sign_up'),
-    path('create_request/', create_request_view.CreateRequestView.as_view, name="create_request"),
+    path('create_request/', create_request_view.CreateRequestView.as_view(), name="create_request"),
     path('request_success/', request_handler_views.request_success, name="request_success"),
-    path('view_requests/',request_handler_views.view_requests, name='view_requests'),
+    path('view_requests/',view_requests_view.ViewRequest.as_view(), name='view_requests'),
     path('edit_request/<int:pk>/', request_handler_views.edit_request, name='edit_request'),
     path('request/<int:pk>/delete/', request_handler_views.delete_request, name='delete_request'),
     path('delete_request/<int:pk>/confirm/', request_handler_views.confirm_delete_request, name='confirm_delete_request'),

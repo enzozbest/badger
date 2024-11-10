@@ -8,26 +8,10 @@
     <div class="col-12">
         <a href = "{% url 'dashboard' %}">Dashboard</a>
     </div>
-    <!--Should we show venue preference too?-->
-    {% if requests  %}<p>View each of your open tutoring requests below </p>
-    {% for request in requests %}
-    <p>Knowledge area: {{request.knowledge_area}}</p>
-    <p>Availability:</p>
-    <ul>
-        {% for day in request.availability.all %}
-        <li>{{day}}</li>
-        {% endfor %}
-    </ul>
-    <p>Term: {{request.term}}</p>
-    <p>Frequency: {{request.frequency}}</p>
-    <p>Duration: {{request.duration}}</p>
-
-    <a href="{% url 'edit_request' request.id %}" class="text-danger">Update</a>
-    <a href="{% url 'confirm_delete_request' request.id %}" class="text-danger">Delete</a>
-
-    <hr>
-    {% endfor %}{% else %}
-        <p>You have no current requests</p>
-    {% endif %}
+    {% for request in requests  %}
+        {% include 'partials/show_single_request.html' %}
+    {% empty %}
+        <p>You have no current requests to be displayed</p>
+    {% endfor %}
 </body>
 </html>

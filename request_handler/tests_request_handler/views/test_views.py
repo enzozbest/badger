@@ -10,7 +10,7 @@ class DeleteRequestViewTest(TestCase):
     def setUp(self):
 
         # Set up test user
-        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.user = User.objects.create_user(username='testuser', password='testpassword', user_type='Student')
 
         self.mode_preference = Modality.objects.create(mode="Online")
         self.available_day = Day.objects.create(day="Monday")
@@ -91,7 +91,7 @@ class DeleteRequestViewTest(TestCase):
 class viewRequestsTest(TestCase):
     def setUp(self):
         # Set up test user
-        self.user = User.objects.create_user(username='@charlie', password='Password123')
+        self.user = User.objects.create_user(username='@charlie', password='Password123', user_type='Student')
 
         self.client.login(username='@charlie', password='Password123')
 
@@ -136,7 +136,7 @@ class TestViews(TestCase):
     def setUp(self):
         self.monday = Day.objects.create(day='Monday')
         self.online = Modality.objects.create(mode='Online')
-        User.objects.create_user(username='@johndoe', email='johndoe@example.org', password='Password123')
+        User.objects.create_user(username='@johndoe', email='johndoe@example.org', password='Password123', user_type='Student')
         self.url = reverse('create_request')
 
     def test_unauthenticated_user_cannot_create_request(self):
