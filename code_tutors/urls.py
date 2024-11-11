@@ -19,7 +19,10 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 from tutorials import views as tutorial_views
-from request_handler import views as request_handler_views
+from request_handler.views import create_request as create_request_view, small_views as request_handler_views
+from request_handler.views import view_requests as view_requests_view
+from request_handler.views import edit_request as edit_request_view
+from request_handler.views import delete_request as delete_request_view
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', tutorial_views.home, name='home'),
@@ -29,11 +32,12 @@ urlpatterns = [
     path('password/', tutorial_views.PasswordView.as_view(), name='password'),
     path('profile/', tutorial_views.ProfileUpdateView.as_view(), name='profile'),
     path('sign_up/', tutorial_views.SignUpView.as_view(), name='sign_up'),
-    path('create_request/', request_handler_views.create_request, name="create_request"),
+    path('create_request/', create_request_view.CreateRequestView.as_view(), name="create_request"),
     path('request_success/', request_handler_views.request_success, name="request_success"),
-    path('view_requests/',request_handler_views.view_requests, name='view_requests'),
-    path('edit_request/<int:pk>/', request_handler_views.edit_request, name='edit_request'),
-    path('request/<int:pk>/delete/', request_handler_views.delete_request, name='delete_request'),
-    path('delete_request/<int:pk>/confirm/', request_handler_views.confirm_delete_request, name='confirm_delete_request'),
+    path('view_requests/',view_requests_view.ViewRequest.as_view(), name='view_requests'),
+    path('edit_request/<int:pk>/', edit_request_view.EditRequestView.as_view(), name='edit_request'),
+    path('request/<int:pk>/delete/', delete_request_view.DeleteRequestView.as_view(), name='delete_request'),
+    path('delete_request/<int:pk>/confirm/', delete_request_view.ConfirmDeleteRequestView.as_view(), name='confirm_delete_request'),
+    path('permission_denied/', request_handler_views.permission_denied, name='permission_denied'),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

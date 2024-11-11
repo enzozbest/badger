@@ -14,22 +14,19 @@ from tutorials.helpers import login_prohibited
 
 
 @login_required
-def dashboard(request):
+def dashboard(request: HttpRequest) -> HttpResponse:
     """Display the current user's dashboard."""
-
     current_user = request.user
     return render(request, 'dashboard.html', {'user': current_user})
 
 
 @login_prohibited
-def home(request):
+def home(request: HttpRequest) -> HttpResponse:
     """Display the application's start/home screen."""
-
     return render(request, 'home.html')
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
-
     redirect_when_logged_in_url = None
 
     def dispatch(self, *args, **kwargs):

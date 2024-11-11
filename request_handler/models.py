@@ -30,7 +30,11 @@ they would like tutoring for, which days of the week they are available, their p
 """
 
 class Request(models.Model):
-    student = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+    student = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name='student')
+    allocated = models.BooleanField(default=False, blank=True)
+    allocated_string = 'No'
+    tutor_name_string = '-'
+    tutor = models.OneToOneField(User, null=True, on_delete=models.CASCADE, blank=True, related_name='tutor')
     knowledge_area = models.CharField(max_length=255, blank=False)
     availability = models.ManyToManyField(Day, blank=False)
     venue_preference = models.ManyToManyField(Modality, blank=False)
@@ -41,6 +45,10 @@ class Request(models.Model):
     @property
     def student_email(self):
         return self.student.email if self.student else None
+
+    @property
+    def tutor_name(self):
+        return self.tutor.first_name + " " + self.tutor.last_name if self.tutor else None
 
     def __str__(self):
         available = 'No availability set!'
@@ -55,13 +63,24 @@ class Request(models.Model):
             preferences = self.venue_preference.all()
             venue = ', '.join(str(pref) for pref in preferences)
 
+        self.allocated_string = 'No'
+        if self.allocated:
+            self.allocated_string = 'Yes'
+
+        self.tutor_name_string = '-'
+        if self.tutor:
+            self.tutor_name_string = self.tutor_name
+
         return (f'Student: {self.student_email}'
                 f'\n Knowledge Area: {self.knowledge_area}'
                 f'\n Availability: {available}'
                 f'\n Term: {self.term}'
                 f'\n Frequency: {self.frequency}'
                 f'\n Duration: {self.duration}'
-                f'\n Venue Preference: {venue}')
+                f'\n Venue Preference: {venue}'
+                f'\n Allocated?: {self.allocated_string}'
+                f'\n Tutor: {self.tutor_name_string}'
+                )
 
     def clean(self):
         super().clean()
