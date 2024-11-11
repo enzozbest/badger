@@ -14,7 +14,7 @@ class CreateRequestView(View):
         if not request.user.is_authenticated:
             return redirect('log_in')
 
-        if not request.user.user_type == 'Student' or request.user.user_type=='Admin':
+        if request.user.user_type == 'Tutor':
             return redirect('permission_denied')
 
         form = RequestForm()

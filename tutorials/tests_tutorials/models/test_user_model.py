@@ -157,3 +157,12 @@ class UserModelTestCase(TestCase):
     def _assert_user_is_invalid(self):
         with self.assertRaises(ValidationError):
             self.user.full_clean()
+
+    def test_string_method(self):
+        s = str(self.user)
+        self.assertEqual(s, (f'Username: @johndoe \n'
+                f'First Name: John \n'
+                f'Last Name: Doe \n'
+                f'User Type: Admin \n'
+                f'Email Address: johndoe@example.org'
+                ))

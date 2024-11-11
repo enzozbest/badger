@@ -6,7 +6,7 @@ from django.contrib import messages
 
 
 class DeleteRequestView(View):
-    def get(self, request: HttpRequest) -> HttpResponse:
+    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         return HttpResponseBadRequest('This URL does not accept GET requests!')
 
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:

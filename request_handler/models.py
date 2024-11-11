@@ -32,6 +32,8 @@ they would like tutoring for, which days of the week they are available, their p
 class Request(models.Model):
     student = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name='student')
     allocated = models.BooleanField(default=False, blank=True)
+    allocated_string = 'No'
+    tutor_name_string = '-'
     tutor = models.OneToOneField(User, null=True, on_delete=models.CASCADE, blank=True, related_name='tutor')
     knowledge_area = models.CharField(max_length=255, blank=False)
     availability = models.ManyToManyField(Day, blank=False)
@@ -46,7 +48,7 @@ class Request(models.Model):
 
     @property
     def tutor_name(self):
-        return self.tutor.first_name + self.tutor.last_name if self.tutor else None
+        return self.tutor.first_name + " " + self.tutor.last_name if self.tutor else None
 
     def __str__(self):
         available = 'No availability set!'
@@ -61,13 +63,13 @@ class Request(models.Model):
             preferences = self.venue_preference.all()
             venue = ', '.join(str(pref) for pref in preferences)
 
-        allocated = 'No'
+        self.allocated_string = 'No'
         if self.allocated:
-            allocated = 'Yes'
+            self.allocated_string = 'Yes'
 
-        tutor_s = '-'
+        self.tutor_name_string = '-'
         if self.tutor:
-            tutor_s = self.tutor.name
+            self.tutor_name_string = self.tutor_name
 
         return (f'Student: {self.student_email}'
                 f'\n Knowledge Area: {self.knowledge_area}'
@@ -76,8 +78,8 @@ class Request(models.Model):
                 f'\n Frequency: {self.frequency}'
                 f'\n Duration: {self.duration}'
                 f'\n Venue Preference: {venue}'
-                f'\n Allocated?: {allocated}'
-                f'\n Tutor: {tutor_s}'
+                f'\n Allocated?: {self.allocated_string}'
+                f'\n Tutor: {self.tutor_name_string}'
                 )
 
     def clean(self):
