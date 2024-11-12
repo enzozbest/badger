@@ -6,3 +6,4 @@ def request_success(request: HttpRequest) -> HttpResponse:
 
 def permission_denied(request: HttpRequest) -> HttpResponse:
     return render(request, 'permission_denied.html')
+
