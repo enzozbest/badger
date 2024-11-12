@@ -19,7 +19,8 @@ class SignUpViewTestCase(TestCase, LogInTester):
             'username': '@janedoe',
             'email': 'janedoe@example.org',
             'new_password': 'Password123',
-            'password_confirmation': 'Password123'
+            'password_confirmation': 'Password123',
+            'user_type': 'Tutor'
         }
         self.user = User.objects.get(username='@johndoe')
 
