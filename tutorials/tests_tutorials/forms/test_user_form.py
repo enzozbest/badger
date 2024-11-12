@@ -41,6 +41,7 @@ class UserFormTestCase(TestCase):
         user = User.objects.get(username='@johndoe')
         form = UserForm(instance=user, data=self.form_input)
         before_count = User.objects.count()
+        self.assertTrue(form.is_valid(), msg=form.errors)
         form.save()
         after_count = User.objects.count()
         self.assertEqual(after_count, before_count)
