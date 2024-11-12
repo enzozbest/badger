@@ -2,6 +2,7 @@ from django.http import HttpRequest, HttpResponse
 from django.views import View
 from django.shortcuts import redirect, render
 from request_handler.forms import RequestForm
+from request_handler.views.small_views import permission_denied
 
 """ Class to represent the creation of a request
 
@@ -15,7 +16,7 @@ class CreateRequestView(View):
             return redirect('log_in')
 
         if request.user.user_type == 'Tutor':
-            return redirect('permission_denied', context={'user_type': 'Tutor'})
+            return render(request, 'permission_denied.html', status=403)
 
         form = RequestForm()
         return render(request, 'create_request.html', {'form': form})
@@ -25,7 +26,7 @@ class CreateRequestView(View):
             return redirect('log_in')
 
         if request.user.user_type == 'Tutor':
-            return redirect('permission_denied', context={'user_type': 'Tutor'})
+            return render(request, 'permission_denied.html', status=403)
 
         form = RequestForm(request.POST)
 
