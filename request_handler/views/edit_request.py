@@ -26,15 +26,11 @@ class EditRequestView(View):
             request_instance = form.save(commit=False)
             request_instance.save()
             form.save_m2m()
-            if not request_instance.venue_preference.exists():
-                form.add_error('venue_preference', "No venue preference set!")
-            else:
-                return redirect('view_requests')
-        else:
-            return self.get(request, pk)
+            return redirect('view_requests')
+        
         return render(request, 'edit_request.html', {'form': form, 'request_instance': request_instance})
 
-    def get_form_and_instance(self, pk:int) -> tuple:
+    def get_form_and_instance(self, pk: int) -> tuple:
         request_instance = get_object_or_404(Request, pk=pk)
         form = RequestForm(instance=request_instance)
         return form, request_instance
