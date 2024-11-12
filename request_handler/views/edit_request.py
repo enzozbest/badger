@@ -7,29 +7,32 @@ from request_handler.forms import RequestForm
 class EditRequestView(View):
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         if request.user.user_type == 'Tutor':
-            return redirect('permission_denied', {'user_type': 'Tutor'})
+            return redirect('permission_denied')
 
-        form = self.get_form(pk)
-        return render(request, 'edit_request.html', {'form': form})
+        form, request_instance = self.get_form_and_instance(pk)
+        return render(request, 'edit_request.html', {'form': form, 'request_instance': request_instance})
 
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
         if request.user.user_type == 'Tutor':
-            return redirect('permission_denied', {'user_type': 'Tutor'})
+            return render(request, 'permission_denied.html', status=403)
+        
+        form, request_instance = self.get_form_and_instance(pk)
+        form = RequestForm(request.POST, instance=request_instance)
 
-        form = self.get_form(pk)
+        if not request.POST.getlist('venue_preference'):
+            form.add_error('venue_preference', "No venue preference set!")
+
         if form.is_valid():
             request_instance = form.save(commit=False)
             request_instance.save()
             form.save_m2m()
-            if not request_instance.venue_preference.exists():
-                form.add_error('venue_preference', "No venue preference set!")
-            else:
-                return redirect('view_requests')
-        else:
-            return self.get(request, pk)
+            return redirect('view_requests')
+        
         return render(request, 'edit_request.html', {'form': form, 'request_instance': request_instance})
 
-    def get_form(self, pk:int) -> RequestForm:
+
+
+    def get_form_and_instance(self, pk: int) -> tuple:
         request_instance = get_object_or_404(Request, pk=pk)
         form = RequestForm(instance=request_instance)
-        return form
+        return form, request_instance
