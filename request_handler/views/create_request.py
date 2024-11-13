@@ -2,6 +2,7 @@ from django.http import HttpRequest, HttpResponse
 from django.views import View
 from django.shortcuts import redirect, render
 from request_handler.forms import RequestForm
+from django.contrib import messages
 
 """ Class to represent the creation of a request
 
@@ -44,9 +45,14 @@ class CreateRequestView(View):
                     request_instance.venue_preference.add(mode)
                 
                 request_instance.term = form.cleaned_data['term']
-                return redirect('request_success')
+                
+                #Redirect the user to a page that is static for 5 seconds, allowing them to see the warning
+                if form.is_late_request():
+                    print("late request")
+                    return redirect('processing_late_request')
+                else:
+                    return redirect('request_success')
 
             except Exception as e:
                 form.add_error(error=f'There was an error submitting this form! {e}', field='term')
-        else:
-            return render(request, 'create_request.html', {'form': form})
+        return render(request, 'create_request.html', {'form': form})

@@ -1,8 +1,5 @@
 import django.forms as forms
-from django.utils import timezone
-from datetime import date,timedelta,datetime
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
+from datetime import timedelta,datetime
 
 from .models import Request, Day, Modality
 
@@ -27,6 +24,23 @@ class RequestForm(forms.ModelForm):
     USER_TERM_CHOICES = [('September','September - December'),('January','January - April'),('May','May - July')]
     term = forms.ChoiceField(choices=USER_TERM_CHOICES, label='Term')
 
+    #Ensure that a warning is shown when a student tries to make a late request
+    def is_late_request(self):
+        term = self.cleaned_data.get('term')
+        todayDate = datetime.today()
+        term_one = datetime(datetime.today().year,9,1) #September of current year
+        if todayDate.month >= 8:
+            term_two = datetime(datetime.today().year+1,1,1) #January of following year
+            term_three = datetime(datetime.today().year+1,5,1) #May of current/following year
+        else:
+            term_two = datetime(datetime.today().year,1,1) #January of following year
+            term_three = datetime(datetime.today().year,5,1) #May of current/following year
+
+        if term:
+            return ((term == "September" and todayDate > term_one - timedelta(weeks=2)) or 
+            (term == "January" and todayDate > term_two - timedelta(weeks=2)) or 
+            (term == "May" and todayDate > term_three - timedelta(weeks=2)))
+        return term
     
 
     class Meta:

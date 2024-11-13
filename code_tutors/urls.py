@@ -39,5 +39,6 @@ urlpatterns = [
     path('request/<int:pk>/delete/', delete_request_view.DeleteRequestView.as_view(), name='delete_request'),
     path('delete_request/<int:pk>/confirm/', delete_request_view.ConfirmDeleteRequestView.as_view(), name='confirm_delete_request'),
     path('permission_denied/', request_handler_views.permission_denied, name='permission_denied'),
+    path('processing_late_request/', request_handler_views.processing_late_request, name='processing_late_request'),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
