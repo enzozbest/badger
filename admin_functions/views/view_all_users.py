@@ -12,7 +12,7 @@ class AllUsersView(View):
 
         user_type = request.user.user_type
         if user_type != 'Admin':
-            return render(request, 'request_handler/templates/permission_denied', status=403)
+            return render(request, 'permission_denied.html', status=403)
 
         users = User.objects.all()
         user_count = User.objects.count()
@@ -20,4 +20,5 @@ class AllUsersView(View):
 
 
     def post(self, request: HttpRequest) -> HttpResponse:
-        return HttpResponseNotAllowed("Requests to this URL must be made by the GET method!", status=405)
+        return HttpResponseNotAllowed("Requests to this URL must be made by the GET method!",
+                                      content=b'Method Not Allowed', status=405)
