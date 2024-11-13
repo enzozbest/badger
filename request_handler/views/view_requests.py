@@ -26,7 +26,7 @@ class ViewRequest(View):
         if user_request:
             context = {'requests': user_request, 'user_type': user_type}
 
-        return render(request, 'view_users.html', context)
+        return render(request, 'view_requests.html', context)
 
     def post(self, request: HttpRequest) -> HttpResponse:
         return HttpResponseBadRequest('This URL does not accept POST requests')
