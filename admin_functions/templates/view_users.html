@@ -5,7 +5,9 @@
     <title>View Users</title>
 </head>
 <body>
-
+    <div>
+        <a href="{% url 'dashboard' %}">Click here to go to the main dashboard</a>
+    </div>
 <h1>Showing all {{count}} users registered: </h1>
 {% for user in users %}
     <p>First name: {{user.first_name}}</p>

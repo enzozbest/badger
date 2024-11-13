@@ -13,7 +13,7 @@
       <a href = "{% url 'view_requests' %}">Click here to view your lesson requests</a>
     </div>
     <div class="col-12">
-      {% if user.user_type == 'Admin'%}<a href = "{% url 'view_all_users' %}">Click here to view all users</a>
+      {% if user.user_type == 'Admin'%}<a href = "{% url 'admin_dash' %}">Click here to go to the admin dashboard</a>
       {% endif %}
     </div>
     
