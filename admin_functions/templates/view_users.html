@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Users</title>
+</head>
+<body>
+
+<h1>Showing all {{count}} users registered: </h1>
+{% for user in users %}
+    <p>First name: {{user.first_name}}</p>
+    <p>Last name: {{user.last_name}}</p>
+    <p>Account type: {{user.user_type}}</p>
+    <p>Email address: {{user.email}}</p>
+    <hr>
+{% empty %}
+    <p>No users registered.</p>
+{% endfor %}
+</body>
+</html>
