@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'tutorials',
     'request_handler',
+    'admin_functions'
 ]
 
 MIDDLEWARE = [
