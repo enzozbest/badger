@@ -42,9 +42,11 @@ class CreateRequestView(View):
                 # Manually add selected venues to Request instance.
                 for mode in form.cleaned_data['venue_preference']:
                     request_instance.venue_preference.add(mode)
+                
+                request_instance.term = form.cleaned_data['term']
                 return redirect('request_success')
 
             except Exception as e:
                 form.add_error(error=f'There was an error submitting this form! {e}', field='term')
         else:
-            return self.get(request)
+            return render(request, 'create_request.html', {'form': form})

@@ -1,4 +1,9 @@
 import django.forms as forms
+from django.utils import timezone
+from datetime import date,timedelta,datetime
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+
 from .models import Request, Day, Modality
 
 """ Class representing a form to create a Request instance.
@@ -18,6 +23,11 @@ class RequestForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple,
         required=True
     )
+
+    USER_TERM_CHOICES = [('September','September - December'),('January','January - April'),('May','May - July')]
+    term = forms.ChoiceField(choices=USER_TERM_CHOICES, label='Term')
+
+    
 
     class Meta:
         model = Request
