@@ -1,0 +1,32 @@
+<div class="card request-details-card shadow-sm border-0 rounded-4 p-4">
+    <div class="card-body">
+        <!-- Knowledge Area -->
+        <p class="mb-3"><strong>Knowledge Area:</strong> <span class="text-primary">{{ request.knowledge_area|upper }}</span></p>
+
+        <!-- Term -->
+        <p class="mb-3"><strong>Term:</strong> <span class="text-secondary">{{ request.term }}</span></p>
+
+        <!-- Availability -->
+        <p class="mb-2"><strong>Availability:</strong></p>
+        <ul class="list-unstyled ms-3 mb-3">
+            {% for day in request.availability.all %}
+                <li><i class="bi bi-calendar-event-fill text-muted"></i> {{ day }}</li>
+            {% endfor %}
+        </ul>
+
+        <!-- Frequency -->
+        <p class="mb-3"><strong>Frequency:</strong> <span class="text-secondary">{{ request.frequency }}</span></p>
+
+        <!-- Duration -->
+        <p class="mb-3"><strong>Duration:</strong> <span class="text-secondary">{{ request.duration }}</span></p>
+
+        <!-- Venue Preference -->
+        <p class="mb-2"><strong>Venue Preference:</strong></p>
+        <ul class="list-unstyled ms-3">
+            {% for mode in request.venue_preference.all %}
+                <li><i class="bi bi-geo-alt-fill text-muted"></i> {{ mode }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+

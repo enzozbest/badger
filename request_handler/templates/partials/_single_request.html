@@ -1,0 +1,35 @@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-4 p-3">
+          <div class="card-body">
+            <h5 class="card-title">Knowledge Area: <span class="text-primary">{{ request.knowledge_area }}</span></h5>
+  
+            <p class="mb-2"><strong>Availability:</strong></p>
+            <ul class="list-unstyled ms-3">
+              {% for day in request.availability.all %}
+                <li>{{ day }}</li>
+              {% endfor %}
+            </ul>
+  
+            <p><strong>Term:</strong> <span class="text-secondary">{{ request.term }}</span></p>
+            <p><strong>Frequency:</strong> <span class="text-secondary">{{ request.frequency }}</span></p>
+            <p><strong>Duration:</strong> <span class="text-secondary">{{ request.duration }}</span></p>
+  
+            <p class="mb-2"><strong>Venue Preference:</strong></p>
+            <ul class="list-unstyled ms-3">
+              {% for mode in request.venue_preference.all %}
+                <li>{{ mode }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+  
+          <div class="card-footer d-flex justify-content-between border-0">
+            <a href="{% url 'edit_request' request.id %}" class="btn btn-outline-warning btn-sm">Update</a>
+            <a href="{% url 'confirm_delete_request' request.id %}" class="btn btn-outline-danger btn-sm">Delete</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

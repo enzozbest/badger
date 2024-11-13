@@ -1,0 +1,59 @@
+<!-- Knowledge Area Field -->
+<div class="form-group mb-3">
+    {{ form.knowledge_area.label_tag }}
+    {{ form.knowledge_area }}
+    {% if form.knowledge_area.errors %}
+        <div class="text-danger">{{ form.knowledge_area.errors }}</div>
+    {% endif %}
+</div>
+
+<!-- Term Field -->
+<div class="form-group mb-3">
+    {{ form.term.label_tag }}
+    {{ form.term }}
+    {% if form.term.errors %}
+        <div class="text-danger">{{ form.term.errors }}</div>
+    {% endif %}
+</div>
+
+<!-- Availability Field (Checkboxes) -->
+<div class="form-group mb-3">
+    {{ form.availability.label_tag }}
+    {{ form.availability }}
+    {% if form.availability.errors %}
+        <div class="text-danger">{{ form.availability.errors }}</div>
+    {% endif %}
+</div>
+
+<!-- Frequency Field -->
+<div class="form-group mb-3">
+    {{ form.frequency.label_tag }}
+    {{ form.frequency }}
+    {% if form.frequency.errors %}
+        <div class="text-danger">{{ form.frequency.errors }}</div>
+    {% endif %}
+</div>
+
+<!-- Duration Field -->
+<div class="form-group mb-3">
+    {{ form.duration.label_tag }}
+    {{ form.duration }}
+    {% if form.duration.errors %}
+        <div class="text-danger">{{ form.duration.errors }}</div>
+    {% endif %}
+</div>
+
+<!-- Venue Preference Field (Checkboxes) -->
+<div class="form-group mb-3">
+    <label class="form-label">Venue Preference</label>
+    {% for option in form.venue_preference.field.queryset %}
+        <div class="form-check">
+            <input type="checkbox" name="venue_preference" value="{{ option.id }}" class="form-check-input"
+                   {% if option in form.venue_preference.value %}checked{% endif %}>
+            <label class="form-check-label" for="id_venue_preference_{{ forloop.counter }}">{{ option }}</label>
+        </div>
+    {% endfor %}
+    {% if form.venue_preference.errors %}
+        <div class="text-danger">{{ form.venue_preference.errors }}</div>
+    {% endif %}
+</div>
