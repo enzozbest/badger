@@ -56,12 +56,14 @@ class TestViews(TestCase):
     def test_tutor_cannot_create_request_get(self):
         self.client.login(username='@janedoe', password='Password123')
         response = self.client.get(self.url, follow=True)
-        self.assertRedirects(response, reverse('permission_denied'), status_code=302, target_status_code=200)
+        self.assertEqual(response.status_code, 403)
+        self.assertTemplateUsed(response, 'permission_denied.html')
 
     def test_tutor_cannot_create_request_post(self):
         self.client.login(username='@janedoe', password='Password123')
         response = self.client.post(self.url, follow=True)
-        self.assertRedirects(response, reverse('permission_denied'), status_code=302, target_status_code=200)
+        self.assertEqual(response.status_code, 403)
+        self.assertTemplateUsed(response, 'permission_denied.html')
 
     def test_unauthenticated_user_cannot_create_request_get(self):
         response = self.client.get(self.url, follow=True)

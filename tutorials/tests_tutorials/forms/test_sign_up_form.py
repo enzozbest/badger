@@ -15,7 +15,8 @@ class SignUpFormTestCase(TestCase):
             'username': '@janedoe',
             'email': 'janedoe@example.org',
             'new_password': 'Password123',
-            'password_confirmation': 'Password123'
+            'password_confirmation': 'Password123',
+            'user_type': 'Tutor'
         }
 
     def test_valid_sign_up_form(self):
@@ -36,6 +37,8 @@ class SignUpFormTestCase(TestCase):
         self.assertIn('password_confirmation', form.fields)
         password_confirmation_widget = form.fields['password_confirmation'].widget
         self.assertTrue(isinstance(password_confirmation_widget, forms.PasswordInput))
+        account_type_field = form.fields['user_type']
+        self.assertTrue(isinstance(account_type_field, forms.ChoiceField))
 
     def test_form_uses_model_validation(self):
         self.form_input['username'] = 'badusername'
@@ -77,3 +80,4 @@ class SignUpFormTestCase(TestCase):
         self.assertEqual(user.email, 'janedoe@example.org')
         is_password_correct = check_password('Password123', user.password)
         self.assertTrue(is_password_correct)
+        self.assertEqual(user.user_type, 'Tutor')

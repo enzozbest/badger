@@ -23,6 +23,9 @@ from request_handler.views import create_request as create_request_view, small_v
 from request_handler.views import view_requests as view_requests_view
 from request_handler.views import edit_request as edit_request_view
 from request_handler.views import delete_request as delete_request_view
+from admin_functions.views import view_all_users as view_all_users_view
+from admin_functions.views import small_views as small_views_view
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', tutorial_views.home, name='home'),
@@ -40,5 +43,8 @@ urlpatterns = [
     path('delete_request/<int:pk>/confirm/', delete_request_view.ConfirmDeleteRequestView.as_view(), name='confirm_delete_request'),
     path('permission_denied/', request_handler_views.permission_denied, name='permission_denied'),
     path('processing_late_request/', request_handler_views.processing_late_request, name='processing_late_request'),
+    path('admins/dashboard', small_views_view.admin_dash, name="admin_dash"),
+    path('admins/view_all_users', view_all_users_view.AllUsersView.as_view(), name='view_all_users'),
+
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
