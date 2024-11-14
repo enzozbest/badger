@@ -17,7 +17,7 @@ class EditRequestViewTest(TestCase):
         self.request_instance = Request.objects.create(
             student=self.user,
             knowledge_area='Ruby',
-            term='Winter',
+            term='May',
             frequency='Weekly',
             duration='4h',
         )
@@ -46,7 +46,7 @@ class EditRequestViewTest(TestCase):
         self.client.login(username='testuser', password='Password123')
         data = {
             'knowledge_area': 'Python',
-            'term': 'Summer',
+            'term': 'May',
             'frequency': 'Biweekly',
             'duration': '2h',
             'availability': [self.available_day.pk],
@@ -57,7 +57,7 @@ class EditRequestViewTest(TestCase):
 
         self.request_instance.refresh_from_db()
         self.assertEqual(self.request_instance.knowledge_area, 'Python')
-        self.assertEqual(self.request_instance.term, 'Summer')
+        self.assertEqual(self.request_instance.term, 'May')
         self.assertEqual(self.request_instance.frequency, 'Biweekly')
         self.assertEqual(self.request_instance.duration, '2h')
 
@@ -65,7 +65,7 @@ class EditRequestViewTest(TestCase):
         self.client.login(username='testuser', password='Password123')
         data = {
             'knowledge_area': 'Python',
-            'term': 'Summer',
+            'term': 'May',
             'frequency': 'Biweekly',
             'duration': '2h',
             'availability': [self.available_day.pk],

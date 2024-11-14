@@ -49,7 +49,6 @@ class CreateRequestView(View):
                 
                 #Redirect the user to a page that is static for 5 seconds, allowing them to see the warning
                 if form.is_late_request():
-                    print("late request")
                     return redirect('processing_late_request')
                 else:
                     return redirect('request_success')
