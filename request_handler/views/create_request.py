@@ -2,6 +2,7 @@ from django.http import HttpRequest, HttpResponse
 from django.views import View
 from django.shortcuts import redirect, render
 from request_handler.forms import RequestForm
+from django.contrib import messages
 from request_handler.views.small_views import permission_denied
 
 """ Class to represent the creation of a request
@@ -43,9 +44,15 @@ class CreateRequestView(View):
                 # Manually add selected venues to Request instance.
                 for mode in form.cleaned_data['venue_preference']:
                     request_instance.venue_preference.add(mode)
-                return redirect('request_success')
+                
+                request_instance.term = form.cleaned_data['term']
+                
+                #Redirect the user to a page that is static for 5 seconds, allowing them to see the warning
+                if form.is_late_request():
+                    return redirect('processing_late_request')
+                else:
+                    return redirect('request_success')
 
             except Exception as e:
                 form.add_error(error=f'There was an error submitting this form! {e}', field='term')
-        else:
-            return self.get(request)
+        return render(request, 'create_request.html', {'form': form})
