@@ -2,14 +2,16 @@ from django.test import TestCase
 from django.urls import reverse
 from tutorials.models import User
 from request_handler.models import Request, Modality, Day
+from django.contrib import messages
+from unittest.mock import patch
 
-INVALID_REQUEST_ID = 999
+INVALID_REQUEST_ID = 999999999
 
 class DeleteRequestViewTest(TestCase):
     def setUp(self):
 
         # Set up test user
-        self.user = User.objects.create_user(username='testuser', password='testpassword', user_type='Student')
+        self.user = User.objects.create_user(username='testuser', password='Password123', user_type='Student')
 
         self.mode_preference = Modality.objects.create(mode="Online")
         self.available_day = Day.objects.create(day="Monday")
@@ -38,7 +40,7 @@ class DeleteRequestViewTest(TestCase):
 
     # Test that the delete confirmation page loads for a valid request ID
     def test_get_delete_request(self):
-        self.client.login(username='testuser', password='testpassword') # should be logged in
+        self.client.login(username='testuser', password='Password123') # should be logged in
         # response = self.client.get(self.url)
         response = self.client.get(reverse('confirm_delete_request', kwargs={'pk': self.request_instance.pk}))
         self.assertEqual(response.status_code, 200)
@@ -53,7 +55,7 @@ class DeleteRequestViewTest(TestCase):
 
     # Test POST request with valid ID deletes request and redirects
     def test_post_with_valid_pk(self):
-        self.client.login(username='testuser', password='testpassword')
+        self.client.login(username='testuser', password='Password123')
         before_count = Request.objects.count()
         response = self.client.post(self.url)
         after_count = Request.objects.count()
@@ -73,7 +75,7 @@ class DeleteRequestViewTest(TestCase):
 
     # Test POST request with invalid ID does not delete from / change the database
     def test_post_with_invalid_pk(self):
-        self.client.login(username='testuser', password='testpassword', user_type='Student')
+        self.client.login(username='testuser', password='Password123', user_type='Student')
         invalid_url = reverse('delete_request', kwargs={'pk': INVALID_REQUEST_ID})
         before_count = Request.objects.count()
         response = self.client.post(invalid_url, follow=True)
@@ -89,6 +91,21 @@ class DeleteRequestViewTest(TestCase):
         self.assertRedirects(response, f'/log_in/')
 
     def test_post_confirm_delete_request(self):
-        self.client.login(username='testuser', password='testpassword')
+        self.client.login(username='testuser', password='Password123', user_type='Student')
         response = self.client.post(reverse('confirm_delete_request', kwargs={'pk': self.request_instance.pk}))
         self.assertRedirects(response, reverse('view_requests'))
+
+    # Tests for handling the post except block
+    def test_post_with_invalid_request_pk(self):
+        self.client.login(username='testuser', password='Password123', user_type='Student')
+        invalid_url = reverse('delete_request', kwargs={'pk': INVALID_REQUEST_ID})
+        before_count = Request.objects.count()
+        response = self.client.post(invalid_url)
+        after_count = Request.objects.count()
+        self.assertEqual(after_count, before_count) # Should be no change
+        self.assertRedirects(response, reverse('view_requests'))
+
+        # Check if correct error message is added to the error framework
+        message_list = list(messages.get_messages(response.wsgi_request))
+        self.assertEqual(len(message_list), 1) # There should only be 1 message
+        self.assertTrue(str(message_list[0]).startswith("There was an error deleting this request"))

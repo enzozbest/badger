@@ -3,6 +3,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect, render, get_object_or_404
 from request_handler.models import Request
 from django.contrib import messages
+from django.http import Http404
 
 
 class DeleteRequestView(View):
@@ -17,10 +18,7 @@ class DeleteRequestView(View):
             request_instance.delete()
             messages.success(request, "Request deleted successfully. ")
             return redirect('view_requests')
-        except Request.DoesNotExist:
-            messages.error(request, "Request cannot be found or deleted. ")
-            return redirect('view_requests')
-        except Exception as e:  # handle unexpected exceptions
+        except (Http404, Exception) as e:  # Handle unexpected exceptions
             messages.error(request, f'There was an error deleting this request: {str(e)}')
             return redirect('view_requests')
 
