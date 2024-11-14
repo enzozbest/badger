@@ -31,16 +31,15 @@ class RequestForm(forms.ModelForm):
         term_one = datetime(datetime.today().year,9,1) #September of current year
         if todayDate.month >= 8:
             term_two = datetime(datetime.today().year+1,1,1) #January of following year
-            term_three = datetime(datetime.today().year+1,5,1) #May of current/following year
+            term_three = datetime(datetime.today().year+1,5,1) #May of following year
         else:
-            term_two = datetime(datetime.today().year,1,1) #January of following year
-            term_three = datetime(datetime.today().year,5,1) #May of current/following year
+            term_two = datetime(datetime.today().year,1,1) #January of current year
+            term_three = datetime(datetime.today().year,5,1) #May of current year
 
         if term:
             return ((term == "September" and todayDate > term_one - timedelta(weeks=2)) or 
             (term == "January" and todayDate > term_two - timedelta(weeks=2)) or 
             (term == "May" and todayDate > term_three - timedelta(weeks=2)))
-        return term
     
 
     class Meta:

@@ -2,6 +2,8 @@ from django.test import TestCase
 from django.urls import reverse
 from tutorials.models import User
 from request_handler.models import Request, Modality, Day
+from datetime import datetime 
+
 
 INVALID_REQUEST_ID = 999
 
@@ -28,7 +30,7 @@ class TestViews(TestCase):
         self.client.login(username='@johndoe', password='Password123')
         data = {
             'availability': [self.monday.pk],
-            'term': 'Easter',
+            'term': 'January',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
             'duration': '1h',
@@ -68,3 +70,26 @@ class TestViews(TestCase):
     def test_unauthenticated_user_cannot_create_request_post(self):
         response = self.client.post(self.url, follow=True)
         self.assertRedirects(response, reverse('log_in'), status_code=302, target_status_code=200)
+
+    def test_form_late_request_redirect(self):
+        self.client.login(username='@johndoe', password='Password123')
+        data = {
+            'availability': [self.monday.id],
+            'term': '',
+            'knowledge_area': 'Scala',
+            'frequency': 'Weekly',
+            'duration': '1h',
+            'venue_preference': [self.online.id]
+        }
+        #Purposefully choosing a late term
+        if datetime.now().month >= 1 and datetime.now().month<5:
+            data['term'] = 'January'
+        elif datetime.now().month > 8 and datetime.now().month <= 12:
+            data['term'] = 'September'
+        elif datetime.now().month < 9 :
+            data['term'] = 'May'
+
+        url = reverse('create_request')
+        response = self.client.post(url, data, follow=True)
+        self.assertRedirects(response, reverse('processing_late_request'), status_code=302, target_status_code=200)
+
