@@ -1,11 +1,11 @@
 from django.views import View
-from django.http import HttpResponseNotAllowed, HttpResponseForbidden, HttpResponse, HttpRequest
+from django.http import HttpResponseNotAllowed, HttpResponse, HttpRequest
 from django.shortcuts import redirect, render
 from tutorials.models import User
 from django.core.paginator import Paginator
+from admin_functions.helpers.filters import UserFilter
 
 class AllUsersView(View):
-
     def get(self, request: HttpRequest) -> HttpResponse:
         if not request.user.is_authenticated:
             return redirect('log_in')
@@ -15,12 +15,14 @@ class AllUsersView(View):
             return render(request, 'permission_denied.html', status=403)
 
         users = User.objects.all()
-        paginator = Paginator(users, 20)
+        filter_obj = UserFilter(request.GET, queryset=users)
+        filtered_users = filter_obj.qs
+        paginator = Paginator(filtered_users, 20)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
         user_count = User.objects.count()
-        return render(request, 'view_users.html', {'page_obj': page_obj, 'count': user_count})
+        return render(request, 'view_users.html', {'page_obj': page_obj, 'count': user_count, 'filter':filter_obj})
 
 
     def post(self, request: HttpRequest) -> HttpResponse:

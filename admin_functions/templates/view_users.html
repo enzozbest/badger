@@ -1,35 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>View Users</title>
-</head>
-<body>
-    <div>
-        <a href="{% url 'dashboard' %}">Click here to go to the main dashboard</a>
-    </div>
-<h1>Showing all {{count}} users registered: </h1>
+    <head>
+        <meta charset="UTF-8">
+        <title>View Users</title>
+    </head>
+    <body>
+        <div>
+            <a href="{% url 'dashboard' %}">Click here to go to the main dashboard</a>
+        </div>
+    <h1>Showing all {{count}} users registered: </h1>
 
-{% for user in page_obj %}
-    <p>First name: {{user.first_name}}</p>
-    <p>Last name: {{user.last_name}}</p>
-    <p>Account type: {{user.user_type}}</p>
-    <p>Email address: {{user.email}}</p>
-    <hr>
-{% empty %}
-    <p>No users registered.</p>
-{% endfor %}
+        <form method="get">
+            {{ filter.form.as_p }}
+            <button type="submit">Filter</button>
+        </form>
 
-    <div class="pagination">
-    {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
-    {% endif %}
+    {% for user in page_obj %}
+        <p>First name: {{user.first_name}}</p>
+        <p>Last name: {{user.last_name}}</p>
+        <p>Account type: {{user.user_type}}</p>
+        <p>Email address: {{user.email}}</p>
+        <hr>
+    {% empty %}
+        <p>No users registered.</p>
+    {% endfor %}
 
-    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            {% endif %}
 
-    {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}">Next</a>
-    {% endif %}
-</div>
-</body>
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Next</a>
+            {% endif %}
+        </div>
+    </body>
 </html>
