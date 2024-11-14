@@ -1,22 +1,27 @@
 {% extends 'base.html' %}
 {% block body %}
-  <div class="container vh-100">
-    <div class="row h-100">
-      <div class="col-12 my-auto">
-        <div class="card cover-card offset-sm-2 offset-md-4 offset-lg-7">
-          <h1 class="cover-heading">Task Manager</h1>
-          <p class="cover-text">A task manager application by Team <i>Insert team name here (or revise this home screen as you see fit)</i></p>
-          <p>
-            <a href='{% url 'sign_up' %}' class="btn btn-lg btn-secondary">
-              Sign up
-            </a>
-          </p>
-          <p>
-            <a href='{% url 'log_in' %}' class="btn btn-lg btn-secondary">
-              Log in
-            </a>
-          </p>
-        </div>
+  {% include 'partials/navbar.html' %}
+  <div class="container vh-100 d-flex flex-column justify-content-center align-items-start px-5">
+    <h1 class="display-5 mb-3">Welcome to Code Tutors <br> Your gateway to personalized learning</h1>
+    <p class="lead text-muted mb-4">We are an online tutoring platform that connects students, tutors, and administrators <br>
+      to create a seamless, efficient, and empowering educational experience.</p>
+
+    <div class="d-flex gap-2">
+      <a href='{% url 'sign_up' %}' class="btn btn-lg btn-primary">Sign up</a>
+      <a href='{% url 'log_in' %}' class="btn btn-lg btn-secondary">Log in</a>
+    </div>
+  </div>
+
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-4 offset-md-1">
+        <h2 class="h6 mb-2">ABOUT US</h2>
+      </div>
+      <div class="col-md-7">
+        <p>Our purpose is to make high-quality tutoring accessible, effective, and easy to manage for everyone involved. Our platform allows students to request and manage tutoring sessions, while tutors can showcase their expertise and availability.</p>
+        <p>At Code Tutors, we believe in creating a safe, user-friendly space where learning thrives, and every user—student, tutor, or administrator—has the tools they need for success.</p>
+        <p>Our mission is to deliver a reliable, intuitive, and automated solution that supports learning and growth, without compromising on the quality or security of your experience.</p>
+        <p>Join us in making education more connected and accessible, one tutoring session at a time.</p>
       </div>
     </div>
   </div>

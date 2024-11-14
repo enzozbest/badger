@@ -1,18 +1,38 @@
 {% extends 'base_content.html' %}
 {% block content %}
-<div class="container">
-  <div class="row">
-    <div class="col-12">
-      <h1>Welcome to your dashboard {{ user.username }}</h1>
+<div class="container mt-5">
+  <!-- Centered Header and Subtitle Text -->
+  <div class="row justify-content-center">
+    <div class="col-12 text-center">
+      <h1 class="display-5">Welcome to [Code Tutors] {{ user.username }}, <br> this is your dashboard.</h1>
+      <p class="text-muted mt-2">Manage your tutoring requests or create new ones below.</p>
     </div>
-    <div class="col-12">
-      {% if user.user_type != 'Tutor'%}<a href = "{% url 'create_request' %}">Click here to create a lesson request</a>
-      {% endif %}
+  </div>
+
+  <!-- Two Request Cards Side by Side -->
+  <div class="row mt-4 justify-content-center">
+    {% if user.user_type != 'Tutor' %}
+      <div class="col-md-6 mb-3">
+        <div class="card shadow-sm">
+          <div class="card-body text-center">
+            <h5 class="card-title">Create a New Lesson Request</h5>
+            <p class="card-text">Need help with a specific subject? Start by creating a new lesson request.</p>
+            <a href="{% url 'create_request' %}" class="btn btn-primary">Create Request</a>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- View Lesson Requests Card -->
+    <div class="col-md-6 mb-3">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+          <h5 class="card-title">View Your Lesson Requests</h5>
+          <p class="card-text">Review and manage your existing lesson requests here.</p>
+          <a href="{% url 'view_requests' %}" class="btn btn-secondary">View Requests</a>
+        </div>
+      </div>
     </div>
-    <div class="col-12">
-      <a href = "{% url 'view_requests' %}">Click here to view your lesson requests</a>
-    </div>
-    
   </div>
 </div>
 {% endblock %}
