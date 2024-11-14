@@ -1,15 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Your Tutoring Request</title>
-</head>
-<body>
-    <p>Fill in the details in the following form to change your Tutoring Request:</p>
-    <form action="{% url 'edit_request' request_instance.id %}" method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Update">
-    </form>
-</body>
-</html>
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="text-center">Edit Your Tutoring Request</h2>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Fill in the details below to update your tutoring request.</p>
+                    
+                    <!-- Check if request_instance.id is displayed correctly -->
+                    {% if request_instance and request_instance.id %}
+                        <p>ID of the request instance: {{ request_instance.id }}</p>
+                    {% endif %}
+
+                    <!-- Display non-field form errors if they exist -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <!-- Form action with request_instance.id -->
+                    <form action="{% url 'edit_request' request_instance.id %}" method="POST">
+                        {% csrf_token %}
+                        {% include 'partials/_request_form_fields.html' %}
+                        <div class="text-center mt-3">
+                            <button type="submit" class="btn btn-success">Update Request</button>
+                            <a href="{% url 'view_requests' %}" class="btn btn-secondary ms-2">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

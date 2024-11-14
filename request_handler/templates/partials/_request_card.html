@@ -1,30 +1,44 @@
 <div class="col-md-4 mb-4">
-    <div class="card request-card shadow-sm border-0 rounded-4">
-        <div class="card-body">
-            <h5 class="card-title">Knowledge Area: <span class="text-primary">{{ request.knowledge_area|upper }}</span></h5>
+    <div class="card request-card h-60">
+        <div class="card-body d-flex flex-column">
+            <div class="field">
+                <h5 class="card-title mb-2">Knowledge Area: <span class="text-primary">{{ request.knowledge_area|upper }}</span></h5>
+            </div>
 
-            <p class="mt-3 mb-1"><strong>Availability:</strong></p>
-            <ul class="list-unstyled ms-3">
-                {% for day in request.availability.all %}
-                    <li>{{ day }}</li>
-                {% endfor %}
-            </ul>
+            <div class="field">
+                <p class="field-label">Availability:</p>
+                <ul class="field-content list-unstyled">
+                    {% for day in request.availability.all %}
+                        <li>{{ day }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
 
-            <p class="mt-3"><strong>Term:</strong> <span class="text-secondary">{{ request.term }}</span></p>
-            <p><strong>Frequency:</strong> <span class="text-secondary">{{ request.frequency }}</span></p>
-            <p><strong>Duration:</strong> <span class="text-secondary">{{ request.duration }}</span></p>
+            <div class="field">
+                <p class="card-title mb-2">Term: <span class="text-primary">{{ request.term|upper }}</span></p>
+            </div>
 
-            <p class="mt-3 mb-1"><strong>Venue Preference:</strong></p>
-            <ul class="list-unstyled ms-3">
-                {% for mode in request.venue_preference.all %}
-                    <li>{{ mode }}</li>
-                {% endfor %}
-            </ul>
-        </div>
+            <div class="field">
+                <p class="field-label">Frequency: <span class="field-content">{{ request.frequency|upper }}</span></p>
+            </div>
 
-        <div class="card-footer d-flex justify-content-between border-0 darker-footer">
-            <a href="{% url 'edit_request' request.id %}" class="btn btn-outline-warning btn-sm">Update</a>
-            <a href="{% url 'confirm_delete_request' request.id %}" class="btn btn-outline-danger btn-sm">Delete</a>
+            <div class="field">
+                <p class="field-label">Duration: <span class="field-content">{{ request.duration|upper }}</span></p>
+            </div>
+
+            <div class="field">
+                <p class="field-label">Venue Preference:</p>
+                <ul class="field-content list-unstyled">
+                    {% for mode in request.venue_preference.all %}
+                        <li>{{ mode }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="mt-auto card-footer action-buttons">
+                <a href="{% url 'edit_request' request.id %}" class="btn btn-outline-warning btn-sm">Update</a>
+                <a href="{% url 'confirm_delete_request' request.id %}" class="btn btn-outline-danger btn-sm">Delete</a>
+            </div>
         </div>
     </div>
 </div>

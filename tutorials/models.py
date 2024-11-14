@@ -14,7 +14,11 @@ class User(AbstractUser):
         )]
     )
 
-    user_type = models.CharField(max_length=20, blank=False, null=False)
+    ACCOUNT_TYPE_STUDENT = 'Student'
+    ACCOUNT_TYPE_TUTOR = 'Tutor'
+    ACCOUNT_TYPE_ADMIN = 'Admin'
+    CHOICES = [(ACCOUNT_TYPE_STUDENT, 'Student'), (ACCOUNT_TYPE_TUTOR, 'Tutor'), (ACCOUNT_TYPE_ADMIN, 'Admin')]
+    user_type = models.CharField(max_length=20, blank=False, null=False, choices=CHOICES)
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
