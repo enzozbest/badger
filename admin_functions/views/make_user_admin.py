@@ -1,5 +1,5 @@
 from django.views import View
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import render, redirect, get_object_or_404
 from tutorials.models import User
 from request_handler.models import Request
@@ -7,6 +7,10 @@ from request_handler.models import Request
 
 
 class MakeUserAdmin(View):
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+        return HttpResponseNotAllowed("Requests to this URL must be made by the GET method!",
+                                      content=b'Method Not Allowed', status=405)
+    
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         if not request.user.is_authenticated:
             return redirect('log_in')
@@ -22,6 +26,10 @@ class MakeUserAdmin(View):
         return render(request, 'make_user_admin.html', context={"first_name":first_name, "last_name":last_name, "pk":pk})
     
 class ConfirmMakeUserAdmin(View):
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+        return HttpResponseNotAllowed("Requests to this URL must be made by the GET method!",
+                                      content=b'Method Not Allowed', status=405)
+    
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         requested_user_pk = pk
         if not request.user.is_authenticated:
