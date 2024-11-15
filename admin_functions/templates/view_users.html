@@ -20,6 +20,9 @@
         <p>Last name: {{user.last_name}}</p>
         <p>Account type: {{user.user_type}}</p>
         <p>Email address: {{user.email}}</p>
+        {% if user.user_type != "Admin" %}
+            <a href="{% url 'make_admin' user.pk %}" >Make administrator</a>
+        {% endif %}
         <hr>
     {% empty %}
         <p>No users registered.</p>
