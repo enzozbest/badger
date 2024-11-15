@@ -49,7 +49,7 @@ urlpatterns = [
     path('admins/view_all_users', view_all_users_view.AllUsersView.as_view(), name='view_all_users'),
     path('admins/make_admin/<int:pk>', make_user_admin_view.MakeUserAdmin.as_view(), name="make_admin"),
     path('admins/make_admin/<int:pk>/confirm', make_user_admin_view.ConfirmMakeUserAdmin.as_view(), name="confirm_make_admin"),
-    path('add-knowledge-areas/', tutorial_views.add_knowledge_areas, name='add_knowledge_areas'),
+    path('add-knowledge-areas/', tutorial_views.AddKnowledgeAreas, name='add_knowledge_areas'),
     path('delete-knowledge-area/<int:area_id>/', tutorial_views.DeleteKnowledgeArea, name='delete_knowledge_area'),
 
 ]

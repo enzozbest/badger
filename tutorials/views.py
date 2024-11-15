@@ -152,9 +152,9 @@ class SignUpView(LoginProhibitedMixin, FormView):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
 @login_required
-def add_knowledge_areas(request):
+def AddKnowledgeAreas(request):
     if not request.user.is_tutor:
-        return redirect('profile')  # Redirect if not a tutor
+        return redirect('profile') # Redirect if not a tutor
 
     form = KnowledgeAreaForm(request.POST or None)
 
