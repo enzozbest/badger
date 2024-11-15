@@ -26,11 +26,11 @@ class MakeUserAdmin(View):
         return render(request, 'make_user_admin.html', context={"first_name":first_name, "last_name":last_name, "pk":pk})
     
 class ConfirmMakeUserAdmin(View):
-    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         return HttpResponseNotAllowed("Requests to this URL must be made by the GET method!",
                                       content=b'Method Not Allowed', status=405)
     
-    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
         requested_user_pk = pk
         if not request.user.is_authenticated:
             return redirect('log_in')
