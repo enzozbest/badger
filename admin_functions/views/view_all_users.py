@@ -1,7 +1,7 @@
 from django.views import View
 from django.http import HttpResponseNotAllowed, HttpResponse, HttpRequest
 from django.shortcuts import redirect, render
-from tutorials.models import User
+from user_system.models import User
 from django.core.paginator import Paginator
 from admin_functions.helpers.filters import UserFilter
 from django.db.models import Q
