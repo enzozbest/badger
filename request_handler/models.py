@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
-from tutorials.models import User
+from user_system.models import User
 
 """ Class representing a day of the week
 

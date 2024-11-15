@@ -3,7 +3,7 @@ from django.test import TestCase
 
 class RequestModelTest(TestCase):
     def setUp(self):
-        from tutorials.models import User
+        from user_system.models import User
         from request_handler.models import Request, Day, Modality
 
         self.user = User.objects.create_user(username='@johndoe', email='johndoe@example.org', password='Password123')
