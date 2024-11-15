@@ -18,7 +18,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
-from tutorials import views as tutorial_views
+from user_system import views as tutorial_views
 from request_handler.views import create_request as create_request_view, small_views as request_handler_views
 from request_handler.views import view_requests as view_requests_view
 from request_handler.views import edit_request as edit_request_view

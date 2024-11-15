@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from tutorials.models import User
+from user_system.models import User
 from faker import Faker
 from random import randint
 

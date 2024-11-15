@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'widget_tweaks',
-    'tutorials',
+    'user_system',
     'code_tutors',
     'request_handler',
     'admin_functions'
@@ -133,7 +133,7 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # User model for authentication and login purposes
-AUTH_USER_MODEL = 'tutorials.User'
+AUTH_USER_MODEL = 'user_system.User'
 
 # Login URL for redirecting users from login protected views
 LOGIN_URL = 'log_in'
