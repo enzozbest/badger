@@ -4,12 +4,12 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
 from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
 from tutorials.forms import LogInForm, PasswordForm, UserForm, SignUpForm
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, Http404
 from tutorials.helpers import login_prohibited
 from .models import KnowledgeArea
 from .forms import KnowledgeAreaForm
@@ -174,3 +174,11 @@ def add_knowledge_areas(request):
     existing_subjects = [area.subject for area in knowledge_areas]
 
     return render(request, 'add_knowledge_areas.html', {'form': form, 'knowledge_areas': knowledge_areas, 'existing_subjects': existing_subjects})
+
+@login_required
+def DeleteKnowledgeArea(request, area_id):
+    knowledge_area = get_object_or_404(KnowledgeArea, pk=area_id, user=request.user)
+    if knowledge_area.user != request.user:
+        raise Http404("You are not allowed to delete this knowledge area. ")
+    knowledge_area.delete()
+    return redirect('add_knowledge_areas')
