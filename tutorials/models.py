@@ -23,6 +23,10 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
 
+    @property
+    def is_tutor(self):
+        return self.user_type == self.ACCOUNT_TYPE_TUTOR
+
     def __str__(self):
         return (f'Username: {self.username} \n'
                 f'First Name: {self.first_name} \n'
@@ -32,6 +36,7 @@ class User(AbstractUser):
                 )
 
     models.pk = email
+
 
     class Meta:
         """Model options."""
@@ -55,3 +60,10 @@ class User(AbstractUser):
 
         return self.gravatar(size=60)
 
+
+class KnowledgeArea(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'is_tutor': True})
+    subject = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.subject

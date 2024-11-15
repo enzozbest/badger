@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+{% extends 'base_content.html' %}
+{% block content %}
+    <div class="container">
+    <div class="row">
+    <div class="col-12">
+        <head>
+            <meta charset="UTF-8">
+            <title>Add Knowledge Areas</title>
+        </head>
+        <body>
+            <h2 class="mb-4"> Add your Knowledge Areas below: </h2>
+            <form method="post">
+                {% csrf_token %}
+            
+                <!-- Greyed-out options for subjects already added as a knowledge area -->
+                <div class="form-group">
+                    <label for="id_subject">Subjects: </label>
+                    <select name="subject" id="id_subject" class="form-control">
+                        {% for value, label in form.subject.field.choices %}
+                            <option value="{{ value }}"
+                                    {% if value in existing_subjects %}
+                                        disabled
+                                        class="text-muted"
+                                    {% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary my-2">Add Knowledge Area </button>
+            </form>
+            
+            <hr class="my-4">
+            
+            <h2>Your Knowledge Areas: </h2>
+            <ul>
+            {% for area in knowledge_areas %}
+                <li>
+                    {{ area.subject }}
+                    <a href="{% url 'delete_knowledge_area' area.id %}" class="text-danger" style="font-size: 12px; text-decoration: underline;">Delete</a>
+                </li>
+            {% empty %}
+                <p>No Knowledge Areas have been added yet.</p>
+            {% endfor %}
+            </ul>
+        </body>
+    </div>
+    </div>
+    </div>
+{% endblock %}
+</html>

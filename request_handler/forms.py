@@ -1,4 +1,6 @@
 import django.forms as forms
+from datetime import timedelta,datetime
+
 from .models import Request, Day, Modality
 
 """ Class representing a form to create a Request instance.
@@ -18,6 +20,36 @@ class RequestForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple,
         required=True
     )
+
+    USER_TERM_CHOICES = [('September','September - December'),('January','January - April'),('May','May - July')]
+    term = forms.ChoiceField(choices=USER_TERM_CHOICES, label='Term')
+
+    #Ensure that a warning is shown when a student tries to make a late request
+    def is_late_request(self):
+        term = self.cleaned_data.get('term')
+        todayDate = datetime.today()
+        term_one = datetime(datetime.today().year,9,1) #September of current year
+        if todayDate.month >= 8:
+            term_two = datetime(datetime.today().year+1,1,1) #January of following year
+            term_three = datetime(datetime.today().year+1,5,1) #May of following year
+        else:
+            term_two = datetime(datetime.today().year,1,1) #January of current year
+            term_three = datetime(datetime.today().year,5,1) #May of current year
+
+        lateness = None
+        if term and ((term == "September" and todayDate > term_one - timedelta(weeks=2)) or 
+        (term == "January" and todayDate > term_two - timedelta(weeks=2)) or 
+        (term == "May" and todayDate > term_three - timedelta(weeks=2))):
+            lateness = "late"
+        else:
+            lateness = "not late"
+
+        match lateness:
+            case "late":
+                return True
+            case "note late":
+                return False
+    
 
     class Meta:
         model = Request

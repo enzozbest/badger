@@ -4,13 +4,15 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
 from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse
 from tutorials.forms import LogInForm, PasswordForm, UserForm, SignUpForm
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, Http404
 from tutorials.helpers import login_prohibited
+from .models import KnowledgeArea
+from .forms import KnowledgeAreaForm
 
 
 @login_required
@@ -148,3 +150,35 @@ class SignUpView(LoginProhibitedMixin, FormView):
 
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
+@login_required
+def AddKnowledgeAreas(request):
+    if not request.user.is_tutor:
+        return redirect('profile') # Redirect if not a tutor
+
+    form = KnowledgeAreaForm(request.POST or None)
+
+    if request.method == 'POST' and form.is_valid():
+        subject = form.cleaned_data['subject']
+
+        if KnowledgeArea.objects.filter(user=request.user, subject=subject).exists():
+            pass  # Can put an error message here maybe
+        else:
+            knowledge_area = form.save(commit=False)
+            knowledge_area.user = request.user
+            knowledge_area.save()
+
+        return redirect('add_knowledge_areas')
+
+    knowledge_areas = KnowledgeArea.objects.filter(user=request.user)  # Only retrieve knowledge areas of this tutor
+    existing_subjects = [area.subject for area in knowledge_areas]
+
+    return render(request, 'add_knowledge_areas.html', {'form': form, 'knowledge_areas': knowledge_areas, 'existing_subjects': existing_subjects})
+
+@login_required
+def DeleteKnowledgeArea(request, area_id):
+    knowledge_area = get_object_or_404(KnowledgeArea, pk=area_id, user=request.user)
+    if knowledge_area.user != request.user:
+        raise Http404("You are not allowed to delete this knowledge area. ")
+    knowledge_area.delete()
+    return redirect('add_knowledge_areas')
