@@ -50,5 +50,6 @@ urlpatterns = [
     path('admins/make_admin/<int:pk>', make_user_admin_view.MakeUserAdmin.as_view(), name="make_admin"),
     path('admins/make_admin/<int:pk>/confirm', make_user_admin_view.ConfirmMakeUserAdmin.as_view(), name="confirm_make_admin"),
     path('add-knowledge-areas/', tutorial_views.add_knowledge_areas, name='add_knowledge_areas'),
+
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
