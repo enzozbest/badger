@@ -61,7 +61,7 @@ class User(AbstractUser):
         return self.gravatar(size=60)
 
 
-class KnowledgeArea(models.Model): # check if the line below creates a new table?
+class KnowledgeArea(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'is_tutor': True})
     subject = models.CharField(max_length=30)
 
