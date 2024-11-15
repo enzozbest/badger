@@ -8,6 +8,9 @@
         {% csrf_token %}
         {% include 'partials/bootstrap_form.html' with form=form %}
         <input type="submit" value="Update" class="btn btn-primary">
+          {%  if user.is_authenticated and user.is_tutor %} <!-- make sure to create this in models -->
+          <a href="{%  url 'add_knowledge_areas' %}" class="btn btn-primary">Add Knowledge Areas</a>
+          {% endif %}
       </form>
     </div>
   </div>

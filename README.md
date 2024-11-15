@@ -10,6 +10,7 @@ The members of the team are:
 
 ## Project structure
 The project is called `CodeConnect by Code Tutors`.
+
 ## Deployed version of the application
 The deployed version of the application can be found at [*enter url here*](*enter_url_here*).
 
