@@ -4,7 +4,7 @@ from tutorials.models import User
 from request_handler.models import Request
 
 from faker import Faker
-from random import random
+from random import randint
 
 user_fixtures = [
     {'username': '@johndoe', 'email': 'john.doe@example.org', 'first_name': 'John', 'last_name': 'Doe', 'user_type': 'Admin'},
@@ -22,7 +22,7 @@ class Command(BaseCommand):
 
     def __init__(self):
         self.faker = Faker('en_GB')
-        self.user_types = ['Tutor', 'Student']
+        self.user_types = ['Tutor', 'Student', 'Admin']
 
     def handle(self, *args, **options):
         self.create_users()
@@ -49,7 +49,7 @@ class Command(BaseCommand):
         last_name = self.faker.last_name()
         email = create_email(first_name, last_name)
         username = create_username(first_name, last_name)
-        user_type = self.user_types[int(random() % 2)]
+        user_type = self.user_types[randint(0, 2)]
         self.try_create_user({'username': username, 'email': email, 'first_name': first_name, 'last_name': last_name, 'user_type': user_type})
        
     def try_create_user(self, data):
