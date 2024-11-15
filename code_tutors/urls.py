@@ -45,6 +45,7 @@ urlpatterns = [
     path('processing_late_request/', request_handler_views.processing_late_request, name='processing_late_request'),
     path('admins/dashboard', small_views_view.admin_dash, name="admin_dash"),
     path('admins/view_all_users', view_all_users_view.AllUsersView.as_view(), name='view_all_users'),
+    path('add-knowledge-areas/', tutorial_views.add_knowledge_areas, name='add_knowledge_areas'),
 
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

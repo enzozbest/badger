@@ -2,7 +2,7 @@
 from django import forms
 from django.contrib.auth import authenticate
 from django.core.validators import RegexValidator
-from .models import User
+from .models import User, KnowledgeArea
 
 
 class LogInForm(forms.Form):
@@ -117,3 +117,20 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
             user_type=self.cleaned_data.get('user_type'),
         )
         return user
+
+class KnowledgeAreaForm(forms.ModelForm):
+    class Meta:
+        model = KnowledgeArea
+        fields = ['subject']
+
+    subject = forms.ChoiceField(choices=[
+        ('C++', 'C++'),
+        ('Scala', 'Scala'),
+        ('Python', 'Python'),
+        ('Java', 'Java'),
+        ('Django', 'Django'),
+        ('JavaScript', 'JavaScript'),
+        ('Databases', 'Databases'),
+        ('Robotics', 'Robotics'),
+        ('Internet Systems', 'Internet Systems'),
+    ])

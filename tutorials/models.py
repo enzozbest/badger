@@ -33,6 +33,11 @@ class User(AbstractUser):
 
     models.pk = email
 
+    @property
+    def is_tutor(self): # Used in views.py to add knowledge areas
+        return self.user_type == self.ACCOUNT_TYPE_TUTOR
+
+
     class Meta:
         """Model options."""
 
@@ -55,3 +60,10 @@ class User(AbstractUser):
 
         return self.gravatar(size=60)
 
+
+class KnowledgeArea(models.Model): # check if the line below creates a new table?
+    user = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'is_tutor': True}) # maybe change to 'user_type': 'tutor'
+    subject = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.subject
