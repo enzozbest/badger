@@ -1,16 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
-</head>
-<body>
-    <h1>Welcome to the Admin Dashboard</h1>
-    <div>
-        <a href="{% url 'view_all_users' %}">Click here to view all users</a>
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-12 text-center">
+      <h1 class="display-5">Welcome to the Admin Dashboard</h1>
+      <p class="text-muted mt-2">Manage users, view statistics, and oversee platform operations.</p>
     </div>
-    <div>
-        <a href="{% url 'dashboard' %}">Click here to go to the main dashboard</a>
+  </div>
+
+  <div class="row mt-4 justify-content-center">
+    <div class="col-md-6 mb-3">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+          <h5 class="card-title">View All Users</h5>
+          <p class="card-text">Access the list of all registered users on the platform.</p>
+          <a href="{% url 'view_all_users' %}" class="btn btn-primary">View Users</a>
+        </div>
+      </div>
     </div>
-</body>
-</html>
+
+    <div class="col-md-6 mb-3">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+          <h5 class="card-title">Main Dashboard</h5>
+          <p class="card-text">Return to the main dashboard for overall management and settings.</p>
+          <a href="{% url 'dashboard' %}" class="btn btn-secondary">Go to Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

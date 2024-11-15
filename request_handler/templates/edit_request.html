@@ -23,7 +23,7 @@
                     {% endif %}
 
                     <!-- Form action with request_instance.id -->
-                    <form action="{% url 'edit_request' request_instance.id %}" method="POST">
+                    <form method="POST" action="{% url 'edit_request' request_instance.id %}" >
                         {% csrf_token %}
                         {% include 'partials/_request_form_fields.html' %}
                         <div class="text-center mt-3">

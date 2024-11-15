@@ -1,35 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>View Users</title>
-</head>
-<body>
-    <div>
-        <a href="{% url 'dashboard' %}">Click here to go to the main dashboard</a>
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h1 class="display-5">
+        Registered Users 
+        <span class="text-muted fs-6">({{ count }} users)</span>
+    </h1>
+    
+    <div class="mb-3">
+        <a href="{% url 'admin_dash' %}" class="text-decoration-none">Go to the Administrator Dashboard</a>
     </div>
-<h1>Showing all {{count}} users registered: </h1>
 
-{% for user in page_obj %}
-    <p>First name: {{user.first_name}}</p>
-    <p>Last name: {{user.last_name}}</p>
-    <p>Account type: {{user.user_type}}</p>
-    <p>Email address: {{user.email}}</p>
-    <hr>
-{% empty %}
-    <p>No users registered.</p>
-{% endfor %}
+    <table class="table table-striped table-hover mt-4">
+        <thead>
+            <tr>
+                <th scope="col">First Name</th>
+                <th scope="col">Last Name</th>
+                <th scope="col">Account Type</th>
+                <th scope="col">Email Address</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in page_obj %}
+                <tr>
+                    <td>{{ user.first_name }}</td>
+                    <td>{{ user.last_name }}</td>
+                    <td>{{ user.user_type }}</td>
+                    <td>{{ user.email|lower }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No users registered.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-    <div class="pagination">
-    {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
-    {% endif %}
+    <div class="pagination mt-3">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-secondary btn-sm">Previous</a>
+        {% endif %}
 
-    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        <span class="mx-2">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
 
-    {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}">Next</a>
-    {% endif %}
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-secondary btn-sm">Next</a>
+        {% endif %}
+    </div>
 </div>
-</body>
-</html>
+{% endblock %}
