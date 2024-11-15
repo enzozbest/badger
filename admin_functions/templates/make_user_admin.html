@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Make admin</title>
+</head>
+<body>
+    <div>
+        <a href="{% url 'admin_dash' %}">Click here to go to the administrator dashboard</a>
+    </div>
+<h1>Please click yes to confirm you would like to make {{first_name}} {{last_name}} an admin </h1>
+<a href = "{% url 'confirm_make_admin' pk %}">Yes</a>
+</body>
+</html>
