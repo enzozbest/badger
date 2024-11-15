@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'widget_tweaks',
     'tutorials',
+    'code_tutors',
     'request_handler',
     'admin_functions'
 ]

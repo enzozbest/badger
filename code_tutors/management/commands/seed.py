@@ -1,8 +1,5 @@
 from django.core.management.base import BaseCommand
-
 from tutorials.models import User
-from request_handler.models import Request
-
 from faker import Faker
 from random import randint
 
@@ -11,7 +8,6 @@ user_fixtures = [
     {'username': '@janedoe', 'email': 'jane.doe@example.org', 'first_name': 'Jane', 'last_name': 'Doe', 'user_type': 'Tutor'},
     {'username': '@charlie', 'email': 'charlie.johnson@example.org', 'first_name': 'Charlie', 'last_name': 'Johnson', 'user_type': 'Student'},
 ]
-
 
 class Command(BaseCommand):
     """Build automation command to seed the database."""
