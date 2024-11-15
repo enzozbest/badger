@@ -1,7 +1,6 @@
 from django.test import TestCase
 from tutorials.models import User
 from tutorials.models import KnowledgeArea
-from django.core.exceptions import ValidationError
 
 class KnowledgeAreaTest(TestCase):
     def setUp(self):
