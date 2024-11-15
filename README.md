@@ -9,8 +9,7 @@ The members of the team are:
 - Lucia Garces Gutierrez
 
 ## Project structure
-The project is called `task_manager`.  It currently consists of a single app `tasks`.
-
+The project is called `CodeConnect by Code Tutors`.
 ## Deployed version of the application
 The deployed version of the application can be found at [*enter url here*](*enter_url_here*).
 
