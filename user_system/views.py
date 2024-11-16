@@ -11,7 +11,7 @@ from django.urls import reverse
 from user_system.forms import LogInForm, PasswordForm, UserForm, SignUpForm
 from django.http import HttpRequest, HttpResponse, Http404
 from user_system.helpers import login_prohibited
-from .models import KnowledgeArea
+from .models import KnowledgeArea, User
 from .forms import KnowledgeAreaForm
 
 
@@ -121,7 +121,7 @@ class PasswordView(LoginRequiredMixin, FormView):
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     """Display user profile editing screen, and handle profile modifications."""
 
-    model = UserForm
+    model = User
     template_name = "profile.html"
     form_class = UserForm
 
@@ -139,7 +139,6 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         """Return redirect URL after successful update."""
         messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-
 
 class SignUpView(LoginProhibitedMixin, FormView):
     """Display the sign up screen and handle sign ups."""

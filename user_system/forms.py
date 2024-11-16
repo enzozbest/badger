@@ -29,6 +29,7 @@ class UserForm(forms.ModelForm):
         self.fields['user_type'].label = 'Account Type'
         self.fields['user_type'].disabled = True
         self.fields['user_type'].required = False
+        hourly_rate = forms.DecimalField(max_digits=6, decimal_places=2)
 
         if 'instance' in kwargs:
             self.fields['user_type'].initial = kwargs['instance'].user_type
