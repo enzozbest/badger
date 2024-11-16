@@ -33,10 +33,24 @@ class UserForm(forms.ModelForm):
         if 'instance' in kwargs:
             self.fields['user_type'].initial = kwargs['instance'].user_type
 
+        # Display hourly rate only for tutors
+        if self.instance.user_type != User.ACCOUNT_TYPE_TUTOR:
+            self.fields.pop('hourly_rate', None)
+        else:
+            self.fields['hourly_rate'].label = 'Hourly Rate (in £)'
+            self.fields['hourly_rate'].widget.attrs['placeholder'] = 'Enter your hourly rate e.g., 22.50'
+            self.fields['hourly_rate'].required = False
+
+    def clean_hourly_rate(self):
+        hourly_rate = self.cleaned_data.get('hourly_rate')
+        if hourly_rate is not None and hourly_rate <= 0:
+            raise forms.ValidationError('Hourly rate must be a positive number! ')
+        return hourly_rate
+
     class Meta:
         """Form options."""
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'user_type']
+        fields = ['first_name', 'last_name', 'username', 'email', 'user_type', 'hourly_rate']
 
 class NewPasswordMixin(forms.Form):
     """Form mixing for new_password and password_confirmation fields."""

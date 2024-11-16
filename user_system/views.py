@@ -130,6 +130,11 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         user = self.request.user
         return user
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'instance': self.request.user})
+        return kwargs
+
     def get_success_url(self):
         """Return redirect URL after successful update."""
         messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
