@@ -21,7 +21,17 @@ class AllUsersView(View):
         filtered_users = filter_obj.qs
 
         if query:
-            filtered_users = filtered_users.filter(Q(first_name__istartswith=query) | Q(last_name__istartswith=query))
+            query_parts = query.split()
+            if len(query_parts) == 1:
+                filtered_users = filtered_users.filter(
+                    Q(first_name__istartswith=query_parts[0]) |
+                    Q(last_name__istartswith=query_parts[0])
+                )
+            elif len(query_parts) >= 2:
+                filtered_users = filtered_users.filter(
+                    Q(first_name__istartswith=query_parts[0]) & Q(last_name__istartswith=query_parts[1])
+                )
+            # filtered_users = filtered_users.filter(Q(first_name__istartswith=query) | Q(last_name__istartswith=query))
 
         paginator = Paginator(filtered_users, 20)
         page_number = request.GET.get('page')

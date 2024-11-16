@@ -136,3 +136,9 @@ class SearchUsersTestCase(TestCase):
         self.assertEqual(len(search_results), 1)
         self.assertEqual(search_results[0].first_name, 'Alice')
 
+    def test_search_by_full_name(self):
+        self.client.login(username='adminuser', password='Password123')
+        response = self.client.get(reverse('view_all_users'), {'q': 'Alice Anderson'})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Alice Anderson')
+        self.assertNotContains(response, 'Bob Brown')
