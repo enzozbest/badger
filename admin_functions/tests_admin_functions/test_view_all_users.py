@@ -87,3 +87,52 @@ class ViewAllUsersTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['page_obj'].paginator.count, 52)
 
+class SearchUsersTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='adminuser', email='admin@test.com', password='Password123', user_type='Admin')
+        self.users = [
+            User.objects.create(first_name="Alice", last_name="Anderson", username="alice", email="alice@test.com", user_type='Student'),
+            User.objects.create(first_name="Bob", last_name="Brown", username="bob", email="bob@test.com", user_type='Student'),
+            User.objects.create(first_name="Charlie", last_name="Chaplin", username="charlie", email="charlie@test.com", user_type='Tutor'),
+        ]
+
+    def test_search_by_first_name(self):
+        self.client.login(username='adminuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?q=Alice')
+        self.assertEqual(response.status_code, 200)
+        search_results = response.context['page_obj'].object_list
+        self.assertEqual(len(search_results), 1)
+        self.assertEqual(search_results[0].first_name, 'Alice')
+
+    def test_search_by_last_name(self):
+        self.client.login(username='adminuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?q=Brown')
+        self.assertEqual(response.status_code, 200)
+        search_results = response.context['page_obj'].object_list
+        self.assertEqual(len(search_results), 1)
+        self.assertEqual(search_results[0].last_name, 'Brown')
+
+    def test_search_with_user_that_does_not_exist(self):
+        self.client.login(username='adminuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?q=David')
+        self.assertEqual(response.status_code, 200)
+        search_results = response.context['page_obj'].object_list
+        self.assertEqual(len(search_results), 0)
+
+    def test_search_combined_with_filter(self):
+        self.client.login(username='adminuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?user_type=Student&q=Alice') #?q=Alice&page=2'
+        self.assertEqual(response.status_code, 200)
+        search_results = response.context['page_obj'].object_list
+        self.assertEqual(len(search_results), 1)
+        self.assertEqual(search_results[0].first_name, 'Alice')
+        self.assertEqual(search_results[0].user_type, 'Student')
+
+    def test_search_case_insensitivity(self):
+        self.client.login(username='adminuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?q=aLiCe')
+        self.assertEqual(response.status_code, 200)
+        search_results = response.context['page_obj'].object_list
+        self.assertEqual(len(search_results), 1)
+        self.assertEqual(search_results[0].first_name, 'Alice')
+
