@@ -36,19 +36,13 @@ class RequestForm(forms.ModelForm):
             term_two = datetime(datetime.today().year,1,1) #January of current year
             term_three = datetime(datetime.today().year,5,1) #May of current year
 
-        lateness = None
+        late = False
         if term and ((term == "September" and todayDate > term_one - timedelta(weeks=2)) or 
         (term == "January" and todayDate > term_two - timedelta(weeks=2)) or 
         (term == "May" and todayDate > term_three - timedelta(weeks=2))):
-            lateness = "late"
-        else:
-            lateness = "not late"
+            late = True
 
-        match lateness:
-            case "late":
-                return True
-            case "note late":
-                return False
+        return late
     
 
     class Meta:
