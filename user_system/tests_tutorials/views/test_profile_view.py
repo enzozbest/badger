@@ -1,4 +1,6 @@
 """Tests for the profile view."""
+from decimal import Decimal
+
 from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
@@ -23,6 +25,23 @@ class ProfileViewTest(TestCase):
             'username': '@johndoe2',
             'email': 'johndoe2@example.org',
         }
+        self.tutor_user = User.objects.create_user(
+            first_name="tutor",
+            last_name="test",
+            username="@tutortest",
+            email="tutor@example.com",
+            password="Password123",
+            user_type=User.ACCOUNT_TYPE_TUTOR,
+            hourly_rate='22.50',
+        )
+        self.student_user = User.objects.create_user(
+            first_name="student",
+            last_name="test",
+            username="@studenttest",
+            email="student@example.com",
+            password="Password123",
+            user_type=User.ACCOUNT_TYPE_STUDENT,
+        )
 
     def test_profile_url(self):
         self.assertEqual(self.url, '/profile/')
@@ -41,7 +60,7 @@ class ProfileViewTest(TestCase):
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    def test_unsuccesful_profile_update(self):
+    def test_unsuccessful_profile_update(self):
         self.client.login(username=self.user.username, password='Password123')
         self.form_input['username'] = 'BAD_USERNAME'
         before_count = User.objects.count()
@@ -77,7 +96,7 @@ class ProfileViewTest(TestCase):
         self.assertEqual(self.user.last_name, 'Doe')
         self.assertEqual(self.user.email, 'johndoe@example.org')
 
-    def test_succesful_profile_update(self):
+    def test_successful_profile_update(self):
         self.client.login(username=self.user.username, password='Password123')
         before_count = User.objects.count()
         response = self.client.post(self.url, self.form_input, follow=True)
@@ -99,3 +118,31 @@ class ProfileViewTest(TestCase):
         redirect_url = reverse_with_next('log_in', self.url)
         response = self.client.post(self.url, self.form_input)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+
+    def test_tutor_can_update_hourly_rate(self):
+        self.client.login(username="@tutortest", password="Password123")
+        response = self.client.post(reverse('profile'), {
+            'first_name': self.tutor_user.first_name,
+            'last_name': self.tutor_user.last_name,
+            'username': self.tutor_user.username,
+            'email': self.tutor_user.email,
+            'user_type': self.tutor_user.user_type,
+            'hourly_rate':'30.00',  # Update hourly rate
+        })
+        self.assertEqual(response.status_code, 302)
+        self.tutor_user.refresh_from_db()
+        self.assertEqual(self.tutor_user.hourly_rate, Decimal('30.00'))
+
+    def test_student_cannot_update_hourly_rate(self):
+        self.client.login(username="@studenttest", password="Password123")
+        response = self.client.post(reverse('profile'), {
+            'first_name': self.student_user.first_name,
+            'last_name': self.student_user.last_name,
+            'username': self.student_user.username,
+            'email': self.student_user.email,
+            'user_type': self.student_user.user_type,
+        })
+        self.assertEqual(response.status_code, 302)
+        self.student_user.refresh_from_db()
+        self.assertIsNone(self.student_user.hourly_rate)
+

@@ -23,6 +23,7 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
 
+    hourly_rate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, help_text="Enter your hourly rate in GBP.")
     @property
     def is_tutor(self):
         return self.user_type == self.ACCOUNT_TYPE_TUTOR
