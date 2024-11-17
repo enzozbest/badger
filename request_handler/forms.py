@@ -1,7 +1,7 @@
 import django.forms as forms
 from datetime import timedelta,datetime
 
-from .models import Request, Day, Modality
+from .models import Request, Day, Venue
 
 """ Class representing a form to create a Request instance.
 
@@ -16,7 +16,7 @@ class RequestForm(forms.ModelForm):
     )
 
     venue_preference = forms.ModelMultipleChoiceField( 
-        queryset=Modality.objects.all(),
+        queryset=Venue.objects.all(),
         widget=forms.CheckboxSelectMultiple,
         required=True
     )

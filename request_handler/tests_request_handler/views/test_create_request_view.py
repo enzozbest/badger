@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from user_system.models import User
-from request_handler.models import Request, Modality, Day
+from request_handler.models import Request, Venue, Day
 from datetime import datetime 
 
 
@@ -11,7 +11,7 @@ INVALID_REQUEST_ID = 999
 class TestViews(TestCase):
     def setUp(self):
         self.monday = Day.objects.create(day='Monday')
-        self.online = Modality.objects.create(mode='Online')
+        self.online = Venue.objects.create(venue='Online')
         User.objects.create_user(username='@johndoe', email='johndoe@example.org', password='Password123', user_type='Student')
         self.tutor = User.objects.create_user(username='@janedoe', email='janedoe@example.org', password='Password123',
                                               first_name='Jane', last_name='Doe', user_type='Tutor')
