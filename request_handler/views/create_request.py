@@ -51,7 +51,6 @@ class CreateRequestView(View):
                 if form.is_late_request():
                     request_instance.late = True
                     request_instance.save()
-                    print("setting late")
                     return redirect('processing_late_request')
                 else:
                     return redirect('request_success')

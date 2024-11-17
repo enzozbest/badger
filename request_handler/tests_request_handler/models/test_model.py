@@ -27,7 +27,8 @@ class RequestModelTest(TestCase):
                 f'\n Duration: 1h'
                 f'\n Venue Preference: In Person, Online'
                 f'\n Allocated?: No'
-                f'\n Tutor: -'))
+                f'\n Tutor: -'
+                f'\n Late: False'))
 
     def test_str_method_availability_blank(self):
         self.request.availability.clear()
@@ -40,7 +41,8 @@ class RequestModelTest(TestCase):
                 f'\n Duration: 1h'
                 f'\n Venue Preference: In Person, Online'
                 f'\n Allocated?: No'
-                f'\n Tutor: -'))
+                f'\n Tutor: -'
+                f'\n Late: False'))
 
     def test_str_method_venue_preference_exists(self):
         s  = str(self.request)
@@ -52,7 +54,8 @@ class RequestModelTest(TestCase):
                 f'\n Duration: 1h'
                 f'\n Venue Preference: In Person, Online'
                 f'\n Allocated?: No'
-                f'\n Tutor: -'))
+                f'\n Tutor: -'
+                f'\n Late: False'))
 
     def test_str_method_venue_preference_blank(self):
         self.request.venue_preference.clear()
@@ -66,7 +69,7 @@ class RequestModelTest(TestCase):
                 f'\n Venue Preference: No venue preference set!'
                 f'\n Allocated?: No'
                 f'\n Tutor: -'
-                             ))
+                f'\n Late: False'))
 
     def test_student_email_student_is_none(self):
         self.request.student = None
