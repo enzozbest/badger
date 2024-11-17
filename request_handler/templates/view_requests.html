@@ -1,17 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>View tutoring requests</title>
-</head>
-<body>
-    <div class="col-12">
-        <a href = "{% url 'dashboard' %}">Dashboard</a>
-    </div>
-    {% for request in requests  %}
+    <head>
+        <meta charset="UTF-8">
+        <title>View Requests</title>
+    </head>
+    <body>
+        <div>
+            <a href="{% url 'dashboard' %}">Click here to go to the main dashboard</a>
+        </div>
+    <h1>Showing all {{count}} requests: </h1>
+
+        <form method="get">
+            {{ filter.form.as_p }}
+            <button type="submit">Filter</button>
+        </form>
+        <form method="get" action="{% url 'view_requests' %}">
+            {% for key, value in request.GET.items %}
+                {% if key != 'q' and key != 'page' %}
+                    <input type="hidden" name="{{ key }}" value="{{ value }}">
+                {% endif %}
+            {% endfor %}
+            <input type="text" name="q" placeholder="Search by name" value="{{ query }}">
+            <button type="submit">Search</button>
+        </form>
+    {% for request in page_obj %}
         {% include 'partials/show_single_request.html' %}
     {% empty %}
-        <p>You have no current requests to be displayed</p>
+        <p>No requests to display.</p>
     {% endfor %}
-</body>
+
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}">Previous</a>
+            {% endif %}
+
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+
+            {% if page_obj.has_next %}
+                <a href="?q={{ query }}&page={{ page_obj.next_page_number }}">Next</a>
+            {% endif %}
+        </div>
+    </body>
 </html>

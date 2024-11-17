@@ -104,11 +104,11 @@ class viewRequestsTest(TestCase):
     # Tests that a logged in user who requests to view their requests (while having none) does not receive an error
     def test_view_requests_empty(self):
         response = self.client.get(reverse('view_requests'))
-        self.assertEqual(response.context['requests'], [])
+        self.assertEqual(list(response.context['requests']), [])
 
     def test_post_request_is_bad_request(self):
         response = self.client.post(reverse('view_requests'))
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 405)
 
     def test_unauthenticated_user_cannot_view_request(self):
         self.client.logout()

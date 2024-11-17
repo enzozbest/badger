@@ -20,13 +20,12 @@ from django.contrib import admin
 from django.urls import path
 from user_system import views as tutorial_views
 from request_handler.views import create_request as create_request_view, small_views as request_handler_views
-from request_handler.views import view_requests as view_requests_view
+from request_handler.views import show_all_requests as view_requests_view
 from request_handler.views import edit_request as edit_request_view
 from request_handler.views import delete_request as delete_request_view
 from admin_functions.views import view_all_users as view_all_users_view
 from admin_functions.views import small_views as small_views_view
 from admin_functions.views import make_user_admin as make_user_admin_view
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -39,7 +38,7 @@ urlpatterns = [
     path('sign_up/', tutorial_views.SignUpView.as_view(), name='sign_up'),
     path('create_request/', create_request_view.CreateRequestView.as_view(), name="create_request"),
     path('request_success/', request_handler_views.request_success, name="request_success"),
-    path('view_requests/',view_requests_view.ViewRequest.as_view(), name='view_requests'),
+    path('view_requests/',view_requests_view.AllRequestsView.as_view(), name='view_requests'),
     path('edit_request/<int:pk>/', edit_request_view.EditRequestView.as_view(), name='edit_request'),
     path('request/<int:pk>/delete/', delete_request_view.DeleteRequestView.as_view(), name='delete_request'),
     path('delete_request/<int:pk>/confirm/', delete_request_view.ConfirmDeleteRequestView.as_view(), name='confirm_delete_request'),
@@ -51,6 +50,6 @@ urlpatterns = [
     path('admins/make_admin/<int:pk>/confirm', make_user_admin_view.ConfirmMakeUserAdmin.as_view(), name="confirm_make_admin"),
     path('add-knowledge-areas/', tutorial_views.AddKnowledgeAreas, name='add_knowledge_areas'),
     path('delete-knowledge-area/<int:area_id>/', tutorial_views.DeleteKnowledgeArea, name='delete_knowledge_area'),
-
 ]
+
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
