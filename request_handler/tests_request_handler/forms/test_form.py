@@ -1,15 +1,15 @@
 from django.test import TestCase
 from django.forms import ModelMultipleChoiceField
 from request_handler.forms import RequestForm
-from request_handler.models import Day, Modality
+from request_handler.models import Day, Venue
 from datetime import datetime 
 
 class TestRequestForm(TestCase):
     def setUp(self):
         self.monday = Day.objects.create(day='Monday')
         self.wednesday = Day.objects.create(day='Wednesday')
-        self.in_person = Modality.objects.create(mode='In Person')
-        self.online = Modality.objects.create(mode='Online')
+        self.in_person = Venue.objects.create(venue='In Person')
+        self.online = Venue.objects.create(venue='Online')
 
     def test_form_contains_required_fields(self):
         form = RequestForm()
