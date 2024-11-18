@@ -27,8 +27,9 @@ class TestRequestForm(TestCase):
             'term': 'January',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
-            'venue_preference': [self.in_person.id, self.online.id]
+            'duration': '1',
+            'venue_preference': [self.in_person.id, self.online.id],
+            'is_recurring': True
         }
         form = RequestForm(data=form_input)
         self.assertTrue(form.is_valid(), form.errors)
@@ -39,8 +40,9 @@ class TestRequestForm(TestCase):
             'term': 'Easter',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
-            'venue_preference': [self.in_person.id, self.online.id]
+            'duration': '1',
+            'venue_preference': [self.in_person.id, self.online.id],
+            'is_recurring': False
         }
         form = RequestForm(data=invalid_input)
         self.assertFalse(form.is_valid())
@@ -50,8 +52,9 @@ class TestRequestForm(TestCase):
             'term': 'Easter',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
-            'venue_preference': []
+            'duration': '1',
+            'venue_preference': [],
+            'is_recurring': False
         }
         form = RequestForm(data=invalid_input)
         self.assertFalse(form.is_valid())
@@ -63,8 +66,9 @@ class TestRequestForm(TestCase):
             'term': '',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
-            'venue_preference': [self.in_person.id, self.online.id]
+            'duration': '1',
+            'venue_preference': [self.in_person.id, self.online.id],
+            'is_recurring': False
         }
         form = RequestForm(data=invalid_input)
         self.assertFalse(form.is_valid())
@@ -76,8 +80,9 @@ class TestRequestForm(TestCase):
             'term': 'Easter',
             'knowledge_area': '',
             'frequency': 'Weekly',
-            'duration': '1h',
-            'venue_preference': [self.in_person.id, self.online.id]
+            'duration': '1',
+            'venue_preference': [self.in_person.id, self.online.id],
+            'is_recurring': False
         }
         form = RequestForm(data=invalid_input)
         self.assertFalse(form.is_valid())
@@ -89,8 +94,9 @@ class TestRequestForm(TestCase):
             'term': 'Easter',
             'knowledge_area': 'Scala',
             'frequency': '',
-            'duration': '1h',
-            'venue_preference': [self.in_person.id, self.online.id]
+            'duration': '1',
+            'venue_preference': [self.in_person.id, self.online.id],
+            'is_recurring': False
         }
         form = RequestForm(data=invalid_input)
         self.assertFalse(form.is_valid())
@@ -103,11 +109,31 @@ class TestRequestForm(TestCase):
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
             'duration': '',
-            'venue_preference': [self.in_person.id, self.online.id]
+            'venue_preference': [self.in_person.id, self.online.id],
+            'is_recurring': False
         }
         form = RequestForm(data=invalid_input)
         self.assertFalse(form.is_valid())
         self.assertIn('duration', form.errors)
+    
+    def test_form_handles_is_recurring_correctly(self):
+        invalid_input = {
+            'availability': [self.monday.id, self.wednesday.id],
+            'term': 'January',
+            'knowledge_area': 'Scala',
+            'frequency': 'Weekly',
+            'duration': '1',
+            'venue_preference': [self.in_person.id, self.online.id],
+            'is_recurring': True
+        }
+        form = RequestForm(data=invalid_input)
+        self.assertTrue(form.is_valid())
+        self.assertTrue(form.cleaned_data['is_recurring'])
+
+        invalid_input['is_recurring'] = False
+        form = RequestForm(data=invalid_input)
+        self.assertTrue(form.is_valid())
+        self.assertFalse(form.cleaned_data['is_recurring'])
 
     def test_form_late_request_response(self):
         form_input = {
@@ -115,8 +141,9 @@ class TestRequestForm(TestCase):
             'term': '',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
-            'venue_preference': [self.in_person.id, self.online.id]
+            'duration': '1',
+            'venue_preference': [self.in_person.id, self.online.id],
+            'is_recurring': False
         }
         #Purposefully choosing a late term
         if datetime.now().month >= 1 and datetime.now().month<5:

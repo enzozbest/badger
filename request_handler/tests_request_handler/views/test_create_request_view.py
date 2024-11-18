@@ -25,8 +25,8 @@ class TestViews(TestCase):
         data = {
             'term': 'January',
             'knowledge_area': 'Scala',
-            'frequency': 'Weekly',
-            'duration': '1h',
+            'frequency': 'Biweekly',
+            'duration': '1',
             'venue_preference': [self.online.pk],
         }
         response = self.client.post(self.url, data, follow=True)
@@ -39,7 +39,7 @@ class TestViews(TestCase):
             'term': '',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
+            'duration': '1',
             'venue_preference': [self.online.id,]
         }
         self.client.post(self.url, data)
@@ -73,7 +73,7 @@ class TestViews(TestCase):
             'term': '',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
+            'duration': '1',
             'venue_preference': [self.online.id]
         }
         #Purposefully choosing a late term

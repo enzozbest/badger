@@ -23,7 +23,9 @@ class RequestModelTest(TestCase):
                 f'\n Duration: 1h'
                 f'\n Venue Preference: Online, In Person'
                 f'\n Allocated?: No'
-                f'\n Tutor: -'))
+                f'\n Tutor: -'
+                f'\n Late: False'
+                f'\n Recurring?: False'))
 
     def test_str_method_venue_preference_blank(self):
         self.request.venue_preference.clear()
@@ -36,7 +38,8 @@ class RequestModelTest(TestCase):
                 f'\n Venue Preference: No venue preference set!'
                 f'\n Allocated?: No'
                 f'\n Tutor: -'
-                             ))
+                f'\n Late: False'
+                f'\n Recurring?: False'))
 
     def test_student_email_student_is_none(self):
         self.request.student = None
@@ -61,22 +64,22 @@ class RequestModelTest(TestCase):
     def test_allocated(self):
         self.request.allocated = True
         str(self.request)
-        self.assertEquals(self.request.allocated_string, "Yes")
+        self.assertEqual(self.request.allocated_string, "Yes")
 
     def test_unallocated(self):
         self.request.allocated = False
         str(self.request)
-        self.assertEquals(self.request.allocated_string, "No")
+        self.assertEqual(self.request.allocated_string, "No")
 
     def test_tutor_allocated(self):
         self.request.tutor = self.tutor
         str(self.request)
-        self.assertEquals(self.request.tutor_name, self.tutor.first_name + " " + self.tutor.last_name)
+        self.assertEqual(self.request.tutor_name, self.tutor.first_name + " " + self.tutor.last_name)
 
     def test_tutor_unallocated(self):
         self.request.tutor = None
         str(self.request)
-        self.assertEquals(self.request.tutor_name_string, "-")
+        self.assertEqual(self.request.tutor_name_string, "-")
 
     def test_student_field_cannot_be_blank(self):
         self.request.student = None
@@ -129,3 +132,10 @@ class RequestModelTest(TestCase):
         with self.assertRaises(ValidationError):
             self.request.full_clean()
 
+    def test_is_recurring_default(self):
+        self.assertFalse(self.request.is_recurring) 
+
+    def test_is_recurring_set_to_true(self):
+        """Ensure is_recurring can be set to True."""
+        self.request.is_recurring = True
+        self.assertTrue(self.request.is_recurring)

@@ -9,7 +9,11 @@
             {% elif user_type == 'Tutor' %} <h2>View requests allocated to you </h2>
             {% else %} <h2>Showing {{request_count}} Requests: </h2>
             {% endif %}
-
+          
+          {% if request.late == True %}
+          <h3> LATE REQUEST</h3>
+          {% endif %}
+          
           {% if user_type != 'Student' %}
             <p>Student name: {{request.student.full_name}}</p>
             <p>Student email address: {{request.student.email}}</p>
