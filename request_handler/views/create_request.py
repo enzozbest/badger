@@ -17,7 +17,7 @@ class CreateRequestView(View):
             return redirect('log_in')
 
         if request.user.user_type == 'Tutor':
-            return render(request, 'permission_denied.html', status=403)
+            return render(request, 'permission_denied.html', status=401)
 
         form = RequestForm()
         return render(request, 'create_request.html', {'form': form})
@@ -36,10 +36,6 @@ class CreateRequestView(View):
                 request_instance = form.save(commit=False)
                 request_instance.student = request.user
                 request_instance.save()
-
-                # Manually add selected days to Request instance.
-                for day in form.cleaned_data['availability']:
-                    request_instance.availability.add(day)
 
                 # Manually add selected venues to Request instance.
                 for mode in form.cleaned_data['venue_preference']:

@@ -1,7 +1,8 @@
 import django.forms as forms
 from datetime import timedelta,datetime
 
-from .models import Request, Day, Venue
+from .models import Request, Venue
+from user_system.models import Day
 
 """ Class representing a form to create a Request instance.
 
@@ -9,12 +10,6 @@ This class is used as the form displayed to au student user when they wish to ma
 in all the fields and a Request instance containing that information will be created and stored in the database.
 """
 class RequestForm(forms.ModelForm):
-    availability = forms.ModelMultipleChoiceField(
-        queryset=Day.objects.all(),
-        widget=forms.CheckboxSelectMultiple,
-        required=True
-    )
-
     venue_preference = forms.ModelMultipleChoiceField( 
         queryset=Venue.objects.all(),
         widget=forms.CheckboxSelectMultiple,
@@ -47,5 +42,5 @@ class RequestForm(forms.ModelForm):
 
     class Meta:
         model = Request
-        fields = ['knowledge_area', 'term', 'frequency', 'duration', 'availability', 'venue_preference']
+        fields = ['knowledge_area', 'term', 'frequency', 'duration', 'venue_preference']
 

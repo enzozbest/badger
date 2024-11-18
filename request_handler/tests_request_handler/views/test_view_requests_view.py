@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
-from user_system.models import User
-from request_handler.models import Request, Venue, Day
+from user_system.models import User, Day
+from request_handler.models import Request, Venue
 from django.forms.models import model_to_dict
 
 INVALID_REQUEST_ID = 999
@@ -12,7 +12,6 @@ class viewRequestsTest(TestCase):
         # Set up test user
         self.user = User.objects.create_user(username='@charlie', password='Password123', user_type='Student')
         self.mode_preference = Venue.objects.create(venue="Online")
-        self.available_day = Day.objects.create(day="Monday")
 
         self.client.login(username='@charlie', password='Password123')
 
@@ -33,13 +32,11 @@ class viewRequestsTest(TestCase):
             frequency='Weekly',
             duration='1h',
         )
-        self.request_instance.availability.set([self.available_day])
         self.request_instance.venue_preference.set([self.mode_preference])
 
         response = self.client.get(reverse('view_requests'))
         self.assertTrue(response.context, {
             'Knowledge_area': 'C++',
-            'Availability': 'Monday',
             'Term': 'Easter',
             'Frequency': 'Weekly',
             'Duration': '1h',
@@ -61,13 +58,11 @@ class viewRequestsTest(TestCase):
             tutor=tutor,
             allocated=True
         )
-        self.request_instance.availability.set([self.available_day])
         self.request_instance.venue_preference.set([self.mode_preference])
 
         response = self.client.get(reverse('view_requests'))
         self.assertTrue(response.context, {
             'Knowledge_area': 'C++',
-            'Availability': 'Monday',
             'Term': 'Easter',
             'Frequency': 'Weekly',
             'Duration': '1h',
