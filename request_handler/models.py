@@ -41,6 +41,7 @@ class Request(models.Model):
     term = models.CharField(max_length=255)
     frequency = models.CharField(max_length=255)
     duration = models.CharField(max_length=255, blank=False)
+    late = models.BooleanField(default=False, blank=False)
 
     @property
     def student_email(self):
@@ -80,6 +81,7 @@ class Request(models.Model):
                 f'\n Venue Preference: {venue}'
                 f'\n Allocated?: {self.allocated_string}'
                 f'\n Tutor: {self.tutor_name_string}'
+                f'\n Late: {self.late}'
                 )
 
     def clean(self):
