@@ -19,7 +19,7 @@ class EditRequestViewTest(TestCase):
             knowledge_area='Ruby',
             term='May',
             frequency='Weekly',
-            duration='4h',
+            duration='1.5',
         )
         self.request_instance.availability.set([self.available_day])
         self.request_instance.venue_preference.set([self.mode_preference])
@@ -48,7 +48,7 @@ class EditRequestViewTest(TestCase):
             'knowledge_area': 'Python',
             'term': 'May',
             'frequency': 'Biweekly',
-            'duration': '2h',
+            'duration': '2',
             'availability': [self.available_day.pk],
             'venue_preference': [self.mode_preference.pk],
         }
@@ -59,7 +59,7 @@ class EditRequestViewTest(TestCase):
         self.assertEqual(self.request_instance.knowledge_area, 'Python')
         self.assertEqual(self.request_instance.term, 'May')
         self.assertEqual(self.request_instance.frequency, 'Biweekly')
-        self.assertEqual(self.request_instance.duration, '2h')
+        self.assertEqual(self.request_instance.duration, '2')
 
     def test_post_missing_venue_preference(self):
         self.client.login(username='testuser', password='Password123')
@@ -67,7 +67,7 @@ class EditRequestViewTest(TestCase):
             'knowledge_area': 'Python',
             'term': 'May',
             'frequency': 'Biweekly',
-            'duration': '2h',
+            'duration': '2',
             'availability': [self.available_day.pk],
             'venue_preference': [], 
         }

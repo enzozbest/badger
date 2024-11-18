@@ -28,7 +28,7 @@ class TestRequestForm(TestCase):
             'term': 'January',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
+            'duration': '1',
             'venue_preference': [self.in_person.id, self.online.id]
         }
         form = RequestForm(data=form_input)
@@ -40,7 +40,7 @@ class TestRequestForm(TestCase):
             'term': 'Easter',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
+            'duration': '1',
             'venue_preference': [self.in_person.id, self.online.id]
         }
         form = RequestForm(data=invalid_input)
@@ -53,7 +53,7 @@ class TestRequestForm(TestCase):
             'term': 'Easter',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
+            'duration': '1',
             'venue_preference': []
         }
         form = RequestForm(data=invalid_input)
@@ -66,7 +66,7 @@ class TestRequestForm(TestCase):
             'term': '',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
+            'duration': '1',
             'venue_preference': [self.in_person.id, self.online.id]
         }
         form = RequestForm(data=invalid_input)
@@ -79,7 +79,7 @@ class TestRequestForm(TestCase):
             'term': 'Easter',
             'knowledge_area': '',
             'frequency': 'Weekly',
-            'duration': '1h',
+            'duration': '1',
             'venue_preference': [self.in_person.id, self.online.id]
         }
         form = RequestForm(data=invalid_input)
@@ -92,7 +92,7 @@ class TestRequestForm(TestCase):
             'term': 'Easter',
             'knowledge_area': 'Scala',
             'frequency': '',
-            'duration': '1h',
+            'duration': '1',
             'venue_preference': [self.in_person.id, self.online.id]
         }
         form = RequestForm(data=invalid_input)
@@ -118,7 +118,7 @@ class TestRequestForm(TestCase):
             'term': '',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
+            'duration': '1',
             'venue_preference': [self.in_person.id, self.online.id]
         }
         #Purposefully choosing a late term
