@@ -12,7 +12,7 @@ The members of the team are:
 The project is called `CodeConnect by Code Tutors`.
 
 ## Deployed version of the application
-The deployed version of the application can be found at [*https://isabellamcleankcl.pythonanywhere.com/*](*https://isabellamcleankcl.pythonanywhere.com/*).
+The deployed version of the application can be found at [*https://isabellamcleankcl.pythonanywhere.com/*](https://isabellamcleankcl.pythonanywhere.com/).
 
 ## Installation instructions
 To install the software and use it in your local development environment, you must first set up and activate a local development environment.  From the root of the project:
