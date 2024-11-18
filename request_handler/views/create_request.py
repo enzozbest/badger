@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpRequest, HttpResponse
 from django.views import View
 from django.shortcuts import redirect, render
@@ -11,12 +12,11 @@ This class is used as a view for the website. This class defines the get() metho
 and the post() method to handle a filled in RequestForm instance.
 Both methods ensure that the user is authenticated and that its user type is Student or Admin.
 """
-class CreateRequestView(View):
-    def get(self, request: HttpRequest) -> HttpResponse:
-        if not request.user.is_authenticated:
-            return redirect('log_in')
+class CreateRequestView(LoginRequiredMixin, View):
+    redirect_field_name = 'next'
 
-        if request.user.user_type == 'Tutor':
+    def get(self, request: HttpRequest) -> HttpResponse:
+        if request.user.is_tutor:
             return render(request, 'permission_denied.html', status=401)
 
         form = RequestForm()
@@ -26,8 +26,8 @@ class CreateRequestView(View):
         if not request.user.is_authenticated:
             return redirect('log_in')
 
-        if request.user.user_type == 'Tutor':
-            return render(request, 'permission_denied.html', status=403)
+        if request.user.is_tutor:
+            return render(request, 'permission_denied.html', status=401)
 
         form = RequestForm(request.POST)
 
