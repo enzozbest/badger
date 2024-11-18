@@ -1,5 +1,5 @@
 from django.test import TestCase
-from tutorials.models import User
+from user_system.models import User
 from django.shortcuts import reverse
 class SmallViewsTestCase(TestCase):
     def setUp(self):

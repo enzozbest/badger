@@ -67,6 +67,17 @@
             <button type="submit">Filter</button>
         </form>
 
+        <form method="get" action="{% url 'view_all_users' %}">
+            {% for key, value in request.GET.items %}
+                {% if key != 'q' and key != 'page' %}
+                    <input type="hidden" name="{{ key }}" value="{{ value }}">
+                {% endif %}
+            {% endfor %}
+
+            <input type="text" name="q" placeholder="Search by name" value="{{ query }}">
+            <button type="submit">Search</button>
+        </form>
+
     {% for user in page_obj %}
         <p>First name: {{user.first_name}}</p>
         <p>Last name: {{user.last_name}}</p>
@@ -82,15 +93,18 @@
 
         <div class="pagination">
             {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}">Previous</a>
             {% endif %}
 
             Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
 
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                <a href="?q={{ query }}&page={{ page_obj.next_page_number }}">Next</a>
             {% endif %}
         </div>
     </body>
 </html>
+<<<<<<< HEAD
 >>>>>>> 94c0d41445fd63777afa80162bd2588a98da5ac8
+=======
+>>>>>>> origin

@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
-from tutorials.models import User
+from user_system.models import User
 
 """ Class representing a day of the week
 
@@ -12,15 +12,15 @@ class Day(models.Model):
     def __str__(self):
         return self.day
 
-""" Class representing a mode of attendance
+""" Class representing a venue for tutoring sessions.
 
 This Model is necessary for the ManyToMany relationships in Request to work, as they must be between model instances.
 Modes are represented in the database as a string (In person, Online, No preference) and an automatically assigned id (primary key).
 """
-class Modality(models.Model):
-    mode = models.CharField(max_length=10)
+class Venue(models.Model):
+    venue = models.CharField(max_length=10)
     def __str__(self):
-        return self.mode
+        return self.venue
 
 """ Class representing a request for lessons from a student.
 
@@ -37,10 +37,11 @@ class Request(models.Model):
     tutor = models.OneToOneField(User, null=True, on_delete=models.CASCADE, blank=True, related_name='tutor')
     knowledge_area = models.CharField(max_length=255, blank=False)
     availability = models.ManyToManyField(Day, blank=False)
-    venue_preference = models.ManyToManyField(Modality, blank=False)
+    venue_preference = models.ManyToManyField(Venue, blank=False)
     term = models.CharField(max_length=255)
     frequency = models.CharField(max_length=255)
     duration = models.CharField(max_length=255, blank=False)
+    late = models.BooleanField(default=False, blank=False)
 
     @property
     def student_email(self):
@@ -80,6 +81,7 @@ class Request(models.Model):
                 f'\n Venue Preference: {venue}'
                 f'\n Allocated?: {self.allocated_string}'
                 f'\n Tutor: {self.tutor_name_string}'
+                f'\n Late: {self.late}'
                 )
 
     def clean(self):

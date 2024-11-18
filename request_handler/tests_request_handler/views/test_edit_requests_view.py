@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
-from tutorials.models import User
-from request_handler.models import Request, Modality, Day
+from user_system.models import User
+from request_handler.models import Request, Venue, Day
 from request_handler.forms import RequestForm
 
 INVALID_REQUEST_ID = 999
@@ -11,7 +11,7 @@ class EditRequestViewTest(TestCase):
         self.user = User.objects.create_user(username='testuser', password='Password123', user_type='Student', email='testuser@example.com')
         self.tutor = User.objects.create_user(username='testtutor', password='Password123', user_type='Tutor', email='testtutor@example.com')
         self.admin = User.objects.create_user(username='adminuser', password='Password123', user_type='Admin', email='admin@example.com')
-        self.mode_preference = Modality.objects.create(mode="Online")
+        self.mode_preference = Venue.objects.create(venue="Online")
         self.available_day = Day.objects.create(day="Monday")
 
         self.request_instance = Request.objects.create(
@@ -19,7 +19,7 @@ class EditRequestViewTest(TestCase):
             knowledge_area='Ruby',
             term='May',
             frequency='Weekly',
-            duration='4h',
+            duration='1.5',
         )
         self.request_instance.availability.set([self.available_day])
         self.request_instance.venue_preference.set([self.mode_preference])
@@ -48,7 +48,7 @@ class EditRequestViewTest(TestCase):
             'knowledge_area': 'Python',
             'term': 'May',
             'frequency': 'Biweekly',
-            'duration': '2h',
+            'duration': '2',
             'availability': [self.available_day.pk],
             'venue_preference': [self.mode_preference.pk],
         }
@@ -59,7 +59,7 @@ class EditRequestViewTest(TestCase):
         self.assertEqual(self.request_instance.knowledge_area, 'Python')
         self.assertEqual(self.request_instance.term, 'May')
         self.assertEqual(self.request_instance.frequency, 'Biweekly')
-        self.assertEqual(self.request_instance.duration, '2h')
+        self.assertEqual(self.request_instance.duration, '2')
 
     def test_post_missing_venue_preference(self):
         self.client.login(username='testuser', password='Password123')
@@ -67,7 +67,7 @@ class EditRequestViewTest(TestCase):
             'knowledge_area': 'Python',
             'term': 'May',
             'frequency': 'Biweekly',
-            'duration': '2h',
+            'duration': '2',
             'availability': [self.available_day.pk],
             'venue_preference': [], 
         }

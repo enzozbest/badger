@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
-from tutorials.models import User
-from request_handler.models import Request, Modality, Day
+from user_system.models import User
+from request_handler.models import Request, Venue, Day
 from datetime import datetime 
 
 
@@ -11,7 +11,7 @@ INVALID_REQUEST_ID = 999
 class TestViews(TestCase):
     def setUp(self):
         self.monday = Day.objects.create(day='Monday')
-        self.online = Modality.objects.create(mode='Online')
+        self.online = Venue.objects.create(venue='Online')
         User.objects.create_user(username='@johndoe', email='johndoe@example.org', password='Password123', user_type='Student')
         self.tutor = User.objects.create_user(username='@janedoe', email='janedoe@example.org', password='Password123',
                                               first_name='Jane', last_name='Doe', user_type='Tutor')
@@ -32,8 +32,8 @@ class TestViews(TestCase):
             'availability': [self.monday.pk],
             'term': 'January',
             'knowledge_area': 'Scala',
-            'frequency': 'Weekly',
-            'duration': '1h',
+            'frequency': 'Biweekly',
+            'duration': '1',
             'venue_preference': [self.online.pk],
         }
         response = self.client.post(self.url, data, follow=True)
@@ -47,7 +47,7 @@ class TestViews(TestCase):
             'term': '',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
+            'duration': '1',
             'venue_preference': [self.online.id,]
         }
         self.client.post(self.url, data)
@@ -80,7 +80,7 @@ class TestViews(TestCase):
             'term': '',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
+            'duration': '1',
             'venue_preference': [self.online.id]
         }
         #Purposefully choosing a late term

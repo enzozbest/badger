@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
-from tutorials.models import User
-from request_handler.models import Request, Modality, Day
+from user_system.models import User
+from request_handler.models import Request, Venue, Day
 from django.forms.models import model_to_dict
 
 INVALID_REQUEST_ID = 999
@@ -11,7 +11,7 @@ class viewRequestsTest(TestCase):
     def setUp(self):
         # Set up test user
         self.user = User.objects.create_user(username='@charlie', password='Password123', user_type='Student')
-        self.mode_preference = Modality.objects.create(mode="Online")
+        self.mode_preference = Venue.objects.create(venue="Online")
         self.available_day = Day.objects.create(day="Monday")
 
         self.client.login(username='@charlie', password='Password123')
