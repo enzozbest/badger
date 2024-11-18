@@ -5,9 +5,18 @@
     <title>Make admin</title>
 </head>
 <body>
-    <div>
-        <a href="{% url 'admin_dash' %}">Click here to go to the administrator dashboard</a>
-    </div>
-<h1>{{user.first_name}} {{user.last_name}} is now an administrator</h1>
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 text-center">
+          <div class="card-body bg-light">
+            <div class="mb-3">
+              <!-- Icon for Tutor -->
+              <i class="bi bi-person-badge" style="font-size: 3rem;"></i>
+            </div>
+            <h5 class="card-title">J{{user.first_name}} {{user.last_name}} </h5>
+            <p class="card-text">is now an administrator</p>
+            <a href="{% url 'admin_dash' %}" class="btn btn-outline-secondary">Click here to go to the administrator dashboard</a>
+          </div>
+        </div>
+      </div>
 </body>
 </html>

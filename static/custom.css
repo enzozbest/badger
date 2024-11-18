@@ -112,3 +112,24 @@ h3.profile-title {
   text-decoration: underline;
   color: #0d6efd;
 }
+
+/*
+ * Add to base.html
+ */
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+.content {
+  flex: 1; /* Ensures content takes up the remaining space */
+}
+.footer {
+  background-color: #f8f9fa;
+  text-align: center;
+}

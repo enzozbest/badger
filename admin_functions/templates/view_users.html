@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 {% extends 'base_content.html' %}
 {% block content %}
 <div class="container mt-5">
@@ -11,7 +10,12 @@
         <a href="{% url 'admin_dash' %}" class="text-decoration-none">Go to the Administrator Dashboard</a>
     </div>
 
-    <table class="table table-striped table-hover mt-4">
+    <form method="get">
+        {{ filter.form.as_p }}
+        <button type="submit" class="btn btn-outline-secondary btn-sm">Filter</button>
+    </form>
+
+    <table class="table table-striped table-hover mt-3">
         <thead>
             <tr>
                 <th scope="col">First Name</th>
@@ -27,6 +31,11 @@
                     <td>{{ user.last_name }}</td>
                     <td>{{ user.user_type }}</td>
                     <td>{{ user.email|lower }}</td>
+                    {% if user.user_type != "Admin" %}
+                    <td>
+                        <a href="{% url 'make_admin' user.pk %}" class="btn btn-primary">Make Administrator</a>
+                    </td>
+                    {% endif %}
                 </tr>
             {% empty %}
                 <tr>
@@ -36,7 +45,7 @@
         </tbody>
     </table>
 
-    <div class="pagination mt-3">
+    <div class="pagination mt-5">
         {% if page_obj.has_previous %}
             <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-secondary btn-sm">Previous</a>
         {% endif %}
@@ -48,6 +57,7 @@
         {% endif %}
     </div>
 </div>
+<<<<<<< Updated upstream
 {% endblock %}
 =======
 <!DOCTYPE html>
@@ -108,3 +118,6 @@
 >>>>>>> 94c0d41445fd63777afa80162bd2588a98da5ac8
 =======
 >>>>>>> origin
+=======
+{% endblock %}
+>>>>>>> Stashed changes
