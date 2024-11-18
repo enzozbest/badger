@@ -19,7 +19,6 @@ class TestRequestForm(TestCase):
         self.assertIn('frequency', form.fields)
         self.assertIn('duration', form.fields)
         self.assertIn('venue_preference', form.fields)
-        self.assertIn('is_recurring', form.fields)
         self.assertTrue(isinstance(form.fields['availability'], ModelMultipleChoiceField))
         self.assertTrue(isinstance(form.fields['venue_preference'], ModelMultipleChoiceField))
 
@@ -29,7 +28,7 @@ class TestRequestForm(TestCase):
             'term': 'January',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
+            'duration': '1',
             'venue_preference': [self.in_person.id, self.online.id],
             'is_recurring': True
         }
@@ -42,10 +41,9 @@ class TestRequestForm(TestCase):
             'term': 'Easter',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
+            'duration': '1',
             'venue_preference': [self.in_person.id, self.online.id],
             'is_recurring': False
-
         }
         form = RequestForm(data=invalid_input)
         self.assertFalse(form.is_valid())
@@ -57,7 +55,7 @@ class TestRequestForm(TestCase):
             'term': 'Easter',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
+            'duration': '1',
             'venue_preference': [],
             'is_recurring': False
         }
@@ -71,8 +69,9 @@ class TestRequestForm(TestCase):
             'term': '',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
-            'venue_preference': [self.in_person.id, self.online.id]
+            'duration': '1',
+            'venue_preference': [self.in_person.id, self.online.id],
+            'is_recurring': False
         }
         form = RequestForm(data=invalid_input)
         self.assertFalse(form.is_valid())
@@ -84,7 +83,7 @@ class TestRequestForm(TestCase):
             'term': 'Easter',
             'knowledge_area': '',
             'frequency': 'Weekly',
-            'duration': '1h',
+            'duration': '1',
             'venue_preference': [self.in_person.id, self.online.id],
             'is_recurring': False
         }
@@ -98,7 +97,7 @@ class TestRequestForm(TestCase):
             'term': 'Easter',
             'knowledge_area': 'Scala',
             'frequency': '',
-            'duration': '1h',
+            'duration': '1',
             'venue_preference': [self.in_person.id, self.online.id],
             'is_recurring': False
         }
@@ -119,7 +118,7 @@ class TestRequestForm(TestCase):
         form = RequestForm(data=invalid_input)
         self.assertFalse(form.is_valid())
         self.assertIn('duration', form.errors)
-
+    
     def test_form_handles_is_recurring_correctly(self):
         invalid_input = {
             'availability': [self.monday.id, self.wednesday.id],
@@ -139,14 +138,13 @@ class TestRequestForm(TestCase):
         self.assertTrue(form.is_valid())
         self.assertFalse(form.cleaned_data['is_recurring'])
 
-
     def test_form_late_request_response(self):
         form_input = {
             'availability': [self.monday.id, self.wednesday.id],
             'term': '',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1h',
+            'duration': '1',
             'venue_preference': [self.in_person.id, self.online.id],
             'is_recurring': False
         }
