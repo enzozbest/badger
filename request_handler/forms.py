@@ -58,5 +58,5 @@ class RequestForm(forms.ModelForm):
 
     class Meta:
         model = Request
-        fields = ['knowledge_area', 'term', 'frequency', 'duration', 'availability', 'venue_preference']
+        fields = ['knowledge_area', 'term', 'frequency', 'duration', 'availability', 'venue_preference', 'is_recurring']
 
