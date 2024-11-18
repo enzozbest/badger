@@ -57,67 +57,6 @@
         {% endif %}
     </div>
 </div>
-<<<<<<< Updated upstream
+
 {% endblock %}
-=======
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>View Users</title>
-    </head>
-    <body>
-        <div>
-            <a href="{% url 'dashboard' %}">Click here to go to the main dashboard</a>
-        </div>
-    <h1>Showing all {{count}} users registered: </h1>
 
-        <form method="get">
-            {{ filter.form.as_p }}
-            <button type="submit">Filter</button>
-        </form>
-
-        <form method="get" action="{% url 'view_all_users' %}">
-            {% for key, value in request.GET.items %}
-                {% if key != 'q' and key != 'page' %}
-                    <input type="hidden" name="{{ key }}" value="{{ value }}">
-                {% endif %}
-            {% endfor %}
-
-            <input type="text" name="q" placeholder="Search by name" value="{{ query }}">
-            <button type="submit">Search</button>
-        </form>
-
-    {% for user in page_obj %}
-        <p>First name: {{user.first_name}}</p>
-        <p>Last name: {{user.last_name}}</p>
-        <p>Account type: {{user.user_type}}</p>
-        <p>Email address: {{user.email}}</p>
-        {% if user.user_type != "Admin" %}
-            <a href="{% url 'make_admin' user.pk %}" >Make administrator</a>
-        {% endif %}
-        <hr>
-    {% empty %}
-        <p>No users registered.</p>
-    {% endfor %}
-
-        <div class="pagination">
-            {% if page_obj.has_previous %}
-                <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}">Previous</a>
-            {% endif %}
-
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-
-            {% if page_obj.has_next %}
-                <a href="?q={{ query }}&page={{ page_obj.next_page_number }}">Next</a>
-            {% endif %}
-        </div>
-    </body>
-</html>
-<<<<<<< HEAD
->>>>>>> 94c0d41445fd63777afa80162bd2588a98da5ac8
-=======
->>>>>>> origin
-=======
-{% endblock %}
->>>>>>> Stashed changes
