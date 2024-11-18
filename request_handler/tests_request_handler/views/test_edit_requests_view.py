@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from user_system.models import User
-from request_handler.models import Request, Modality, Day
+from request_handler.models import Request, Venue, Day
 from request_handler.forms import RequestForm
 
 INVALID_REQUEST_ID = 999
@@ -11,7 +11,7 @@ class EditRequestViewTest(TestCase):
         self.user = User.objects.create_user(username='testuser', password='Password123', user_type='Student', email='testuser@example.com')
         self.tutor = User.objects.create_user(username='testtutor', password='Password123', user_type='Tutor', email='testtutor@example.com')
         self.admin = User.objects.create_user(username='adminuser', password='Password123', user_type='Admin', email='admin@example.com')
-        self.mode_preference = Modality.objects.create(mode="Online")
+        self.mode_preference = Venue.objects.create(venue="Online")
         self.available_day = Day.objects.create(day="Monday")
 
         self.request_instance = Request.objects.create(

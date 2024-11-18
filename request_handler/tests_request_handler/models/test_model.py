@@ -4,13 +4,13 @@ from django.test import TestCase
 class RequestModelTest(TestCase):
     def setUp(self):
         from user_system.models import User
-        from request_handler.models import Request, Day, Modality
+        from request_handler.models import Request, Day, Venue
 
         self.user = User.objects.create_user(username='@johndoe', email='johndoe@example.org', password='Password123')
         self.monday = Day.objects.create(day='Monday')
         self.wednesday = Day.objects.create(day='Wednesday')
-        self.in_person = Modality.objects.create(mode='In Person')
-        self.online = Modality.objects.create(mode='Online')
+        self.in_person = Venue.objects.create(venue='In Person')
+        self.online = Venue.objects.create(venue='Online')
         self.request = Request.objects.create(student=self.user, term='Easter', knowledge_area='Scala',
                                duration='1h', frequency='Weekly')
         self.request.availability.add(self.monday, self.wednesday)

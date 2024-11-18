@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from user_system.models import User
-from request_handler.models import Request, Modality, Day
+from request_handler.models import Request, Venue, Day
 from django.contrib import messages
 from unittest.mock import patch
 
@@ -13,7 +13,7 @@ class DeleteRequestViewTest(TestCase):
         # Set up test user
         self.user = User.objects.create_user(username='testuser', password='Password123', user_type='Student')
 
-        self.mode_preference = Modality.objects.create(mode="Online")
+        self.mode_preference = Venue.objects.create(venue="Online")
         self.available_day = Day.objects.create(day="Monday")
 
         # Request instance belonging to test user
