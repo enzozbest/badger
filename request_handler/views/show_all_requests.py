@@ -2,7 +2,6 @@ from request_handler.models import Request
 from request_handler.helpers.request_filter import AllocationFilter
 from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
 
 class AllRequestsView(LoginRequiredMixin, ListView):
     model = Request

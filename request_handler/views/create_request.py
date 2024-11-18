@@ -13,8 +13,6 @@ and the post() method to handle a filled in RequestForm instance.
 Both methods ensure that the user is authenticated and that its user type is Student or Admin.
 """
 class CreateRequestView(LoginRequiredMixin, View):
-    redirect_field_name = 'next'
-
     def get(self, request: HttpRequest) -> HttpResponse:
         if request.user.is_tutor:
             return render(request, 'permission_denied.html', status=401)
