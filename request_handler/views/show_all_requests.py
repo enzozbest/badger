@@ -13,7 +13,13 @@ class AllRequestsView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        self.filterset = AllocationFilter(self.request.GET, queryset=queryset)
+        relevant_requests = queryset
+        if self.request.user.is_student:
+            relevant_requests = queryset.filter(student=self.request.user)
+        if self.request.user.is_tutor:
+            relevant_requests = queryset.filter(tutor=self.request.user)
+
+        self.filterset = AllocationFilter(self.request.GET, queryset=relevant_requests)
         if self.filterset.is_valid():
             return self.filterset.qs
         return queryset
