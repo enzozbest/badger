@@ -20,7 +20,8 @@ class viewRequestsTest(TestCase):
     def test_redirect_if_not_logged_in_view_requests(self):
         self.client.logout()
         response = self.client.get(reverse('view_requests'))
-        self.assertRedirects(response, f'/log_in/')
+        expected_url = f"{reverse('log_in')}?next={reverse('view_requests')}"
+        self.assertRedirects(response, expected_url, status_code=302, target_status_code=200)
 
     # Tests that a logged in user with requests can see them and the data is accurate
     def test_view_requests_populated(self):
@@ -103,6 +104,7 @@ class viewRequestsTest(TestCase):
 
     # Tests that a logged in user who requests to view their requests (while having none) does not receive an error
     def test_view_requests_empty(self):
+        self.client.login(username='@charlie', password='Password123')
         response = self.client.get(reverse('view_requests'))
         self.assertEqual(list(response.context['requests']), [])
 
@@ -113,4 +115,5 @@ class viewRequestsTest(TestCase):
     def test_unauthenticated_user_cannot_view_request(self):
         self.client.logout()
         response = self.client.get(reverse('view_requests'))
-        self.assertRedirects(response, reverse('log_in'), status_code=302, target_status_code=200)
+        expected_url = f"{reverse('log_in')}?next={reverse('view_requests')}"
+        self.assertRedirects(response, expected_url, status_code=302, target_status_code=200)
