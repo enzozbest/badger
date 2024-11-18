@@ -1,13 +1,13 @@
-"""Unit tests_tutorials of the log in form."""
+"""Unit tests_user_system of the log in form."""
 from django import forms
 from django.test import TestCase
 from user_system.forms import LogInForm
 from user_system.models import User
 
 class LogInFormTestCase(TestCase):
-    """Unit tests_tutorials of the log in form."""
+    """Unit tests_user_system of the log in form."""
 
-    fixtures = ['user_system/tests_tutorials/fixtures/default_user.json']
+    fixtures = ['user_system/tests_user_system/fixtures/default_user.json']
 
     def setUp(self):
         self.form_input = {'username': '@janedoe', 'password': 'Password123'}

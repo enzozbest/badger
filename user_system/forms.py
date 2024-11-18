@@ -2,7 +2,7 @@
 from django import forms
 from django.contrib.auth import authenticate
 from django.core.validators import RegexValidator
-from .models import User, KnowledgeArea
+from .models import User, KnowledgeArea, Day
 
 
 class LogInForm(forms.Form):
@@ -48,10 +48,18 @@ class UserForm(forms.ModelForm):
             raise forms.ValidationError('Hourly rate must be a positive number! ')
         return hourly_rate
 
+    availability = forms.ModelMultipleChoiceField(
+        label='Availability',
+        queryset=Day.objects.all(),
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+        required=False
+    )
+
     class Meta:
         """Form options."""
+
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'user_type', 'hourly_rate']
+        fields = ['first_name', 'last_name', 'username', 'email', 'user_type', 'hourly_rate', 'availability']
 
 class NewPasswordMixin(forms.Form):
     """Form mixing for new_password and password_confirmation fields."""
@@ -113,11 +121,16 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
     """Form enabling unregistered users to sign up."""
     USER_SIGNUP_CHOICES = [(User.ACCOUNT_TYPE_TUTOR, 'Tutor'), (User.ACCOUNT_TYPE_STUDENT, 'Student')]
     user_type = forms.ChoiceField(choices=USER_SIGNUP_CHOICES, label='Account Type')
-
+    availability = forms.ModelMultipleChoiceField(
+        label='Availability',
+        queryset=Day.objects.all(),
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+        required=False
+    )
     class Meta:
         """Form options."""
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'user_type']
+        fields = ['first_name', 'last_name', 'username', 'email', 'user_type', 'availability']
 
     def save(self):
         """Create a new user."""

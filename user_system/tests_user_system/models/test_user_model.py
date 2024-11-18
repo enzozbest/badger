@@ -1,14 +1,14 @@
-"""Unit tests_tutorials for the User model."""
+"""Unit tests_user_system for the User model."""
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from user_system.models import User
 
 class UserModelTestCase(TestCase):
-    """Unit tests_tutorials for the User model."""
+    """Unit tests_user_system for the User model."""
 
     fixtures = [
-        'user_system/tests_tutorials/fixtures/default_user.json',
-        'user_system/tests_tutorials/fixtures/other_users.json'
+        'user_system/tests_user_system/fixtures/default_user.json',
+        'user_system/tests_user_system/fixtures/other_users.json'
     ]
 
     GRAVATAR_URL = "https://www.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986"
