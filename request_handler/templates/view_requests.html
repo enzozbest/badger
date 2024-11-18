@@ -2,16 +2,95 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>View tutoring requests</title>
+    <title>View Requests</title>
 </head>
 <body>
-    <div class="col-12">
-        <a href = "{% url 'dashboard' %}">Dashboard</a>
+    <div>
+        <a href="{% url 'dashboard' %}">Click here to go to the main dashboard</a>
     </div>
-    {% for request in requests  %}
-        {% include 'partials/show_single_request.html' %}
-    {% empty %}
-        <p>You have no current requests to be displayed</p>
-    {% endfor %}
+
+    <h1>Showing {{ count }} out of {{ total }} requests:</h1>
+
+    <!-- Filter Form -->
+    <form method="get">
+        {{ filter.form.as_p }} <button type="submit">Go</button>
+    </form>
+
+    <!-- Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Student</th>
+                <th>Requested Area</th>
+                <th>Venue Preference</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in requests %}
+                <tr>
+                    <td>{{ request.id }}</td>
+                    <td>
+                        <ol>
+                            <li>{{ request.student.first_name }} {{ request.student.last_name }}</li>
+                            <li>{{ request.student.email }}</li>
+                        </ol>
+                    </td>
+                    <td>{{ request.knowledge_area }}</td>
+                    <td>
+                        <ul>
+                            {% for venue in request.venue_preference.all %}
+                            <li>{{ venue }}</li>
+                            {% empty %}
+                            <li>No Venue Preference</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                    <td>
+                        {% if request.tutor %}
+                            Allocated to {{ request.tutor }}
+                        {% else %}
+                            Unallocated
+                        {% endif %}
+                    </td>
+                    <td>
+                        <ul>
+                            {% if user.user_type == 'Admin' and not request.allocated %}
+                                <li> <a href="{% url 'view_requests'%}">Allocate</a> </li>
+                                {% if user.user_type != 'Tutor' %}
+                                    <li> <a href="{% url 'edit_request' request.id %}">Update</a> </li>
+                                    <li> <a href="{% url 'delete_request' request.id%}">Delete</a> </li>
+                                {% endif %}
+                            {% endif %}
+                        </ul>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">No requests found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+   <div class="pagination">
+    {% if is_paginated %}
+        {% if page_obj.has_previous %}
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">First</a>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+
+        <span>Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next</a>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ paginator.num_pages }}">Last</a>
+        {% endif %}
+    {% endif %}
+</div>
+
 </body>
 </html>

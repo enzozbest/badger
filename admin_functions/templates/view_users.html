@@ -1,54 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>View Users</title>
-    </head>
-    <body>
-        <div>
-            <a href="{% url 'dashboard' %}">Click here to go to the main dashboard</a>
-        </div>
-    <h1>Showing all {{count}} users registered: </h1>
+<head>
+    <meta charset="UTF-8">
+    <title>View Requests</title>
+</head>
+<body>
+    <div>
+        <a href="{% url 'dashboard' %}">Click here to go to the main dashboard</a>
+    </div>
 
-        <form method="get">
-            {{ filter.form.as_p }}
-            <button type="submit">Filter</button>
-        </form>
+    <h1>Showing {{ count }} out of {{ total }} users:</h1>
 
-        <form method="get" action="{% url 'view_all_users' %}">
-            {% for key, value in request.GET.items %}
-                {% if key != 'q' and key != 'page' %}
-                    <input type="hidden" name="{{ key }}" value="{{ value }}">
-                {% endif %}
+    <!-- Filter Form -->
+    <form method="get">
+        {{ filter.form.as_p }} <button type="submit">Go</button>
+    </form>
+
+    <!-- Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>First name</th>
+                <th>Last name</th>
+                <th>Account type</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.first_name }}</td>
+                    <td>{{ user.last_name }}</td>
+                    <td>{{ user.user_type}}</td>
+                    <td>{% if user.user_type != 'Admin' %}
+                            <a href="{% url 'make_admin' user.id %}">Make Administrator</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">No users found.</td>
+                </tr>
             {% endfor %}
+        </tbody>
+    </table>
 
-            <input type="text" name="q" placeholder="Search by name" value="{{ query }}">
-            <button type="submit">Search</button>
-        </form>
-
-    {% for user in page_obj %}
-        <p>First name: {{user.first_name}}</p>
-        <p>Last name: {{user.last_name}}</p>
-        <p>Account type: {{user.user_type}}</p>
-        <p>Email address: {{user.email}}</p>
-        {% if user.user_type != "Admin" %}
-            <a href="{% url 'make_admin' user.pk %}" >Make administrator</a>
+    <!-- Pagination -->
+   <div class="pagination">
+    {% if is_paginated %}
+        {% if page_obj.has_previous %}
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">First</a>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Previous</a>
         {% endif %}
-        <hr>
-    {% empty %}
-        <p>No users registered.</p>
-    {% endfor %}
 
-        <div class="pagination">
-            {% if page_obj.has_previous %}
-                <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}">Previous</a>
-            {% endif %}
+        <span>Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
 
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        {% if page_obj.has_next %}
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next</a>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ paginator.num_pages }}">Last</a>
+        {% endif %}
+    {% endif %}
+</div>
 
-            {% if page_obj.has_next %}
-                <a href="?q={{ query }}&page={{ page_obj.next_page_number }}">Next</a>
-            {% endif %}
-        </div>
-    </body>
+</body>
 </html>

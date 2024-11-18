@@ -1,12 +1,10 @@
 from django.test import TestCase
 from django.urls import reverse
-from user_system.models import User
-from request_handler.models import Request, Venue, Day
+from user_system.models import User, Day
+from request_handler.models import Request, Venue
 from datetime import datetime 
 
-
 INVALID_REQUEST_ID = 999
-
 
 class TestViews(TestCase):
     def setUp(self):
@@ -17,10 +15,6 @@ class TestViews(TestCase):
                                               first_name='Jane', last_name='Doe', user_type='Tutor')
         self.url = reverse('create_request')
 
-    def test_unauthenticated_user_cannot_create_request(self):
-        response = self.client.get(self.url, follow=True)
-        self.assertRedirects(response, reverse('log_in'), status_code=302, target_status_code=200)
-
     def test_user_can_see_rqeuest_creation_page(self):
         self.client.login(username='@johndoe', password='Password123')
         response = self.client.get(self.url)
@@ -29,7 +23,6 @@ class TestViews(TestCase):
     def test_create_request_with_valid_data(self):
         self.client.login(username='@johndoe', password='Password123')
         data = {
-            'availability': [self.monday.pk],
             'term': 'January',
             'knowledge_area': 'Scala',
             'frequency': 'Biweekly',
@@ -43,7 +36,6 @@ class TestViews(TestCase):
         self.client.login(username='@johndoe', password='Password123')
         #Blank 'term' field!
         data = {
-            'availability': [self.monday.id,],
             'term': '',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
@@ -56,27 +48,28 @@ class TestViews(TestCase):
     def test_tutor_cannot_create_request_get(self):
         self.client.login(username='@janedoe', password='Password123')
         response = self.client.get(self.url, follow=True)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
         self.assertTemplateUsed(response, 'permission_denied.html')
 
     def test_tutor_cannot_create_request_post(self):
         self.client.login(username='@janedoe', password='Password123')
         response = self.client.post(self.url, follow=True)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
         self.assertTemplateUsed(response, 'permission_denied.html')
 
     def test_unauthenticated_user_cannot_create_request_get(self):
         response = self.client.get(self.url, follow=True)
-        self.assertRedirects(response, reverse('log_in'), status_code=302, target_status_code=200)
+        expected_url = f'{reverse("log_in")}?next={reverse("create_request")}'
+        self.assertRedirects(response, expected_url, status_code=302, target_status_code=200)
 
     def test_unauthenticated_user_cannot_create_request_post(self):
         response = self.client.post(self.url, follow=True)
-        self.assertRedirects(response, reverse('log_in'), status_code=302, target_status_code=200)
+        expected_url = f'{reverse("log_in")}?next={reverse("create_request")}'
+        self.assertRedirects(response, expected_url, status_code=302, target_status_code=200)
 
     def test_form_late_request_redirect(self):
         self.client.login(username='@johndoe', password='Password123')
         data = {
-            'availability': [self.monday.id],
             'term': '',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',

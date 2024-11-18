@@ -1,56 +1,55 @@
-from django.views import View
-from django.http import HttpResponseNotAllowed, HttpResponse, HttpRequest
-from django.shortcuts import redirect, render
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.views.generic import ListView
 from user_system.models import User
-from django.core.paginator import Paginator
 from admin_functions.helpers.filters import UserFilter
-from django.db.models import Q
+from django.http import HttpResponse
+from django.shortcuts import reverse
+from django.http import HttpResponseRedirect
 
-class AllUsersView(View):
-    def get(self, request: HttpRequest) -> HttpResponse:
+class AllUsersView(LoginRequiredMixin, ListView):
+    model = User
+    template_name = 'view_users.html'
+    context_object_name = 'users'
+    paginate_by = 20
+    ordering = ['pk']
+    filterset_class = UserFilter
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        self.filterset = self.filterset_class(self.request.GET, queryset=queryset)
+        if self.filterset.is_valid():
+            return self.filterset.qs
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filter'] = self.filterset  # Pass the filter object to the template
+        context['count'] = context['users'].count()
+        context['total'] = self.filterset.qs.count()
+        return context
+
+    def get(self, request, *args, **kwargs):
+        # Fetch the queryset
+        self.object_list = self.get_queryset()
+
+        # Apply pagination manually
+        paginator = Paginator(self.object_list, self.paginate_by)
+        page = request.GET.get('page', 1)
+        try:
+            page_obj = paginator.page(page)
+        except (PageNotAnInteger, EmptyPage):
+            # Redirect to the last page if out of range
+            last_page = paginator.num_pages
+            return HttpResponseRedirect(f"{reverse('view_all_users')}?page={last_page}")
+
+        # Set `object_list` for the context
+        self.object_list = page_obj
+        return super().get(request, *args, **kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return redirect('log_in')
-
-        user_type = request.user.user_type
-        if user_type != 'Admin':
-            return render(request, 'permission_denied.html', status=403)
-
-        query = request.GET.get('q', '').strip()  # Default to empty string if no query provided
-        users = User.objects.all()
-        filter_obj = UserFilter(request.GET, queryset=users)
-        filtered_users = filter_obj.qs
-
-        if query:
-            query_parts = query.split()
-            if len(query_parts) == 1:
-                filtered_users = filtered_users.filter(
-                    Q(first_name__istartswith=query_parts[0]) |
-                    Q(last_name__istartswith=query_parts[0])
-                )
-            elif len(query_parts) >= 2:
-                filtered_users = filtered_users.filter(
-                    Q(first_name__istartswith=query_parts[0]) & Q(last_name__istartswith=query_parts[1])
-                )
-            # filtered_users = filtered_users.filter(Q(first_name__istartswith=query) | Q(last_name__istartswith=query))
-
-        paginator = Paginator(filtered_users, 20)
-        page_number = request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
-
-        user_count = filtered_users.count()
-
-        context = {
-            'users': users,
-            'query': query,
-            'page_obj': page_obj,
-            'count': user_count,
-            'filter': filter_obj,
-        }
-
-        user_count = User.objects.count()
-        return render(request, 'view_users.html', context)
-
-
-    def post(self, request: HttpRequest) -> HttpResponse:
-        return HttpResponseNotAllowed("Requests to this URL must be made by the GET method!",
-                                      content=b'Method Not Allowed', status=405)
+            return self.handle_no_permission()  # Redirects to login page
+        if not request.user.user_type == 'Admin':  # Example: Allow only staff users
+            return HttpResponse("You do not have permission to view this page.", status=401)
+        return super().dispatch(request, *args, **kwargs)

@@ -1,18 +1,18 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
-from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
+from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import redirect, render, get_object_or_404
 from request_handler.models import Request
 from django.contrib import messages
 from django.http import Http404
 
 
-class DeleteRequestView(View):
+class DeleteRequestView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
-        return HttpResponseBadRequest('This URL does not accept GET requests!')
+        return HttpResponseNotAllowed('This URL does not accept GET requests!', status=405,
+                                      content=b'Method Not Allowed')
 
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
-        if not request.user.is_authenticated:
-            return redirect('log_in')
         try:
             request_instance = get_object_or_404(Request, pk=pk, student=request.user)
             request_instance.delete()

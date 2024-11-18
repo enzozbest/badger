@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
-from user_system.models import User
-from request_handler.models import Request, Venue, Day
+from user_system.models import User, Day
+from request_handler.models import Request, Venue
 from django.contrib import messages
 from unittest.mock import patch
 
@@ -14,7 +14,6 @@ class DeleteRequestViewTest(TestCase):
         self.user = User.objects.create_user(username='testuser', password='Password123', user_type='Student')
 
         self.mode_preference = Venue.objects.create(venue="Online")
-        self.available_day = Day.objects.create(day="Monday")
 
         # Request instance belonging to test user
         self.request_instance = Request.objects.create(
@@ -24,7 +23,6 @@ class DeleteRequestViewTest(TestCase):
             frequency='Weekly',
             duration='1h',
         )
-        self.request_instance.availability.set([self.available_day])
         self.request_instance.venue_preference.set([self.mode_preference])
 
         self.url = reverse('delete_request', kwargs={'pk': self.request_instance.pk})
@@ -35,8 +33,9 @@ class DeleteRequestViewTest(TestCase):
         self.assertEqual(self.url, f'/request/{self.request_instance.pk}/delete/')
 
     def test_get_bad_request(self):
+        self.client.login(username='testuser', password='Password123')
         response = self.client.get(self.url, kwargs={'pk': self.request_instance.pk})
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 405)
 
     # Test that the delete confirmation page loads for a valid request ID
     def test_get_delete_request(self):
@@ -88,7 +87,8 @@ class DeleteRequestViewTest(TestCase):
     def test_redirect_if_not_logged_in(self):
         self.client.logout()
         response = self.client.post(reverse('delete_request', args=[self.request_instance.id]))
-        self.assertRedirects(response, f'/log_in/')
+        expected_url = f'{reverse("log_in")}?next={self.url}'
+        self.assertRedirects(response, expected_url, status_code=302, target_status_code=200)
 
     def test_post_confirm_delete_request(self):
         self.client.login(username='testuser', password='Password123', user_type='Student')
