@@ -21,19 +21,8 @@ class RequestForm(forms.ModelForm):
         required=True
     )
 
-    USER_KNOWLEDGE_AREA_CHOICES = [('C++','C++'),('Scala','Scala'),('Python','Python'),('Java','Java'),
-                                   ('Django','Django'),('JavaScript','JavaScript'),('Databases','Databases'),
-                                   ('Robotics','Robotics'),('Internet Systems','Internet Systems')]
-    knowledge_area = forms.ChoiceField(choices=USER_KNOWLEDGE_AREA_CHOICES, label='Knowledge Area')
-
     USER_TERM_CHOICES = [('September','September - December'),('January','January - April'),('May','May - July')]
     term = forms.ChoiceField(choices=USER_TERM_CHOICES, label='Term')
-
-    USER_FREQUENCY_CHOICES = [('Weekly','Weekly'),('Biweekly','Biweekly'),('Fortnightly','Fortnightly')]
-    frequency = forms.ChoiceField(choices=USER_FREQUENCY_CHOICES, label='Frequency')
-
-    USER_DURATION_CHOICES = [('0.5','30 minutes'),('1','1 hour'),('1.5','1 hour 30 minutes'),('2','2 hours')]
-    duration = forms.ChoiceField(choices=USER_DURATION_CHOICES, label='Duration')
 
     #Ensure that a warning is shown when a student tries to make a late request
     def is_late_request(self):
@@ -58,5 +47,5 @@ class RequestForm(forms.ModelForm):
 
     class Meta:
         model = Request
-        fields = ['knowledge_area', 'term', 'frequency', 'duration', 'availability', 'venue_preference']
+        fields = ['knowledge_area', 'term', 'frequency', 'duration', 'availability', 'venue_preference','is_recurring']
 

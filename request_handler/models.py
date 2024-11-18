@@ -42,6 +42,7 @@ class Request(models.Model):
     frequency = models.CharField(max_length=255)
     duration = models.CharField(max_length=255, blank=False)
     late = models.BooleanField(default=False, blank=False)
+    is_recurring = models.BooleanField(default=False)
 
     @property
     def student_email(self):
@@ -81,7 +82,7 @@ class Request(models.Model):
                 f'\n Venue Preference: {venue}'
                 f'\n Allocated?: {self.allocated_string}'
                 f'\n Tutor: {self.tutor_name_string}'
-                f'\n Late: {self.late}'
+                f'\n Recurring?: {self.is_recurring}'
                 )
 
     def clean(self):

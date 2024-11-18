@@ -32,8 +32,8 @@ class TestViews(TestCase):
             'availability': [self.monday.pk],
             'term': 'January',
             'knowledge_area': 'Scala',
-            'frequency': 'Biweekly',
-            'duration': '1',
+            'frequency': 'Weekly',
+            'duration': '1h',
             'venue_preference': [self.online.pk],
         }
         response = self.client.post(self.url, data, follow=True)
@@ -47,7 +47,7 @@ class TestViews(TestCase):
             'term': '',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1',
+            'duration': '1h',
             'venue_preference': [self.online.id,]
         }
         self.client.post(self.url, data)
@@ -80,7 +80,7 @@ class TestViews(TestCase):
             'term': '',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
-            'duration': '1',
+            'duration': '1h',
             'venue_preference': [self.online.id]
         }
         #Purposefully choosing a late term
