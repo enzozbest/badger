@@ -5,7 +5,12 @@ from user_system.models import User
 from request_handler.models import Request
 
 
+""" These classes allow admins to make selected user also admins and confirms their choice
 
+Both classes take the primary key of the selected user as a parameter, allowing the user's record to be 
+updated in the model.
+Both classes require the Admin user type and redirect users to the login page if not authenticated.
+"""
 class MakeUserAdmin(View):
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
         return HttpResponseNotAllowed("Requests to this URL must be made by the GET method!",
@@ -37,7 +42,7 @@ class ConfirmMakeUserAdmin(View):
         
         user_type = request.user.user_type
         if user_type != 'Admin':
-            return render(request, 'permission_denied.html', status=403)
+            return render(request, 'permission_denied.html', status=401)
         
         user_to_change = get_object_or_404(User, pk=requested_user_pk)
         user_to_change.user_type = "Admin"
