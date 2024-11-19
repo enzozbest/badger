@@ -5,7 +5,7 @@ from random import randint
 
 from code_tutors.management.helpers import programming_langs_provider
 from code_tutors.management.helpers import term_provider
-from code_tutors.management.helpers import availability_provider
+
 from code_tutors.management.helpers import user_provider
 from code_tutors.management.helpers import venue_provider
 
@@ -16,7 +16,6 @@ class Command(BaseCommand):
         self.faker = Faker('en_GB')
         self.faker.add_provider(programming_langs_provider.ProgrammingLangsProvider)
         self.faker.add_provider(term_provider.TermProvider)
-        self.faker.add_provider(availability_provider.AvailabilityProvider)
         self.faker.add_provider(user_provider.UserProvider)
         self.faker.add_provider(venue_provider.VenueProvider)
         self.frequencies = ['Weekly', 'Fortnightly', 'Bi-weekly', 'Monthly']
@@ -46,10 +45,10 @@ class Command(BaseCommand):
         term = self.faker.term()
         frequency = self.frequencies[randint(0, 3)]
         duration = str(randint(1, 3)) + 'h'
-        availability = self.faker.availability()
+
         venue_preference = self.faker.venue()
         self.try_create_request({'knowledge_area': knowledge_area, 'term':term, 'frequency':frequency, 'duration':duration,
-                                 'availability':availability, 'student':student, 'tutor':tutor, 'allocated':allocated,
+                                  'student':student, 'tutor':tutor, 'allocated':allocated,
                                   'venue_preference':venue_preference})
 
     def try_create_request(self, data):
@@ -68,8 +67,6 @@ class Command(BaseCommand):
             frequency=data['frequency'],
             duration=data['duration'],
         )
-        if data['availability']:
-            req_object.availability.set(data['availability'])
         if data['venue_preference']:
             req_object.venue_preference.set(data['venue_preference'])
 
