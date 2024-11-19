@@ -5,13 +5,13 @@ from django.test import TestCase
 from django.urls import reverse
 from user_system.forms import PasswordForm
 from user_system.models import User
-from user_system.tests_tutorials.helpers import reverse_with_next
+from user_system.tests_user_system.helpers import reverse_with_next
 
 class PasswordViewTest(TestCase):
     """Test suite for the password view."""
 
     fixtures = [
-        'user_system/tests_tutorials/fixtures/default_user.json'
+        'user_system/tests_user_system/fixtures/default_user.json'
     ]
 
     def setUp(self):

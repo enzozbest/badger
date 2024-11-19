@@ -3,7 +3,7 @@
 from django.db import migrations
 
 def populate_days(apps, schema_editor):
-    Day = apps.get_model('request_handler', 'Day')
+    Day = apps.get_model('user_system', 'Day')
     days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     for day_name in days_of_week:
         Day.objects.create(day=day_name)
@@ -11,7 +11,7 @@ def populate_days(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('request_handler', '0001_initial'),
+        ('user_system', '0002_day_user_availability'),
     ]
 
     operations = [

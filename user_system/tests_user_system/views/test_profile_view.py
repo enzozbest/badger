@@ -6,14 +6,14 @@ from django.test import TestCase
 from django.urls import reverse
 from user_system.forms import UserForm
 from user_system.models import User
-from user_system.tests_tutorials.helpers import reverse_with_next
+from user_system.tests_user_system.helpers import reverse_with_next
 
 class ProfileViewTest(TestCase):
     """Test suite for the profile view."""
 
     fixtures = [
-        'user_system/tests_tutorials/fixtures/default_user.json',
-        'user_system/tests_tutorials/fixtures/other_users.json'
+        'user_system/tests_user_system/fixtures/default_user.json',
+        'user_system/tests_user_system/fixtures/other_users.json'
     ]
 
     def setUp(self):

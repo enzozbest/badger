@@ -58,7 +58,7 @@
                     <td>
                         <ul>
                             {% if user.user_type == 'Admin' and not request.allocated %}
-                                <li> <a href="{% url 'view_requests'%}">Allocate</a> </li>
+                                <li> <a href="{% url 'allocate_request' request.id%}">Allocate</a> </li>
                                 {% if user.user_type != 'Tutor' %}
                                     <li> <a href="{% url 'edit_request' request.id %}">Update</a> </li>
                                     <li> <a href="{% url 'delete_request' request.id%}">Delete</a> </li>

@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
-from user_system.models import User
+from user_system.models import User, Day
 
 
 
@@ -28,13 +28,14 @@ class Request(models.Model):
     tutor_name_string = '-'
     tutor = models.OneToOneField(User, default=None, null=True, on_delete=models.CASCADE, blank=True, related_name='tutor')
     knowledge_area = models.CharField(max_length=255, blank=False)
-    venue_preference = models.ManyToManyField(Venue, blank=False)
+    venue_preference = models.ManyToManyField(Venue, blank=False, related_name='student_venue_preference')
     term = models.CharField(max_length=255)
     frequency = models.CharField(max_length=255)
     duration = models.CharField(max_length=255, blank=False)
     late = models.BooleanField(default=False, blank=False)
     is_recurring = models.BooleanField(default=False)
-
+    day = models.ForeignKey(Day, null=True, blank=True, on_delete=models.SET_NULL, related_name='allocated_day')
+    venue = models.ForeignKey(Venue, null=True, blank=True, on_delete=models.SET_NULL, related_name='allocated_venue')
 
     @property
     def student_email(self):
