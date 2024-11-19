@@ -50,6 +50,10 @@ class User(AbstractUser):
     def is_student(self):
         return self.user_type == self.ACCOUNT_TYPE_STUDENT
 
+    @property
+    def full_name(self):
+        return "%s %s" % (self.first_name, self.last_name)
+
     def __str__(self):
         return (f'Username: {self.username} \n'
                 f'First Name: {self.first_name} \n'

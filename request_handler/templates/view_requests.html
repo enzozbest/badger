@@ -49,8 +49,8 @@
                         </ul>
                     </td>
                     <td>
-                        {% if request.tutor %}
-                            Allocated to {{ request.tutor }}
+                        {% if request.allocated %}
+                            Allocated to {{ request.tutor_name }}
                         {% else %}
                             Unallocated
                         {% endif %}
