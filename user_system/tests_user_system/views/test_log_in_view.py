@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 from user_system.forms import LogInForm
 from user_system.models import User
-from user_system.tests_tutorials.helpers import LogInTester, MenuTesterMixin, reverse_with_next
+from user_system.tests_user_system.helpers import LogInTester, MenuTesterMixin, reverse_with_next
 
 class LogInViewTestCase(TestCase, LogInTester, MenuTesterMixin):
     """Tests of the log in view."""

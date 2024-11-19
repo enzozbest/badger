@@ -50,7 +50,7 @@
               <a href="{% url 'edit_request' request.id %}" class="text-danger">Update</a>
               <a href="{% url 'confirm_delete_request' request.id %}" class="text-danger">Delete</a>
               {% if user_type == 'Admin' %}
-                <a href="{% url 'view_requests' %}">Allocate</a>
+                <a href="{% url 'allocate_request' request.id %}">Allocate</a>
               {% endif %}
             {% endif %}
 <hr>
