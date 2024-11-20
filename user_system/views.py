@@ -181,8 +181,6 @@ def AddKnowledgeAreas(request):
 
 @login_required
 def DeleteKnowledgeArea(request, area_id):
-    knowledge_area = get_object_or_404(KnowledgeArea, pk=area_id, user=request.user)
-    if knowledge_area.user != request.user:
-        raise Http404("You are not allowed to delete this knowledge area. ")
+    knowledge_area = get_object_or_404(KnowledgeArea, id=area_id, user=request.user)
     knowledge_area.delete()
     return redirect('add_knowledge_areas')

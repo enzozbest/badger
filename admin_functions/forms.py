@@ -9,7 +9,6 @@ class AllocationForm(forms.Form):
     venue = forms.ChoiceField(choices=[], label="Choose a Venue")
     tutor = forms.ModelChoiceField(queryset=User.objects.none(), label="Choose a Tutor")
 
-
     def __init__(self, *args, **kwargs):
         student = kwargs.pop('student')
         tutors = kwargs.pop('tutors')

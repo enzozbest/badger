@@ -2,6 +2,7 @@
 from django.contrib.auth.hashers import check_password
 from django import forms
 from django.test import TestCase
+from django.core.management import call_command
 from user_system.forms import SignUpForm
 from user_system.models import User
 

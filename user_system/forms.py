@@ -45,8 +45,22 @@ class UserForm(forms.ModelForm):
     def clean_hourly_rate(self):
         hourly_rate = self.cleaned_data.get('hourly_rate')
         if hourly_rate is not None and hourly_rate <= 0:
-            raise forms.ValidationError('Hourly rate must be a positive number! ')
+            raise forms.ValidationError('Hourly rate must be a positive number!')
         return hourly_rate
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        # Check if the username is already in use by another user
+        if User.objects.filter(username=username).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("User with this username already exists.")
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        # Check if the email is already in use by another user
+        if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("User with this email address already exists.")
+        return email
 
     availability = forms.ModelMultipleChoiceField(
         label='Availability',
@@ -57,7 +71,6 @@ class UserForm(forms.ModelForm):
 
     class Meta:
         """Form options."""
-
         model = User
         fields = ['first_name', 'last_name', 'username', 'email', 'user_type', 'hourly_rate', 'availability']
 

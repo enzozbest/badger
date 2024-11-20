@@ -1,0 +1,30 @@
+[
+  {
+    "student": "Charlie",
+    "knowledge_area": "Python",
+    "duration": "1h",
+    "term": "January",
+    "frequency": "Weekly",
+    "allocated": false,
+    "tutor": null,
+    "is_recurring": true,
+    "late": false,
+    "venue_preference": "Online",
+    "day": null,
+    "venue": null
+  },
+  {
+    "student": "Charlie",
+    "knowledge_area": "Java",
+    "duration": "1h",
+    "term": "January",
+    "frequency": "Weekly",
+    "allocated": true,
+    "tutor": "Jane Doe",
+    "is_recurring": true,
+    "late": false,
+    "venue_preference": "Online",
+    "day": "Tuesday",
+    "venue": "Online"
+  }
+]

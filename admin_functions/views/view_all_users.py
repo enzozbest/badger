@@ -4,7 +4,7 @@ from django.views.generic import ListView
 from user_system.models import User
 from admin_functions.helpers.filters import UserFilter
 from django.http import HttpResponse
-from django.shortcuts import reverse
+from django.shortcuts import reverse, render
 from django.http import HttpResponseRedirect
 
 class AllUsersView(LoginRequiredMixin, ListView):
@@ -49,7 +49,7 @@ class AllUsersView(LoginRequiredMixin, ListView):
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return self.handle_no_permission()  # Redirects to login page
-        if not request.user.user_type == 'Admin':  # Example: Allow only staff users
-            return HttpResponse("You do not have permission to view this page.", status=401)
+            return self.handle_no_permission()
+        if not request.user.user_type == 'Admin':
+            return render(request, 'permission_denied.html', status=401)
         return super().dispatch(request, *args, **kwargs)
