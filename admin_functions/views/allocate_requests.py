@@ -31,6 +31,10 @@ class AllocateRequestView(LoginRequiredMixin, View):
             lesson_request.venue = Venue.objects.get(id=int(venue)) # Assuming Venue is stored as an FK
             lesson_request.save()
 
+            #Calculate cost of request
+            #In the future, this could be generate invoice or the admin could click a button later doing this
+            price = calculate_cost(tutor, request_id)
+
             #Update availabilities:
             lesson_request.student.availability.remove(day)
             lesson_request.tutor.availability.remove(day)
@@ -65,3 +69,12 @@ def get_tuple(id: int) -> tuple:
         else Venue.objects.all()
     )
     return lesson_request, suitable_tutors, venues
+
+def calculate_cost(tutor: User, request_id: int)-> int:
+    #Cost = price * duration * occurence
+    lesson = get_object_or_404(Request, id=request_id)
+    duration = lesson.duration
+    #We would need to calculate the number of sessions they are scheduled for and then multiply this
+    #Rather than 15 since they would want an accurate number, we then also wouldn't need the occurence
+    cost = tutor.hourly_rate * duration  * 15 #Assuming a 15 week term
+    return cost
