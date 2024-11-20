@@ -8,11 +8,13 @@ INVALID_REQUEST_ID = 999
 
 class TestViews(TestCase):
     def setUp(self):
-        self.monday = Day.objects.create(day='Monday')
-        self.online = Venue.objects.create(venue='Online')
-        User.objects.create_user(username='@johndoe', email='johndoe@example.org', password='Password123', user_type='Student')
-        self.tutor = User.objects.create_user(username='@janedoe', email='janedoe@example.org', password='Password123',
-                                              first_name='Jane', last_name='Doe', user_type='Tutor')
+        from user_system.fixtures.create_test_users import create_test_user
+        create_test_user()
+        self.monday, _ = Day.objects.get_or_create(day='Monday')
+        self.online, _ = Venue.objects.get_or_create(venue='Online')
+        self.student = User.objects.get(username='@charlie')
+        self.tutor = User.objects.get(username='@janedoe')
+
         self.url = reverse('create_request')
 
     def test_user_can_see_rqeuest_creation_page(self):
@@ -21,7 +23,7 @@ class TestViews(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_create_request_with_valid_data(self):
-        self.client.login(username='@johndoe', password='Password123')
+        self.client.login(username='@charlie', password='Password123')
         data = {
             'term': 'January',
             'knowledge_area': 'Scala',
@@ -33,7 +35,7 @@ class TestViews(TestCase):
         self.assertRedirects(response, reverse('request_success'), status_code=302, target_status_code=200)
 
     def test_create_request_with_invalid_data(self):
-        self.client.login(username='@johndoe', password='Password123')
+        self.client.login(username='@charlie', password='Password123')
         #Blank 'term' field!
         data = {
             'term': '',
@@ -68,7 +70,7 @@ class TestViews(TestCase):
         self.assertRedirects(response, expected_url, status_code=302, target_status_code=200)
 
     def test_form_late_request_redirect(self):
-        self.client.login(username='@johndoe', password='Password123')
+        self.client.login(username='@charlie', password='Password123')
         data = {
             'term': '',
             'knowledge_area': 'Scala',

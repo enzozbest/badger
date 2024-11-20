@@ -7,10 +7,10 @@ from datetime import datetime
 
 class TestRequestForm(TestCase):
     def setUp(self):
-        self.monday = Day.objects.create(day='Monday')
-        self.wednesday = Day.objects.create(day='Wednesday')
-        self.in_person = Venue.objects.create(venue='In Person')
-        self.online = Venue.objects.create(venue='Online')
+        self.monday, _ = Day.objects.get_or_create(day='Monday')
+        self.wednesday, _ = Day.objects.get_or_create(day='Wednesday')
+        self.in_person, _ = Venue.objects.get_or_create(venue='In Person')
+        self.online, _ = Venue.objects.get_or_create(venue='Online')
 
     def test_form_contains_required_fields(self):
         form = RequestForm()
