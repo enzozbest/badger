@@ -1,19 +1,16 @@
 """Unit tests_user_system for the User model."""
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.core.management import call_command
 from user_system.models import User
 
 class UserModelTestCase(TestCase):
     """Unit tests_user_system for the User model."""
-
-    fixtures = [
-        'user_system/tests_user_system/fixtures/default_user.json',
-        'user_system/tests_user_system/fixtures/other_users.json'
-    ]
-
     GRAVATAR_URL = "https://www.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986"
 
     def setUp(self):
+        from user_system.fixtures import create_test_users
+        create_test_users.create_test_user()
         self.user = User.objects.get(username='@johndoe')
 
     def test_valid_user(self):

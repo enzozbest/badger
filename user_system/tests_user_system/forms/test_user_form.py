@@ -9,35 +9,22 @@ from user_system.models import User
 class UserFormTestCase(TestCase):
     """Unit tests_user_system of the user form."""
 
-    fixtures = [
-        'user_system/tests_user_system/fixtures/default_user.json'
-    ]
-
     def setUp(self):
+        from user_system.fixtures import create_test_users
+        create_test_users.create_test_user()
         self.form_input = {
-            'first_name': 'Jane',
-            'last_name': 'Doe',
-            'username': '@janedoe',
-            'email': 'janedoe@example.org',
+            'first_name': 'Enzo',
+            'last_name': 'Bestetti',
+            'username': '@enzozbest',
+            'email': 'enzozbest@example.org',
         }
-        self.tutor_user = User.objects.create_user(
-            first_name='tutor',
-            last_name='test',
-            username="@tutortest",
-            email="tutor@example.com",
-            password="Password123",
+        self.tutor_user = User.objects.get(
             user_type=User.ACCOUNT_TYPE_TUTOR,
-            hourly_rate=Decimal('22.50'),
         )
-        self.student_user = User.objects.create_user(
-            first_name='student',
-            last_name='test',
-            username="@studenttest",
-            email="student@example.com",
-            password="Password123",
+        self.student_user = User.objects.get(
             user_type=User.ACCOUNT_TYPE_STUDENT,
         )
-        self.client.login(username="@tutortest", password="Password123")
+        self.client.login(username=self.tutor_user.username, password=self.tutor_user._password)
 
     def test_form_has_necessary_fields(self):
         form = UserForm()
@@ -65,10 +52,10 @@ class UserFormTestCase(TestCase):
         form.save()
         after_count = User.objects.count()
         self.assertEqual(after_count, before_count)
-        self.assertEqual(user.username, '@janedoe')
-        self.assertEqual(user.first_name, 'Jane')
-        self.assertEqual(user.last_name, 'Doe')
-        self.assertEqual(user.email, 'janedoe@example.org')
+        self.assertEqual(user.username, '@enzozbest')
+        self.assertEqual(user.first_name, 'Enzo')
+        self.assertEqual(user.last_name, 'Bestetti')
+        self.assertEqual(user.email, 'enzozbest@example.org')
 
     def test_hourly_rate_field_visible_for_tutors(self):
         form = UserForm(instance=self.tutor_user)
@@ -82,12 +69,12 @@ class UserFormTestCase(TestCase):
             'username': self.tutor_user.username,
             'email': self.tutor_user.email,
             'user_type': self.tutor_user.user_type,
-            'hourly_rate': Decimal('30.00'),  # Update hourly rate
+            'hourly_rate': Decimal('20.00'),  # Update hourly rate
         }
         form = UserForm(data=data, instance=self.tutor_user)
         self.assertTrue(form.is_valid())
         form.save()
-        self.assertEqual(self.tutor_user.hourly_rate, Decimal('30.00'))
+        self.assertEqual(self.tutor_user.hourly_rate, Decimal('20.00'))
 
     def test_hourly_rate_invalid_value(self):
         data = {
@@ -101,7 +88,7 @@ class UserFormTestCase(TestCase):
         form = UserForm(data=data, instance=self.tutor_user)
         self.assertFalse(form.is_valid())
         self.assertIn('hourly_rate', form.errors)
-        self.assertEqual(form.errors['hourly_rate'][0], "Hourly rate must be a positive number! ")
+        self.assertEqual(form.errors['hourly_rate'][0], "Hourly rate must be a positive number!")
 
     def test_hourly_rate_default_value(self):
         new_tutor = User.objects.create_user(

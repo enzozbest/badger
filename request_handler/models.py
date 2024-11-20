@@ -26,7 +26,7 @@ class Request(models.Model):
     allocated = models.BooleanField(default=False, blank=True)
     allocated_string = 'No'
     tutor_name_string = '-'
-    tutor = models.OneToOneField(User, default=None, null=True, on_delete=models.CASCADE, blank=True, related_name='tutor')
+    tutor = models.ForeignKey(User, default=None, null=True, on_delete=models.SET_NULL, blank=True, related_name='tutor')
     knowledge_area = models.CharField(max_length=255, blank=False)
     venue_preference = models.ManyToManyField(Venue, blank=False, related_name='student_venue_preference')
     term = models.CharField(max_length=255)
@@ -43,7 +43,7 @@ class Request(models.Model):
 
     @property
     def tutor_name(self):
-        return self.tutor.first_name + " " + self.tutor.last_name if self.tutor else None
+        return f'{self.tutor.first_name} {self.tutor.last_name}' if self.tutor else None
 
     def __str__(self):
         venue = "No venue preference set!"

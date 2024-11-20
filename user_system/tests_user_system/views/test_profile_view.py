@@ -11,13 +11,12 @@ from user_system.tests_user_system.helpers import reverse_with_next
 class ProfileViewTest(TestCase):
     """Test suite for the profile view."""
 
-    fixtures = [
-        'user_system/tests_user_system/fixtures/default_user.json',
-        'user_system/tests_user_system/fixtures/other_users.json'
-    ]
-
     def setUp(self):
+        from user_system.fixtures import create_test_users
+        create_test_users.create_test_user()
+
         self.user = User.objects.get(username='@johndoe')
+
         self.url = reverse('profile')
         self.form_input = {
             'first_name': 'John2',
@@ -25,23 +24,8 @@ class ProfileViewTest(TestCase):
             'username': '@johndoe2',
             'email': 'johndoe2@example.org',
         }
-        self.tutor_user = User.objects.create_user(
-            first_name="tutor",
-            last_name="test",
-            username="@tutortest",
-            email="tutor@example.com",
-            password="Password123",
-            user_type=User.ACCOUNT_TYPE_TUTOR,
-            hourly_rate='22.50',
-        )
-        self.student_user = User.objects.create_user(
-            first_name="student",
-            last_name="test",
-            username="@studenttest",
-            email="student@example.com",
-            password="Password123",
-            user_type=User.ACCOUNT_TYPE_STUDENT,
-        )
+        self.tutor_user = User.objects.get(username='@janedoe')
+        self.student_user = User.objects.get(username='@charlie')
 
     def test_profile_url(self):
         self.assertEqual(self.url, '/profile/')
@@ -120,21 +104,23 @@ class ProfileViewTest(TestCase):
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
     def test_tutor_can_update_hourly_rate(self):
-        self.client.login(username="@tutortest", password="Password123")
+        self.client.login(username='@janedoe', password='Password123')
         response = self.client.post(reverse('profile'), {
             'first_name': self.tutor_user.first_name,
             'last_name': self.tutor_user.last_name,
             'username': self.tutor_user.username,
             'email': self.tutor_user.email,
             'user_type': self.tutor_user.user_type,
-            'hourly_rate':'30.00',  # Update hourly rate
+            'hourly_rate': 20.00,  # Update hourly rate
         })
         self.assertEqual(response.status_code, 302)
         self.tutor_user.refresh_from_db()
-        self.assertEqual(self.tutor_user.hourly_rate, Decimal('30.00'))
+        self.assertEqual(self.tutor_user.hourly_rate, Decimal('20.00'))
 
     def test_student_cannot_update_hourly_rate(self):
-        self.client.login(username="@studenttest", password="Password123")
+        student = User.objects.filter(user_type=User.ACCOUNT_TYPE_STUDENT).all().first()
+
+        self.client.login(username=student.username, password='Password123')
         response = self.client.post(reverse('profile'), {
             'first_name': self.student_user.first_name,
             'last_name': self.student_user.last_name,
@@ -142,6 +128,7 @@ class ProfileViewTest(TestCase):
             'email': self.student_user.email,
             'user_type': self.student_user.user_type,
         })
+
         self.assertEqual(response.status_code, 302)
         self.student_user.refresh_from_db()
         self.assertIsNone(self.student_user.hourly_rate)

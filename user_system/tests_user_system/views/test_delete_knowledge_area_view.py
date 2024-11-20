@@ -1,30 +1,42 @@
+from django.http import Http404
 from django.test import TestCase
 from django.urls import reverse
+from django.core.management import call_command
 from user_system.models import User
 from user_system.models import KnowledgeArea
 
 class DeleteKnowledgeAreaTest(TestCase):
     def setUp(self):
-        self.user_1 = User.objects.create_user(username="testuser1", password="Password123", email="tutor1@outlook.com", user_type=User.ACCOUNT_TYPE_TUTOR)
-        self.knowledge_area_1 = KnowledgeArea.objects.create(user=self.user_1, subject="Python")
-        self.knowledge_area_2 = KnowledgeArea.objects.create(user=self.user_1, subject="Java")
-        self.user_2 = User.objects.create_user(username="testuser2", password="Password123", email="tutor2@outlook.com", user_type=User.ACCOUNT_TYPE_TUTOR)
+        from user_system.fixtures import create_test_users
+        create_test_users.create_test_user()
+
+        self.tutor_user = User.objects.get(user_type=User.ACCOUNT_TYPE_TUTOR)
+        self.tutor_areas = KnowledgeArea.objects.filter(user=self.tutor_user).all()
+        self.knowledge_area_1 = self.tutor_areas.first()
+        self.knowledge_area_2 = self.tutor_areas.last()
+
+
+        self.user2 = User.objects.create_user(username='@testuser1', password='Password123',
+                                                   user_type=User.ACCOUNT_TYPE_TUTOR,
+                                                   email='test@example.org')
+
+        KnowledgeArea.objects.create(user=self.user2, subject=self.knowledge_area_1.subject)
 
     # Tests that a tutor can delete a knowledge area successfully.
     def test_user_can_delete_knowledge_area(self):
-        self.client.login(username="testuser1", password="Password123")
+        self.client.login(username=self.tutor_user.username, password='Password123')
         self.assertTrue(KnowledgeArea.objects.filter(id=self.knowledge_area_1.id).exists())
         response = self.client.get(reverse('delete_knowledge_area', args=[self.knowledge_area_1.id]))
         self.assertFalse(KnowledgeArea.objects.filter(id=self.knowledge_area_1.id).exists())
         self.assertRedirects(response, reverse('add_knowledge_areas'))
 
-    # Tests that one user cannot delete another users knowledge area
+    # Tests that one user cannot delete another users' knowledge areas
     def test_user_can_not_delete_others_knowledge_area(self):
-        self.client.login(username="testuser1", password="Password123")
+        self.client.login(username=self.tutor_user.username, password='Password123')
         self.assertTrue(KnowledgeArea.objects.filter(id=self.knowledge_area_2.id).exists())
         self.client.logout()
-        self.client.login(username="testuser2", password="Password123")
-        response = self.client.get(reverse('delete_knowledge_area', args=[self.knowledge_area_2.id]))
+        self.client.login(username= self.user2.username, password='Password123')
+        response = self.client.get(reverse('delete_knowledge_area', args=[self.knowledge_area_2.pk]))
         self.assertTrue(KnowledgeArea.objects.filter(id=self.knowledge_area_2.id).exists())
         self.assertEqual(response.status_code, 404)
 
@@ -35,10 +47,9 @@ class DeleteKnowledgeAreaTest(TestCase):
 
     # Tests that a non-tutor cannot delete a knowledge area
     def test_not_tutor_cannot_delete_knowledge_area(self):
-        self.student = User.objects.create_user(username='studentuser', password='Password123', email="student@outlook.com", user_type=User.ACCOUNT_TYPE_STUDENT)
-        self.client.login(username='studentuser', password='Password123')
+        student = User.objects.get(user_type=User.ACCOUNT_TYPE_STUDENT)
+        self.client.login(username=student.username, password='Password123')
         response = self.client.get(reverse('delete_knowledge_area', args=[self.knowledge_area_2.id]))
+        self.assertRaises(Http404)
         self.assertEqual(response.status_code, 404)
-
-
 

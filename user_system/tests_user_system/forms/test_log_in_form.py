@@ -1,16 +1,18 @@
 """Unit tests_user_system of the log in form."""
 from django import forms
 from django.test import TestCase
+from django.core.management import call_command
 from user_system.forms import LogInForm
 from user_system.models import User
 
 class LogInFormTestCase(TestCase):
     """Unit tests_user_system of the log in form."""
 
-    fixtures = ['user_system/tests_user_system/fixtures/default_user.json']
-
     def setUp(self):
+        from user_system.fixtures import create_test_users
+        create_test_users.create_test_user()
         self.form_input = {'username': '@janedoe', 'password': 'Password123'}
+
 
     def test_form_contains_required_fields(self):
         form = LogInForm()

@@ -1,8 +1,8 @@
 """Tests for the password view."""
-from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.test import TestCase
 from django.urls import reverse
+from django.core.management import call_command
 from user_system.forms import PasswordForm
 from user_system.models import User
 from user_system.tests_user_system.helpers import reverse_with_next
@@ -10,11 +10,10 @@ from user_system.tests_user_system.helpers import reverse_with_next
 class PasswordViewTest(TestCase):
     """Test suite for the password view."""
 
-    fixtures = [
-        'user_system/tests_user_system/fixtures/default_user.json'
-    ]
-
     def setUp(self):
+        from user_system.fixtures import create_test_users
+        create_test_users.create_test_user()
+
         self.user = User.objects.get(username='@johndoe')
         self.url = reverse('password')
         self.form_input = {
