@@ -9,7 +9,7 @@ This Model is necessary for the ManyToMany relationships in Request to work, as 
 Days are represented in the database as a string (their name) and an automatically assigned id (primary key).
 """
 class Day(models.Model):
-    day = models.CharField(max_length=10)
+    day = models.CharField(max_length=10, unique=True)
     def __str__(self):
         return self.day
 
