@@ -4,11 +4,9 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('user_system', '0003_auto_20241117_1610'),
     ]
-
     operations = [
         migrations.AlterField(
             model_name='day',

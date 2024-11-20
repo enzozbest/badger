@@ -9,7 +9,7 @@ def create_test_user():
         for user_data in users:
             availability_days = user_data.pop('availability', [])
             knowledge_areas = user_data.pop('knowledge_areas', [])
-            user, created = User.objects.get_or_create(**user_data)
+            user, _ = User.objects.get_or_create(**user_data)
 
             if availability_days:
                 update_availability(user, availability_days)
