@@ -31,9 +31,6 @@ class AllocateRequestView(LoginRequiredMixin, View):
             lesson_request.venue = Venue.objects.get(id=int(venue)) # Assuming Venue is stored as an FK
             lesson_request.save()
 
-            #Calculate cost of request
-            #In the future, this could be generate invoice or the admin could click a button later doing this
-            price = calculate_cost(tutor, request_id)
 
             #Update availabilities:
             lesson_request.student.availability.remove(day)
