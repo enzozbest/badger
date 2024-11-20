@@ -22,7 +22,7 @@ class MakeUserAdmin(View):
         
         user_type = request.user.user_type
         if user_type != 'Admin':
-            return render(request, 'permission_denied.html', status=403)
+            return render(request, 'permission_denied.html', status=401)
         
         userToChange = User.objects.get(pk=pk)
         first_name = userToChange.first_name
