@@ -1,5 +1,6 @@
 from faker.providers import BaseProvider
-from request_handler.models import Day
+from user_system.models import Day
+
 
 class AvailabilityProvider(BaseProvider):
     def availability(self):

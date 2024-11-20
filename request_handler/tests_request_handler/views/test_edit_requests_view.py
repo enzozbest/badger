@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
-from user_system.models import User
-from request_handler.models import Request, Venue, Day
+from user_system.models import User, Day
+from request_handler.models import Request, Venue
 from request_handler.forms import RequestForm
 
 INVALID_REQUEST_ID = 999
@@ -12,7 +12,6 @@ class EditRequestViewTest(TestCase):
         self.tutor = User.objects.create_user(username='testtutor', password='Password123', user_type='Tutor', email='testtutor@example.com')
         self.admin = User.objects.create_user(username='adminuser', password='Password123', user_type='Admin', email='admin@example.com')
         self.mode_preference = Venue.objects.create(venue="Online")
-        self.available_day = Day.objects.create(day="Monday")
 
         self.request_instance = Request.objects.create(
             student=self.user,
@@ -21,7 +20,6 @@ class EditRequestViewTest(TestCase):
             frequency='Weekly',
             duration='1.5',
         )
-        self.request_instance.availability.set([self.available_day])
         self.request_instance.venue_preference.set([self.mode_preference])
 
         self.url = reverse('edit_request', kwargs={'pk': self.request_instance.pk})
@@ -49,7 +47,6 @@ class EditRequestViewTest(TestCase):
             'term': 'May',
             'frequency': 'Biweekly',
             'duration': '2',
-            'availability': [self.available_day.pk],
             'venue_preference': [self.mode_preference.pk],
         }
         response = self.client.post(self.url, data)
@@ -68,8 +65,7 @@ class EditRequestViewTest(TestCase):
             'term': 'May',
             'frequency': 'Biweekly',
             'duration': '2',
-            'availability': [self.available_day.pk],
-            'venue_preference': [], 
+            'venue_preference': [],
         }
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, 200)

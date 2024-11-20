@@ -1,4 +1,4 @@
-"""Unit tests_tutorials of the user form."""
+"""Unit tests_user_system of the user form."""
 from decimal import Decimal
 
 from django import forms
@@ -7,10 +7,10 @@ from user_system.forms import UserForm
 from user_system.models import User
 
 class UserFormTestCase(TestCase):
-    """Unit tests_tutorials of the user form."""
+    """Unit tests_user_system of the user form."""
 
     fixtures = [
-        'user_system/tests_tutorials/fixtures/default_user.json'
+        'user_system/tests_user_system/fixtures/default_user.json'
     ]
 
     def setUp(self):
