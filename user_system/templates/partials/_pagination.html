@@ -1,0 +1,40 @@
+<div class="pagination d-flex justify-content-center mt-4">
+    {% if is_paginated %}
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <!-- First Page -->
+                <li class="page-item">
+                    <a class="page-link ms-2" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">
+                        First
+                    </a>
+                </li>
+                <!-- Previous Page -->
+                <li class="page-item ms-2">
+                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">
+                        Previous
+                    </a>
+                </li>
+            {% endif %}
+
+            <!-- Current Page Info -->
+            <li class="page-item disabled ms-2">
+                <span class="page-link">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+            </li>
+
+            {% if page_obj.has_next %}
+                <!-- Next Page -->
+                <li class="page-item ms-2">
+                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">
+                        Next
+                    </a>
+                </li>
+                <!-- Last Page -->
+                <li class="page-item ms-2">
+                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ paginator.num_pages }}">
+                        Last
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    {% endif %}
+</div>

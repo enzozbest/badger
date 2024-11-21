@@ -3,7 +3,7 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm bg-dark text-white rounded-3">
                 <div class="card-header bg-primary text-white">
                     <h2 class="text-center">Edit Your Tutoring Request</h2>
                 </div>
@@ -12,7 +12,7 @@
                     
                     <!-- Check if request_instance.id is displayed correctly -->
                     {% if request_instance and request_instance.id %}
-                        <p>ID of the request instance: {{ request_instance.id }}</p>
+                        <p class="text-white">ID of the request instance: <strong>{{ request_instance.id }}</strong></p>
                     {% endif %}
 
                     <!-- Display non-field form errors if they exist -->
@@ -23,12 +23,12 @@
                     {% endif %}
 
                     <!-- Form action with request_instance.id -->
-                    <form method="POST" action="{% url 'edit_request' request_instance.id %}" >
+                    <form method="POST" action="{% url 'edit_request' request_instance.id %}">
                         {% csrf_token %}
                         {% include 'partials/_request_form_fields.html' %}
                         <div class="text-center mt-3">
                             <button type="submit" class="btn btn-success">Update Request</button>
-                            <a href="{% url 'view_requests' %}" class="btn btn-secondary ms-2">Cancel</a>
+                            <a href="{% url 'view_requests' %}" class="btn btn-outline-light ms-2">Cancel</a>
                         </div>
                     </form>
                 </div>

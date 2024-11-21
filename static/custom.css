@@ -1,32 +1,62 @@
-/*
- * Alerts
- */
-
- .alert {
-  border-radius: 0px;
+/* General Styles */
+html, body {
+  height: 100%;
+  margin: 0;
+  background-color: #000; /* Black background */
+  color: #fff; /* White text */
 }
 
-
-/*
- * Cover page
- */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
 .content {
+  flex: 1; /* Ensures content takes up the remaining space */
   padding-top: 10px;
 }
 
-.h-60 {
-  height: 60vh;
+/* Typography */
+h1, h2, h3, p {
+  text-shadow: 1px 1px 2px #333; /* Subtle shadow for readability */
 }
 
-.vcenter-item{
-    display: flex;
-    align-items: center;
+/* Hyperlinks */
+.content a {
+  text-decoration: none;
+  color: #1e90ff; /* Light blue */
+}
+.content a:hover {
+  text-decoration: underline;
+  color: #87ceeb; /* Lighter blue on hover */
 }
 
-/*
- * Cover page
- */
+/* Lists */
+ul.errorlist {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  color: #ff6347; /* Red text for errors */
+}
+
+/* Alerts */
+.alert {
+  border-radius: 0px;
+}
+
+/* Cover Page */
+.cover-card {
+  background-color: rgba(245, 245, 245, 0.6); /* Semi-transparent light background */
+  color: #fff; /* White text */
+  max-width: 30rem;
+  padding: 30px 50px;
+  border-radius: 15%;
+}
+.cover-card-block {
+  opacity: 1;
+}
+
 h1.cover-heading {
   font-size: 4rem;
 }
@@ -35,39 +65,53 @@ p.cover-text {
   font-size: 1.7rem;
 }
 
-.cover-card {
-  background-color: rgba(245, 245, 245, 0.6);
-  max-width: 30rem;
-  padding-top: 30px;
-  padding-left: 50px;
-  padding-right: 50px;
-  padding-bottom: 30px;
-  border-radius: 15%;
-}
-.cover-card-block {
-  opacity: 1
+.h-60 {
+  height: 60vh;
 }
 
+.vcenter-item {
+  display: flex;
+  align-items: center;
+}
 
-/*
- * forms
- */
+/* Forms */
 .nolabel label {
   display: none;
 }
 
-ul.errorlist {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
+/* Profile */
+.profile-image {
+  width: 120px;
+  clear: both;
+  float: left;
 }
 
-/*
- * Typefaces
- */
+.profile-text {
+  overflow: hidden;
+  padding-left: 20px;
+}
 
+h3.profile-title {
+  margin-bottom: 0;
+}
+
+.profile-username {
+  color: #777;
+  font-weight: 300;
+  font-style: italic;
+}
+
+/* Footer */
+.footer {
+  background-color: #1f1f1f; /* Match the black background */
+  text-align: center;
+  color: #fff; /* White text for consistency */
+  flex-shrink: 0;
+}
+
+/* Additional Styles */
 .low-key {
-  color: #777777;
+  color: #777;
   font-weight: 300;
 }
 
@@ -76,60 +120,23 @@ ul.errorlist {
   margin-bottom: 20px;
 }
 
-/*
- * Profile
- */
-.profile-image {
-  width: 120px;
-  clear:both;
-  float:left;
+.form-control.bg-light {
+  background-color: #f8f9fa; /* Light grey background */
+  color: #000; /* Dark text */
+  border: 1px solid #ced4da; /* Border for clarity */
 }
 
-.profile-text {
-  overflow:hidden;
-  padding-left:20px
+.form-control.bg-light:focus {
+  background-color: #e9ecef; /* Slightly darker grey on focus */
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Focus effect */
 }
 
-h3.profile-title {
-  margin-bottom: 0px;
+.card {
+  border: none; /* Remove default border */
 }
 
-.profile-username {
-  color: #777777;
-  font-weight: 300;
-  font-style: italic;
-}
-
-
-/*
- * Hyperlinks
- */
-.content a {
-  text-decoration: none;
-  color: #0d6efd;
-}
-.content a:hover {
-  text-decoration: underline;
-  color: #0d6efd;
-}
-
-/*
- * Add to base.html
- */
-
-html, body {
-  height: 100%;
-  margin: 0;
-}
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-}
-.content {
-  flex: 1; /* Ensures content takes up the remaining space */
-}
-.footer {
-  background-color: #f8f9fa;
-  text-align: center;
+.card-footer {
+  background-color: transparent; /* Match dark theme */
+  border-top: none;
 }

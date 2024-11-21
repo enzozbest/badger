@@ -1,42 +1,53 @@
 <div class="col-md-4 mb-4">
-    <div class="card request-card h-60">
+    <div class="card request-card bg-dark text-white shadow-sm rounded-3 h-100">
         <div class="card-body d-flex flex-column">
+            <!-- Knowledge Area -->
             <div class="field">
                 <h5 class="card-title mb-2">Knowledge Area: <span class="text-primary">{{ request.knowledge_area|upper }}</span></h5>
             </div>
 
+            <!-- Availability -->
             <div class="field">
-                <p class="field-label">Availability:</p>
+                <p class="field-label mb-1">Availability:</p>
                 <ul class="field-content list-unstyled">
                     {% for day in request.availability.all %}
                         <li>{{ day }}</li>
+                    {% empty %}
+                        <li class="text-muted">No availability specified</li>
                     {% endfor %}
                 </ul>
             </div>
 
+            <!-- Term -->
             <div class="field">
                 <p class="card-title mb-2">Term: <span class="text-primary">{{ request.term|upper }}</span></p>
             </div>
 
+            <!-- Frequency -->
             <div class="field">
-                <p class="field-label">Frequency: <span class="field-content">{{ request.frequency|upper }}</span></p>
+                <p class="field-label mb-1">Frequency: <span class="field-content">{{ request.frequency|upper }}</span></p>
             </div>
 
+            <!-- Duration -->
             <div class="field">
-                <p class="field-label">Duration: <span class="field-content">{{ request.duration|upper }}</span></p>
+                <p class="field-label mb-1">Duration: <span class="field-content">{{ request.duration|upper }}</span></p>
             </div>
 
+            <!-- Venue Preference -->
             <div class="field">
-                <p class="field-label">Venue Preference:</p>
+                <p class="field-label mb-1">Venue Preference:</p>
                 <ul class="field-content list-unstyled">
                     {% for mode in request.venue_preference.all %}
                         <li>{{ mode }}</li>
+                    {% empty %}
+                        <li class="text-muted">No venue preference specified</li>
                     {% endfor %}
                 </ul>
             </div>
 
-            <div class="mt-auto card-footer action-buttons">
-                <a href="{% url 'edit_request' request.id %}" class="btn btn-outline-warning btn-sm">Update</a>
+            <!-- Action Buttons -->
+            <div class="mt-auto card-footer bg-transparent border-0 text-center">
+                <a href="{% url 'edit_request' request.id %}" class="btn btn-outline-warning btn-sm me-2">Update</a>
                 <a href="{% url 'confirm_delete_request' request.id %}" class="btn btn-outline-danger btn-sm">Delete</a>
             </div>
         </div>

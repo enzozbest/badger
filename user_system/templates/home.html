@@ -3,18 +3,18 @@
   {% include 'partials/navbar.html' %}
 
   <!-- Header Section -->
-  <div class="container vh-60 d-flex flex-column justify-content-center align-items-start px-5 mt-5 mb-4">
-    <h1 class="display-5">
-      Welcome to CodeConnect 
-      <span class="text-muted fs-6">by Code Tutors</span>
-      <br> Your gateway to personalized learning
+<div class="container vh-60 d-flex flex-column justify-content-center align-items-start px-5 mt-5 mb-4">
+  <h1 class="display-5">
+    Welcome to <span class="text-success">CodeConnect</span>
+    <span class="text-success fs-6">by Code Tutors</span>
+    <br> Your gateway to personalized learning
   </h1>
-    <p class="lead text-muted mb-4">
-      We are an online tutoring platform that connects students, tutors, and administrators <br>
-      to create a seamless, efficient, and empowering educational experience.
-    </p>
-    
-  </div>
+  <p class="lead text-muted mb-4">
+    We are an online tutoring platform that connects students, tutors, and administrators <br>
+    to create a seamless, efficient, and empowering educational experience.
+  </p>
+</div>
+
 
   <!-- Join as Student/Tutor Cards -->
   <div class="container">
@@ -22,14 +22,14 @@
       <!-- Card for "Join as a Student" -->
       <div class="col-md-6 mb-4 ">
         <div class="card h-100 text-center">
-          <div class="card-body bg-light">
+          <div class="card-body bg-dark">
             <div class="mb-3">
               <!-- Icon for Student -->
-              <i class="bi bi-person" style="font-size: 3rem;"></i>
+              <i class="bi bi-person text-success" style="font-size: 3rem;"></i>
             </div>
             <h5 class="card-title">Join as a Student</h5>
             <p class="card-text">Discover the right tutors to help you excel in your studies and achieve your educational goals.</p>
-            <a href="{% url 'sign_up' %}" class="btn btn-outline-secondary">Sign up as Student</a>
+            <a href="{% url 'sign_up' %}" class="btn btn-outline-success">Sign up as Student</a>
           </div>
         </div>
       </div>
@@ -37,14 +37,14 @@
       <!-- Card for "Join as a Tutor" -->
       <div class="col-md-6 mb-4">
         <div class="card h-100 text-center">
-          <div class="card-body bg-light">
+          <div class="card-body bg-dark">
             <div class="mb-3">
               <!-- Icon for Tutor -->
-              <i class="bi bi-person-badge" style="font-size: 3rem;"></i>
+              <i class="bi bi-person-badge text-success" style="font-size: 3rem;"></i>
             </div>
             <h5 class="card-title">Join as a Tutor</h5>
             <p class="card-text">Showcase your expertise, inspire curious minds, and connect with students who are eager to learn and grow.</p>
-            <a href="{% url 'sign_up' %}" class="btn btn-outline-secondary">Sign up as Tutor</a>
+            <a href="{% url 'sign_up' %}" class="btn btn-outline-success">Sign up as Tutor</a>
           </div>
         </div>
       </div>
@@ -65,4 +65,5 @@
       </div>
     </div>
   </div>
+
 {% endblock %}

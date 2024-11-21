@@ -3,7 +3,10 @@
   <div class="container">
     <!-- Navbar Brand -->
     <a class="navbar-brand" href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}">
+      <img src="/static/images/icon7.png" alt="Icon" style="width: 50px; height: 50px; position: relative; left: -10px;">
+
       CodeConnect
+      
     </a>
 
     <!-- Navbar Links and Dropdown -->
