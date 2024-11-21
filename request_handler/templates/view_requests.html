@@ -3,19 +3,19 @@
 {% block content %}
 <div class="container mt-5">
     <!-- Tutoring Requests Section -->
-    <h1 class="display-5 text-white">
-        Tutoring Requests 
-    </h1>
+    <h1 class="display-5 text-white">Tutoring Requests</h1>
     <p class="text-white">Showing {{ count }} out of {{ total }} requests:</p>
     <div class="mb-3">
         <a href="{% url 'dashboard' %}" class="text-decoration-none text-success">Go to Dashboard</a>
     </div>
+    
     <!-- Filter Form -->
     <form method="get" class="bg-dark text-white p-3 rounded mb-4">
         {{ filter.form.as_p }}
         <button type="submit" class="btn btn-outline-light btn-sm">Filter</button>
     </form>
-        {% if requests %}
+    
+    {% if requests %}
         <!-- Requests Cards Grid -->
         <div class="row row-cols-1 row-cols-md-4 g-4">
             {% for request in requests %}
@@ -34,6 +34,12 @@
                                         <li>No Venue Preference</li>
                                     {% endfor %}
                                 </ul>
+                                <strong>On Time?</strong> 
+                                {% if request.late %}
+                                    <span class="text-danger">Late Request</span>
+                                {% else %}
+                                    <span class="text-success">On Time</span>
+                                {% endif %}<br>
                                 <strong>Status:</strong> 
                                 {% if request.allocated %}
                                     Allocated to {{ request.tutor_name }}

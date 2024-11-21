@@ -4,7 +4,9 @@ from request_handler.models import Request, Venue
 from user_system.fixtures.create_test_users import create_test_user
 from django.shortcuts import reverse
 from user_system.models import User, Day
-
+from admin_functions.helpers import calculate_cost
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
 
 class TestAllocation(TestCase):
     def setUp(self):
@@ -102,3 +104,77 @@ class TestAllocation(TestCase):
         response = self.client.get(reverse("allocate_request", args={self.unallocated_request.id}))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed("allocate_request.html")
+
+    def test_basic_allocation_cost(self):
+        self.client.login(username=self.admin.username, password='Password123')
+        self.client.post(reverse("allocate_request", args={self.unallocated_request.id}), data={
+            'tutor': self.tutor.id,
+            'venue': str(self.online.id),
+            'day': self.tuesday.id
+        })
+        tutor = get_object_or_404(User, id=self.tutor.id)
+        cost = calculate_cost.calculate_cost(tutor, self.allocated_request.id)
+        self.assertEqual(cost,375.0)
+
+    def test_recurring_allocation_cost(self):
+        self.unallocated_request.is_recurring = True
+        self.unallocated_request.save()
+        self.unallocated_request.refresh_from_db()
+        self.client.login(username=self.admin.username, password='Password123')
+        response = self.client.post(reverse("allocate_request", args={self.unallocated_request.id}), data={
+            'tutor': self.tutor.id,
+            'venue': str(self.online.id),
+            'day': self.tuesday.id
+        })
+        self.unallocated_request.refresh_from_db()
+        tutor = get_object_or_404(User, id=self.tutor.id)
+        cost = calculate_cost.calculate_cost(tutor, self.allocated_request.id)
+        self.assertEqual(cost,375.0)
+
+    def test_2hr30_session_cost(self):
+        self.unallocated_request.duration= "2.5h"
+        self.unallocated_request.save()
+        self.unallocated_request.refresh_from_db()
+        self.client.login(username=self.admin.username, password='Password123')
+        response = self.client.post(reverse("allocate_request", args={self.unallocated_request.id}), data={
+            'tutor': self.tutor.id,
+            'venue': str(self.online.id),
+            'day': self.tuesday.id
+        })
+        self.unallocated_request.refresh_from_db()
+        tutor = get_object_or_404(User, id=self.tutor.id)
+        cost = calculate_cost.calculate_cost(tutor, self.unallocated_request.id)
+        self.assertEqual(cost,937.5)
+
+
+    def test_biweekly_allocation_cost(self):
+        #Specifc test request that has a biweekly lesson
+        self.unallocated_request.frequency = "Biweekly"
+        self.unallocated_request.save()
+        self.unallocated_request.refresh_from_db()
+        self.client.login(username=self.admin.username, password='Password123')
+        response = self.client.post(reverse("allocate_request", args={self.unallocated_request.id}), data={
+            'tutor': self.tutor.id,
+            'venue': str(self.online.id),
+            'day': self.tuesday.id
+        })
+        self.unallocated_request.refresh_from_db()
+        tutor = get_object_or_404(User, id=self.tutor.id)
+        cost = calculate_cost.calculate_cost(tutor, self.unallocated_request.id)
+        self.assertEqual(cost,750.0)
+    
+    def test_fortnightly_allocation_cost(self):
+        #Specifc test request that has a fortnightly lesson
+        self.unallocated_request.frequency = "Fortnightly"
+        self.unallocated_request.save()
+        self.unallocated_request.refresh_from_db()
+        self.client.login(username=self.admin.username, password='Password123')
+        response = self.client.post(reverse("allocate_request", args={self.unallocated_request.id}), data={
+            'tutor': self.tutor.id,
+            'venue': str(self.online.id),
+            'day': self.tuesday.id
+        })
+        self.unallocated_request.refresh_from_db()
+        tutor = get_object_or_404(User, id=self.tutor.id)
+        cost = calculate_cost.calculate_cost(tutor, self.unallocated_request.id)
+        self.assertEqual(cost,175.0)
