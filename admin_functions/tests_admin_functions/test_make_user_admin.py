@@ -36,14 +36,14 @@ class MakeUserAdminTestCase(TestCase):
         self.user = User.objects.create_user(username='testuser2', email='test2@test.com', password='Password123', user_type='Tutor')
         self.client.login(username='testuser2', password='Password123')
         response = self.client.get(reverse('make_admin', args=[2]), follow=True)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
         self.assertTemplateUsed(response, 'permission_denied.html')
 
     def test_nonadmin_user_confirm_make_user_admin(self):
         self.user = User.objects.create_user(username='testuser2', email='test2@test.com', password='Password123', user_type='Tutor')
         self.client.login(username='testuser2', password='Password123')
         response = self.client.post(reverse('confirm_make_admin', args=[2]), follow=True)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
         self.assertTemplateUsed(response, 'permission_denied.html')
 
     def test_make_user_admin(self):

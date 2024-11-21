@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpRequest, HttpResponse
 from django.views import View
 from django.shortcuts import redirect, render
@@ -11,13 +12,10 @@ This class is used as a view for the website. This class defines the get() metho
 and the post() method to handle a filled in RequestForm instance.
 Both methods ensure that the user is authenticated and that its user type is Student or Admin.
 """
-class CreateRequestView(View):
+class CreateRequestView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest) -> HttpResponse:
-        if not request.user.is_authenticated:
-            return redirect('log_in')
-
-        if request.user.user_type == 'Tutor':
-            return render(request, 'permission_denied.html', status=403)
+        if request.user.is_tutor:
+            return render(request, 'permission_denied.html', status=401)
 
         form = RequestForm()
         return render(request, 'create_request.html', {'form': form})
@@ -26,8 +24,8 @@ class CreateRequestView(View):
         if not request.user.is_authenticated:
             return redirect('log_in')
 
-        if request.user.user_type == 'Tutor':
-            return render(request, 'permission_denied.html', status=403)
+        if request.user.is_tutor:
+            return render(request, 'permission_denied.html', status=401)
 
         form = RequestForm(request.POST)
 
@@ -36,10 +34,6 @@ class CreateRequestView(View):
                 request_instance = form.save(commit=False)
                 request_instance.student = request.user
                 request_instance.save()
-
-                # Manually add selected days to Request instance.
-                for day in form.cleaned_data['availability']:
-                    request_instance.availability.add(day)
 
                 # Manually add selected venues to Request instance.
                 for mode in form.cleaned_data['venue_preference']:

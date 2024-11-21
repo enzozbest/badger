@@ -1,25 +1,21 @@
 from django.test import TestCase
 from django.urls import reverse
-from user_system.models import User
-from request_handler.models import Request, Venue, Day
+from user_system.models import User, Day
+from request_handler.models import Request, Venue
 from datetime import datetime 
-
 
 INVALID_REQUEST_ID = 999
 
-
 class TestViews(TestCase):
     def setUp(self):
-        self.monday = Day.objects.create(day='Monday')
-        self.online = Venue.objects.create(venue='Online')
-        User.objects.create_user(username='@johndoe', email='johndoe@example.org', password='Password123', user_type='Student')
-        self.tutor = User.objects.create_user(username='@janedoe', email='janedoe@example.org', password='Password123',
-                                              first_name='Jane', last_name='Doe', user_type='Tutor')
-        self.url = reverse('create_request')
+        from user_system.fixtures.create_test_users import create_test_user
+        create_test_user()
+        self.monday, _ = Day.objects.get_or_create(day='Monday')
+        self.online, _ = Venue.objects.get_or_create(venue='Online')
+        self.student = User.objects.get(username='@charlie')
+        self.tutor = User.objects.get(username='@janedoe')
 
-    def test_unauthenticated_user_cannot_create_request(self):
-        response = self.client.get(self.url, follow=True)
-        self.assertRedirects(response, reverse('log_in'), status_code=302, target_status_code=200)
+        self.url = reverse('create_request')
 
     def test_user_can_see_rqeuest_creation_page(self):
         self.client.login(username='@johndoe', password='Password123')
@@ -27,9 +23,8 @@ class TestViews(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_create_request_with_valid_data(self):
-        self.client.login(username='@johndoe', password='Password123')
+        self.client.login(username='@charlie', password='Password123')
         data = {
-            'availability': [self.monday.pk],
             'term': 'January',
             'knowledge_area': 'Scala',
             'frequency': 'Biweekly',
@@ -40,10 +35,9 @@ class TestViews(TestCase):
         self.assertRedirects(response, reverse('request_success'), status_code=302, target_status_code=200)
 
     def test_create_request_with_invalid_data(self):
-        self.client.login(username='@johndoe', password='Password123')
+        self.client.login(username='@charlie', password='Password123')
         #Blank 'term' field!
         data = {
-            'availability': [self.monday.id,],
             'term': '',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',
@@ -56,27 +50,28 @@ class TestViews(TestCase):
     def test_tutor_cannot_create_request_get(self):
         self.client.login(username='@janedoe', password='Password123')
         response = self.client.get(self.url, follow=True)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
         self.assertTemplateUsed(response, 'permission_denied.html')
 
     def test_tutor_cannot_create_request_post(self):
         self.client.login(username='@janedoe', password='Password123')
         response = self.client.post(self.url, follow=True)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
         self.assertTemplateUsed(response, 'permission_denied.html')
 
     def test_unauthenticated_user_cannot_create_request_get(self):
         response = self.client.get(self.url, follow=True)
-        self.assertRedirects(response, reverse('log_in'), status_code=302, target_status_code=200)
+        expected_url = f'{reverse("log_in")}?next={reverse("create_request")}'
+        self.assertRedirects(response, expected_url, status_code=302, target_status_code=200)
 
     def test_unauthenticated_user_cannot_create_request_post(self):
         response = self.client.post(self.url, follow=True)
-        self.assertRedirects(response, reverse('log_in'), status_code=302, target_status_code=200)
+        expected_url = f'{reverse("log_in")}?next={reverse("create_request")}'
+        self.assertRedirects(response, expected_url, status_code=302, target_status_code=200)
 
     def test_form_late_request_redirect(self):
-        self.client.login(username='@johndoe', password='Password123')
+        self.client.login(username='@charlie', password='Password123')
         data = {
-            'availability': [self.monday.id],
             'term': '',
             'knowledge_area': 'Scala',
             'frequency': 'Weekly',

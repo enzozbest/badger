@@ -2,7 +2,7 @@
 from django import forms
 from django.contrib.auth import authenticate
 from django.core.validators import RegexValidator
-from .models import User, KnowledgeArea
+from .models import User, KnowledgeArea, Day
 
 
 class LogInForm(forms.Form):
@@ -45,13 +45,34 @@ class UserForm(forms.ModelForm):
     def clean_hourly_rate(self):
         hourly_rate = self.cleaned_data.get('hourly_rate')
         if hourly_rate is not None and hourly_rate <= 0:
-            raise forms.ValidationError('Hourly rate must be a positive number! ')
+            raise forms.ValidationError('Hourly rate must be a positive number!')
         return hourly_rate
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        # Check if the username is already in use by another user
+        if User.objects.filter(username=username).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("User with this username already exists.")
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        # Check if the email is already in use by another user
+        if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("User with this email address already exists.")
+        return email
+
+    availability = forms.ModelMultipleChoiceField(
+        label='Availability',
+        queryset=Day.objects.all(),
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+        required=False
+    )
 
     class Meta:
         """Form options."""
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'user_type', 'hourly_rate']
+        fields = ['first_name', 'last_name', 'username', 'email', 'user_type', 'hourly_rate', 'availability']
 
 class NewPasswordMixin(forms.Form):
     """Form mixing for new_password and password_confirmation fields."""
@@ -113,11 +134,16 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
     """Form enabling unregistered users to sign up."""
     USER_SIGNUP_CHOICES = [(User.ACCOUNT_TYPE_TUTOR, 'Tutor'), (User.ACCOUNT_TYPE_STUDENT, 'Student')]
     user_type = forms.ChoiceField(choices=USER_SIGNUP_CHOICES, label='Account Type')
-
+    availability = forms.ModelMultipleChoiceField(
+        label='Availability',
+        queryset=Day.objects.all(),
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+        required=False
+    )
     class Meta:
         """Form options."""
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'user_type']
+        fields = ['first_name', 'last_name', 'username', 'email', 'user_type', 'availability']
 
     def save(self):
         """Create a new user."""

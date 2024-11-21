@@ -11,7 +11,7 @@ def populate_modes(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('request_handler', '0002_auto_20241117_1610'),
+        ('request_handler', '0001_initial'),
     ]
 
     operations = [

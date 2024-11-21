@@ -4,72 +4,42 @@ from django.test import TestCase
 class RequestModelTest(TestCase):
     def setUp(self):
         from user_system.models import User
-        from request_handler.models import Request, Day, Venue
+        from request_handler.models import Request, Venue
 
         self.user = User.objects.create_user(username='@johndoe', email='johndoe@example.org', password='Password123')
-        self.monday = Day.objects.create(day='Monday')
-        self.wednesday = Day.objects.create(day='Wednesday')
-        self.in_person = Venue.objects.create(venue='In Person')
         self.online = Venue.objects.create(venue='Online')
+        self.in_person = Venue.objects.create(venue='In Person')
         self.request = Request.objects.create(student=self.user, term='Easter', knowledge_area='Scala',
                                duration='1h', frequency='Weekly')
-        self.request.availability.add(self.monday, self.wednesday)
         self.request.venue_preference.add(self.in_person, self.online)
         self.tutor = User.objects.create_user(username='@janedoe', email='janedoe@example.org', password='Password123', first_name='Jane', last_name='Doe')
-
-    def test_str_method_availability_exists(self):
-        s  = str(self.request)
-        self.assertEqual(s, (f'Student: johndoe@example.org'
-                f'\n Knowledge Area: Scala'
-                f'\n Availability: Monday, Wednesday'
-                f'\n Term: Easter'
-                f'\n Frequency: Weekly'
-                f'\n Duration: 1h'
-                f'\n Venue Preference: In Person, Online'
-                f'\n Allocated?: No'
-                f'\n Tutor: -'
-                f'\n Late: False'))
-
-    def test_str_method_availability_blank(self):
-        self.request.availability.clear()
-        s  = str(self.request)
-        self.assertEqual(s, (f'Student: johndoe@example.org'
-                f'\n Knowledge Area: Scala'
-                f'\n Availability: No availability set!'
-                f'\n Term: Easter'
-                f'\n Frequency: Weekly'
-                f'\n Duration: 1h'
-                f'\n Venue Preference: In Person, Online'
-                f'\n Allocated?: No'
-                f'\n Tutor: -'
-                f'\n Late: False'))
 
     def test_str_method_venue_preference_exists(self):
         s  = str(self.request)
         self.assertEqual(s, (f'Student: johndoe@example.org'
                 f'\n Knowledge Area: Scala'
-                f'\n Availability: Monday, Wednesday'
                 f'\n Term: Easter'
                 f'\n Frequency: Weekly'
                 f'\n Duration: 1h'
-                f'\n Venue Preference: In Person, Online'
+                f'\n Venue Preference: Online, In Person'
                 f'\n Allocated?: No'
                 f'\n Tutor: -'
-                f'\n Late: False'))
+                f'\n Late: False'
+                f'\n Recurring?: False'))
 
     def test_str_method_venue_preference_blank(self):
         self.request.venue_preference.clear()
         s = str(self.request)
         self.assertEqual(s, (f'Student: johndoe@example.org'
                 f'\n Knowledge Area: Scala'
-                f'\n Availability: Monday, Wednesday'
                 f'\n Term: Easter'
                 f'\n Frequency: Weekly'
                 f'\n Duration: 1h'
                 f'\n Venue Preference: No venue preference set!'
                 f'\n Allocated?: No'
                 f'\n Tutor: -'
-                f'\n Late: False'))
+                f'\n Late: False'
+                f'\n Recurring?: False'))
 
     def test_student_email_student_is_none(self):
         self.request.student = None
@@ -136,11 +106,6 @@ class RequestModelTest(TestCase):
         with self.assertRaises(ValidationError):
             self.request.full_clean()
 
-    def test_availability_field_cannot_be_empty(self):
-        self.request.availability.clear()
-        with self.assertRaises(ValidationError):
-            self.request.full_clean()
-
     def test_venue_preference_field_cannot_be_empty(self):
         self.request.venue_preference.clear()
         with self.assertRaises(ValidationError):
@@ -167,3 +132,10 @@ class RequestModelTest(TestCase):
         with self.assertRaises(ValidationError):
             self.request.full_clean()
 
+    def test_is_recurring_default(self):
+        self.assertFalse(self.request.is_recurring) 
+
+    def test_is_recurring_set_to_true(self):
+        """Ensure is_recurring can be set to True."""
+        self.request.is_recurring = True
+        self.assertTrue(self.request.is_recurring)
