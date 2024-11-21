@@ -24,6 +24,7 @@
                 <th>Student</th>
                 <th>Requested Area</th>
                 <th>Venue Preference</th>
+                <th>On time?</th>
                 <th>Status</th>
                 <th>Action</th>
             </tr>
@@ -47,6 +48,13 @@
                             <li>No Venue Preference</li>
                             {% endfor %}
                         </ul>
+                    </td>
+                    <td>
+                        {% if request.late %}
+                        <li>Late request</li>
+                        {% else %}
+                        <li>On time</li>
+                        {% endif %}
                     </td>
                     <td>
                         {% if request.allocated %}
