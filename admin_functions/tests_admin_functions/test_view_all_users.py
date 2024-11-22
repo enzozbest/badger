@@ -33,7 +33,7 @@ class ViewAllUsersTestCase(TestCase):
         self.client.login(username='testuser2', password='Password123')
         response = self.client.get(reverse('view_all_users'))
         self.assertEqual(response.status_code, 401)
-        #self.assertTemplateUsed(response, 'permission_denied.html')
+
 
     def test_admin_can_send_request(self):
         self.client.login(username='testuser', password='Password123')

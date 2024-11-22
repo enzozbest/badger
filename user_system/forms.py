@@ -42,6 +42,7 @@ class UserForm(forms.ModelForm):
             self.fields['hourly_rate'].widget.attrs['placeholder'] = 'Enter your hourly rate e.g., 22.50'
             self.fields['hourly_rate'].required = False
 
+    # Validates hourly rate to make sure it is 0 or positive
     def clean_hourly_rate(self):
         hourly_rate = self.cleaned_data.get('hourly_rate')
         if hourly_rate is not None and hourly_rate <= 0:
@@ -159,12 +160,8 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         )
         return user
 
-class KnowledgeAreaForm(forms.ModelForm):
-    class Meta:
-        model = KnowledgeArea
-        fields = ['subject']
-
-    subject = forms.ChoiceField(choices=[
+def get_knowledge_areas():
+    return [
         ('C++', 'C++'),
         ('Scala', 'Scala'),
         ('Python', 'Python'),
@@ -174,4 +171,14 @@ class KnowledgeAreaForm(forms.ModelForm):
         ('Databases', 'Databases'),
         ('Robotics', 'Robotics'),
         ('Internet Systems', 'Internet Systems'),
-    ])
+    ]
+
+class KnowledgeAreaForm(forms.ModelForm):
+    """Form to set knowledge areas."""
+    class Meta:
+        model = KnowledgeArea
+        fields = ['subject']
+
+    subject = forms.ChoiceField(choices=get_knowledge_areas())
+
+
