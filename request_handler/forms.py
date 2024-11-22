@@ -1,4 +1,5 @@
 import django.forms as forms
+from user_system.forms import get_knowledge_areas
 from datetime import timedelta,datetime
 
 from .models import Request, Venue
@@ -16,9 +17,7 @@ class RequestForm(forms.ModelForm):
         required=True
     )
 
-    USER_KNOWLEDGE_AREA_CHOICES = [('C++','C++'),('Scala','Scala'),('Python','Python'),('Java','Java'),
-                                   ('Django','Django'),('JavaScript','JavaScript'),('Databases','Databases'),
-                                   ('Robotics','Robotics'),('Internet Systems','Internet Systems')]
+    USER_KNOWLEDGE_AREA_CHOICES = get_knowledge_areas()
     knowledge_area = forms.ChoiceField(choices=USER_KNOWLEDGE_AREA_CHOICES, label='Knowledge Area')
 
     USER_TERM_CHOICES = [('September','September - December'),('January','January - April'),('May','May - July')]

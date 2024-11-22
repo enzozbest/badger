@@ -6,7 +6,7 @@
 </head>
 <body>
     <h2> Are you sure you want to delete this request? </h2>
-    <!-- What data do we want to put here? -->
+    
     <p> Knowledge Area: {{  request_instance.knowledge_area  }}</p>
     <p> Term: {{ request_instance.term }} </p>
     <form method="post" action="{% url 'confirm_delete_request' request_instance.id %}">
