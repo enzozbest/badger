@@ -3,8 +3,6 @@ from django.http import HttpRequest, HttpResponse
 from django.views import View
 from django.shortcuts import redirect, render
 from request_handler.forms import RequestForm
-from django.contrib import messages
-from request_handler.views.small_views import permission_denied
 
 """ Class to represent the creation of a request
 
