@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'user_system',
     'code_tutors',
     'request_handler',
-    'admin_functions'
+    'admin_functions',
+    'invoicer'
 ]
 
 MIDDLEWARE = [
