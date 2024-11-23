@@ -74,6 +74,18 @@
                             {% endif %}
                         </ul>
                     </td>
+                    <td>
+                        <ul>
+                            {% if user.is_tutor and request.allocated and request.tutor == user %}
+                                <li>
+                                <form method="post" action="{% url 'accept_request' request.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit">Accept Request</button>
+                                </form>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </td>
                 </tr>
             {% empty %}
                 <tr>

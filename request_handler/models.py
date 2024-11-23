@@ -1,6 +1,9 @@
+from email.policy import default
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from user_system.models import User, Day
+from user_system.models import User
 
 
 
@@ -76,3 +79,24 @@ class Request(models.Model):
         super().clean()
         if self.pk and not self.venue_preference.exists():
             raise ValidationError({"venue_preference": "No venue preference set!"})
+
+""" Class representing requests accepted by a tutor, known as bookings or lessons.
+
+This Model represents a booking accepted by the tutor. It contains all the necessary details to be displayed when a 
+student or tutor wants to view their booked lessons.
+"""
+class Booking(models.Model):
+    request = models.ForeignKey(Request, on_delete=models.CASCADE, default=1) # Change this default or set null and blank to True
+    tutor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tutor_bookings')
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student_bookings')
+    knowledge_area = models.CharField(max_length=100)
+    venue = models.CharField(max_length=255, null=True, blank=True)
+    day = models.CharField(max_length=20)
+    # start_date = models.DateField()
+    # end_date = models.DateField()
+    # recurring = models.BooleanField(default=False)
+    term = models.CharField(max_length=255, null=True, blank=True)
+
+
+    def __str__(self):
+        return f"{self.student} -> {self.tutor} ({self.day})"
