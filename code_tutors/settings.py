@@ -149,3 +149,4 @@ MESSAGE_TAGS = {
 
 #AWS Configurations
 AWS_ACCOUNT_ID = '058264317710'
+USE_AWS_S3 = True

@@ -34,7 +34,41 @@ Migrate the database:
 $ python3 manage.py migrate
 ```
 
-Seed the development database with:
+Decide whether you wish to use AWS's S3 service to store automatically generated invoices.
+This is disabled by default, and invoices will be stored locally at the 'invoicer/pdfs' directory.
+
+The field "USE_AWS_S3" in 'code_tutors/settings.py' can be changed to 'True' if you wish to use S3.
+If you do, you must also provide your AWS Account ID in the same file, to the field "AWS_ACCOUNT_ID".
+You must then change the file 'config.yml' in the code_tutors/aws/resources directory, to reflect your AWS 
+setup (bucket name, IAM role access name, etc).
+
+Also make sure you have correctly set up your credentials in your environment. You can do this using the AWS Command line interface(aws-cli)
+with the following command:
+
+```
+$aws configure
+```
+
+You will then be prompted to enter you AWS_ACCESS_KEY_ID, SECRET_ACCESS_KEY, and REGION_NAME. If these are correctly set up,
+the application will pick them up automatically and nothing further will need to be done.
+
+Alternatively, you can use the following commands to set environment variables:
+
+* Linux/macOS:
+```
+$ export AWS_ACCESS_KEY_ID=your-access-key-here
+$ export SECRET_ACCESS_KEY=your-secret-access-key-here
+$ export AWS_REGION_NAME=your-aws-region-name-here
+```
+
+* Windows:
+```
+$ set AWS_ACCESS_KEY_ID=your-access-key-here
+$ set SECRET_ACCESS_KEY=your-secret-access-key-here
+$ set AWS_REGION_NAME=your-aws-region-name-here 
+```
+
+Afterwards, seed the development database with:
 
 ```
 $ python3 manage.py seed
@@ -45,9 +79,5 @@ Run all tests with:
 $ python3 manage.py test
 ```
 
-*The above instructions should work in your version of the application.  If there are deviations, declare those here in bold.  Otherwise, remove this line.*
-
 ## Sources
 The packages used by this application are specified in `requirements.txt`
-
-*Declare are other sources here, and remove this line*
