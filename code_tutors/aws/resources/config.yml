@@ -1,0 +1,9 @@
+bucket_names:
+  invoicer: 'seg-sgp-badger-2024'
+
+roles:
+  invoicer-s3: 's3-badger-access-role'
+
+logo_name: 'logo.jpeg'
+
+

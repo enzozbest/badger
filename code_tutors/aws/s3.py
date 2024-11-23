@@ -2,10 +2,12 @@ import typing
 from .sts import assume_role
 from .settings import get_client
 from django.conf import settings as django_settings
+from .resources import yaml_loader as yaml
 
-ROLE_NAME = 's3-badger-access-role'
-BUCKET = 'seg-sgp-badger-2024'
-SESSION_COUNTER = 0
+ROLE_NAME = yaml.get_role_name('invoicer-s3')
+BUCKET = yaml.get_bucket_name('invoicer')
+_session_counter = -1
+
 def upload(bucket: str, obj: typing.IO, key: str, extra_args: typing.Optional[dict]=None) -> None:
     """
     Function to upload an object to S3 """
@@ -25,7 +27,7 @@ def generate_access_url(bucket: str, key: str, expiration: int=3600) -> str:
     except Exception as e:
         print(f'Error generating pre-signed URL: {e}')
 
-def list_objects(bucket: str, prefix: typing.Optional[str] = None, credentials:dict[str]=None) -> list[dict]:
+def list_objects(bucket: str, prefix: typing.Optional[str] = None, credentials:dict[str, str]=None) -> list[dict]:
     """Function to list objects in an S3 bucket"""
     s3_client = get_client('s3', credentials=credentials) if credentials else None
     try:
@@ -35,4 +37,6 @@ def list_objects(bucket: str, prefix: typing.Optional[str] = None, credentials:d
         print(f'Error listing objects in bucket: {e}')
 
 def _get_credentials() -> dict[str, str]:
-    return assume_role(f'arn:aws:iam::{django_settings.AWS_ACCOUNT_ID}:role/{ROLE_NAME}', 'badger')
+    global _session_counter
+    _session_counter += 1
+    return assume_role(f'arn:aws:iam::{django_settings.AWS_ACCOUNT_ID}:role/{ROLE_NAME}', f'badger-{_session_counter}')
