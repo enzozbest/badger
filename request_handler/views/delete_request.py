@@ -35,7 +35,7 @@ they want to delete the request, and the post() method handles the deletion of a
 get_request_instance() is a helper method used to retrieve a request object.
 """
 
-class ConfirmDeleteRequestView(LoginRequiredMixin, View):
+class ConfirmDeleteRequestView(View):
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         request_instance = self.get_request_instance(pk)
         return render(request, 'confirm_delete_request.html', {'request_instance': request_instance})

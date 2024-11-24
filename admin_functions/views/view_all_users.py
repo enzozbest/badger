@@ -16,18 +16,36 @@ class AllUsersView(LoginRequiredMixin, ListView):
     filterset_class = UserFilter
 
     def get_queryset(self):
+        # Get the base queryset
         queryset = super().get_queryset()
+
+        # Apply the filter
         self.filterset = self.filterset_class(self.request.GET, queryset=queryset)
         if self.filterset.is_valid():
-            return self.filterset.qs
+            queryset = self.filterset.qs
+
+        # Apply sorting
+        sort_field = self.request.GET.get('sort', 'pk')  # Default to 'pk'
+        if sort_field:
+            try:
+                # Validate sort_field against the model's fields
+                valid_fields = [field.name for field in User._meta.get_fields()]
+                if sort_field.lstrip('-') in valid_fields:
+                    queryset = queryset.order_by(sort_field)
+            except Exception:
+                pass  # Ignore invalid sort_field and fall back to default
+
         return queryset
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['filter'] = self.filterset  # Pass the filter object to the template
         context['count'] = context['users'].count()
         context['total'] = self.filterset.qs.count()
+        context['current_sort'] = self.request.GET.get('sort', 'pk')  # Pass current sort field
         return context
+
 
     def get(self, request, *args, **kwargs):
         # Fetch the queryset

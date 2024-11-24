@@ -20,11 +20,10 @@
     <table>
         <thead>
             <tr>
-                <th>Email</th>
-                <th>First name</th>
-                <th>Last name</th>
-                <th>Account type</th>
-                <th>Actions</th>
+                <th><a href="?{% for key, value in request.GET.items %}{% if key != 'sort' and key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=email">Email</a></th>
+                <th><a href="?{% for key, value in request.GET.items %}{% if key != 'sort' and key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=first_name">First name</a></th>
+                <th><a href="?{% for key, value in request.GET.items %}{% if key != 'sort' and key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=last_name">Last name</a></th>
+                <th><a href="?{% for key, value in request.GET.items %}{% if key != 'sort' and key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=user_type">Account type</a></th>
             </tr>
         </thead>
         <tbody>
@@ -51,8 +50,8 @@
    <div class="pagination">
     {% if is_paginated %}
         {% if page_obj.has_previous %}
-            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">First</a>
-            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Previous</a>
+        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={{ request.GET.sort|default:'' }}&page=1">First</a>
+        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Previous</a>
         {% endif %}
 
         <span>Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>

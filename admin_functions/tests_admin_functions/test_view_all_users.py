@@ -85,6 +85,50 @@ class ViewAllUsersTestCase(TestCase):
         response = self.client.get(reverse('view_all_users') + '?user_type=NA')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['page_obj'].paginator.count, 52)
+    
+    def test_sort_by_email(self):
+        """Test sorting by email in ascending order."""
+        self.client.login(username='testuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?sort=email')
+        users = list(response.context['page_obj'].object_list)
+        self.assertTrue(all(users[i].email <= users[i+1].email for i in range(len(users)-1)))
+
+    def test_sort_by_username_descending(self):
+        """Test sorting by username in descending order."""
+        self.client.login(username='testuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?sort=-username')
+        users = list(response.context['page_obj'].object_list)
+        self.assertTrue(all(users[i].username >= users[i+1].username for i in range(len(users)-1)))
+
+    def test_sort_invalid_field_falls_back_to_default(self):
+        """Test sorting by an invalid field falls back to default sorting."""
+        self.client.login(username='testuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?sort=invalid_field')
+        users = list(response.context['page_obj'].object_list)
+        self.assertTrue(all(users[i].pk <= users[i+1].pk for i in range(len(users)-1)))
+
+    def test_sort_by_user_type(self):
+        """Test sorting by user_type field."""
+        self.client.login(username='testuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?sort=user_type')
+        users = list(response.context['page_obj'].object_list)
+        self.assertTrue(all(users[i].user_type <= users[i+1].user_type for i in range(len(users)-1)))
+
+    def test_sort_with_filter_combination(self):
+        """Test sorting by email after applying a filter."""
+        self.client.login(username='testuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?user_type=Student&sort=email')
+        users = list(response.context['page_obj'].object_list)
+        self.assertTrue(all(user.user_type == 'Student' for user in users))
+        self.assertTrue(all(users[i].email <= users[i+1].email for i in range(len(users)-1)))
+
+    def test_sort_and_pagination_combination(self):
+        """Test sorting by username and verify pagination."""
+        self.client.login(username='testuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?sort=username&page=1')
+        users = list(response.context['page_obj'].object_list)
+        self.assertEqual(len(users), 20)  # Assuming 20 users per page
+        self.assertTrue(all(users[i].username <= users[i+1].username for i in range(len(users)-1)))
 
 class SearchUsersTestCase(TestCase):
     def setUp(self):
