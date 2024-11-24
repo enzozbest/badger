@@ -4,7 +4,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from user_system.models import User
 from request_handler.models import Request
 
-
 """ These classes allow admins to make selected users also admins and confirms their choice
 
 Both classes take the primary key of the selected user as a parameter, allowing the user's record to be 
