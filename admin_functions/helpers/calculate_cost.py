@@ -13,13 +13,16 @@ def calculate_cost(tutor: User, request_id: int)-> int:
     frequency = lesson_request.frequency
 
     lesson_num=0
-    match frequency:
-        case "Weekly":
-            lesson_num=15
-        case "Biweekly":
-            lesson_num=30
-        case "Fortnightly":
-            lesson_num=7
+
 
     cost = float(tutor.hourly_rate) * float(duration[:-1])  * lesson_num 
     return cost
+
+def calculate_num_lessons(frequency: str) -> int:
+    match frequency:
+        case "Weekly":
+            return 15
+        case "Biweekly":
+            return 30
+        case "Fortnightly":
+            return 7

@@ -28,11 +28,6 @@ Install all required packages:
 $ pip3 install -r requirements.txt
 ```
 
-Migrate the database:
-
-```
-$ python3 manage.py migrate
-```
 
 Decide whether you wish to use AWS's S3 service to store automatically generated invoices.
 This is disabled by default, and invoices will be stored locally at the 'invoicer/pdfs' directory.
@@ -68,8 +63,18 @@ $ set SECRET_ACCESS_KEY=your-secret-access-key-here
 $ set AWS_REGION_NAME=your-aws-region-name-here 
 ```
 
-Afterwards, seed the development database with:
+If you made any changes to the default configurations, update database migrations before continuing with:
+```
+$ python3 manage.py makemigrations --merge
+$ python3 manage.py makemigrations
+```
 
+Then, migrate the database:
+```
+$ python3 manage.py migrate
+```
+
+Seed the development database with:
 ```
 $ python3 manage.py seed
 ```

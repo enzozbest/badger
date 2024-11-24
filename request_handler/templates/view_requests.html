@@ -71,6 +71,8 @@
                                     <li> <a href="{% url 'edit_request' request.id %}">Update</a> </li>
                                     <li> <a href="{% url 'delete_request' request.id%}">Delete</a> </li>
                                 {% endif %}
+                            {% elif user.user_type == 'Admin' and request.allocated and request.invoice == None%}
+                                <li> <a href="{% url 'generate_invoice' request.id%}">Generate Invoice</a> </li>
                             {% endif %}
                         </ul>
                     </td>

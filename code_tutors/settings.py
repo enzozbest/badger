@@ -147,6 +147,10 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
+#Invoicer Configuration
+LOGO_PATH = BASE_DIR/'static/logo.jpeg'
+INVOICE_OUTPUT_PATH = BASE_DIR/'invoicer/invoices/pdfs'
+
 #AWS Configurations
 AWS_ACCOUNT_ID = '058264317710'
 USE_AWS_S3 = True

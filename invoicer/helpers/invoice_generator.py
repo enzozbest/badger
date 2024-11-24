@@ -1,85 +1,62 @@
+import os
+
 from reportlab.lib.pagesizes import A4
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.pdfgen import canvas
+from invoicer.models import Invoice
+from request_handler.models import Request
+from django.conf import settings
+from admin_functions.helpers.calculate_cost import calculate_num_lessons
+from io import BytesIO
+from code_tutors.aws import s3
+from code_tutors.aws.resources import yaml_loader
 
-def generate_invoice(file_name: str, company_info, recipient_info, invoice_data):
-    pdf = SimpleDocTemplate(file_name, pagesize=A4)
-    elements = []
+LOCAL_STORE = not settings.USE_AWS_S3
+LOGO_PATH = settings.LOGO_PATH
+OUTPUT_PATH = settings.INVOICE_OUTPUT_PATH
 
+def generate_invoice(request_obj: Request):
+    invoice: Invoice = request_obj.invoice
+    buffer = BytesIO()
+    path = f'{OUTPUT_PATH}/{invoice.invoice_id}.pdf'
 
-    styles = getSampleStyleSheet()
-    title_style = styles["Heading1"]
-    normal_style = styles["Normal"]
+    if not LOCAL_STORE:
+        pdf = canvas.Canvas(buffer, pagesize=A4)
+    else:
+        pdf = canvas.Canvas(buffer, pagesize=A4)
 
-    elements.append(Paragraph(company_info['name'], title_style))
-    elements.append(Paragraph(company_info['address'], normal_style))
-    elements.append(Paragraph(f'Phone: {company_info["phone"]}', normal_style))
-    elements.append(Paragraph(f'email: {company_info["email"]}', normal_style))
-    elements.append(Paragraph("<br></br>", normal_style))
+    width, height = A4
+    pdf.drawImage(LOGO_PATH, x=20, y=height-100, width=100, height=50, preserveAspectRatio=True, mask='auto')
 
-    elements.append(Paragraph(f'Billed to: {recipient_info["name"]}', normal_style))
-    elements.append(Paragraph(f'Address: {recipient_info["address"]}', normal_style))
-    elements.append(Paragraph(f'Phone: {recipient_info["phone"]}', normal_style))
-    elements.append(Paragraph(f'Email: {recipient_info["email"]}', normal_style))
-    elements.append(Paragraph("<br></br>", normal_style))
+    # Add title
+    pdf.setFont("Helvetica-Bold", 16)
+    pdf.drawString(150, height - 60, "Invoice")
 
-    elements.append(Paragraph(f'Invoice Number: {invoice_data["number"]}', normal_style))
-    elements.append(Paragraph(f'Invoice Date: {invoice_data["date"]}', normal_style))
-    elements.append(Paragraph("<br></br>", normal_style))
+    # Add recipient details
+    pdf.setFont("Helvetica", 12)
+    pdf.drawString(20, height - 120, f"Recipient: {request_obj.student.full_name}")
+    pdf.drawString(20, height - 140, f"Tutor: {request_obj.tutor.full_name}")
 
-    table_data = [['Description', 'Quantity', 'Unit Price', 'Total']]
-    for item in invoice_data["items"]:
-        table_data.append([item["description"], item["quantity"], f'£{item["unit_price"]:.2f}', f'{item["total"]:.2f}'])
+    # Add lesson details
+    pdf.drawString(20, height - 180, f"Hourly Rate: £{request_obj.tutor.hourly_rate:.2f}")
+    pdf.drawString(20, height - 200, f"Lessons Booked: {calculate_num_lessons(request_obj.frequency)}")
+    pdf.drawString(20, height - 220, f"Total Cost: £{invoice.total:.2f}")
 
-    table_data.append(["", "", "Total", f'£{invoice_data["total"]:.2f}'])
+    # # Add payment information
+    # pdf.setFont("Helvetica-Bold", 12)
+    # pdf.drawString(20, height - 260, "Payment Information:")
+    # pdf.setFont("Helvetica", 12)
+    # pdf.drawString(20, height - 280, f"Bank Name: {bank_details['bank_name']}")
+    # pdf.drawString(20, height - 300, f"Account Number: {bank_details['account_number']}")
+    # pdf.drawString(20, height - 320, f"Sort Code: {bank_details['sort_code']}")
+    # pdf.drawString(20, height - 340, f"Reference: {bank_details['reference']}")
 
-    table = Table(table_data, colWidths=[250, 100, 100, 100])
-    table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 1, colors.black),
-    ]))
+    # Finalize the PDF
+    pdf.save()
 
-    elements.append(table)
-    elements.append(Paragraph("<br/><br/> Thank you for your business!", normal_style))
-
-    pdf.build(elements)
-
-
-def test():
-    company_info = {
-        "name": "CodeConnect by CodeTutors",
-        "address": "123 Nowhere, London, A1 1AB",
-        "email": "test@example.org",
-        "phone": "0123456789",
-    }
-    recipient_info = {
-        "name": "John Doe",
-        "address": "123 Nowhere, London, A1 1AB",
-        "email": "jd@example.org",
-        "phone": "0123456789",
-    }
-    invoice_data = {
-        "number": "123456789",
-        "date": "2020-01-10",
-        "items": [
-            {
-                "description": "test1",
-                "quantity": 2,
-                "unit_price": 500,
-                "total": 1000,
-            },
-            {
-                "description": "test2",
-                "quantity": 1,
-                "unit_price": 200,
-                "total": 200,
-            }
-        ],
-        "total": 300
-    }
-
-    generate_invoice("invoice.pdf", company_info, recipient_info, invoice_data)
+    if not LOCAL_STORE:
+        buffer.seek(0)
+        s3.upload(obj=buffer, bucket=yaml_loader.get_bucket_name('invoicer'), key=f'invoices/pdfs/{invoice.invoice_id}.pdf')
+    else:
+        with open(path, "wb") as f:
+            f.write(buffer.getvalue())
+    buffer.close()
