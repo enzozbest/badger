@@ -14,10 +14,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
+
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
+
 from user_system import views as tutorial_views
 from request_handler.views import create_request as create_request_view, small_views as request_handler_views
 from request_handler.views import show_all_requests as view_requests_view
@@ -28,6 +31,7 @@ from admin_functions.views import small_views as small_views_view
 from admin_functions.views import make_user_admin as make_user_admin_view
 from admin_functions.views import allocate_requests as allocate_requests_view
 from request_handler.views import accept_request as accept_request_view
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -54,6 +58,7 @@ urlpatterns = [
     path('delete-knowledge-area/<int:area_id>/', tutorial_views.DeleteKnowledgeArea, name='delete_knowledge_area'),
     path("admins/allocate_request/<int:request_id>/", allocate_requests_view.AllocateRequestView.as_view(), name="allocate_request"),
     path('accept_request/<int:request_id>/', accept_request_view.AcceptRequestView.as_view(), name="accept_request"),
+
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

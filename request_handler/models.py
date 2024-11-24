@@ -86,16 +86,19 @@ This Model represents a booking accepted by the tutor. It contains all the neces
 student or tutor wants to view their booked lessons.
 """
 class Booking(models.Model):
-    request = models.ForeignKey(Request, on_delete=models.CASCADE, default=1) # Change this default or set null and blank to True
-    tutor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tutor_bookings')
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student_bookings')
-    knowledge_area = models.CharField(max_length=100)
-    venue = models.CharField(max_length=255, null=True, blank=True)
-    day = models.CharField(max_length=20)
-    # start_date = models.DateField()
-    # end_date = models.DateField()
-    # recurring = models.BooleanField(default=False)
-    term = models.CharField(max_length=255, null=True, blank=True)
+    student = models.ForeignKey(User, default=None, null=True, on_delete=models.CASCADE, related_name='booking_student')
+    tutor_name_string = '-'
+    tutor = models.ForeignKey(User, default=None, null=True, on_delete=models.SET_NULL, blank=True,
+                              related_name='booking_tutor')
+    knowledge_area = models.CharField(max_length=255, blank=False)
+    venue_preference = models.ManyToManyField(Venue, blank=False, related_name='booking_student_venue_preference')
+    term = models.CharField(max_length=255, null=True)
+    frequency = models.CharField(max_length=255, null=True, default="Weekly")
+    duration = models.CharField(max_length=255, blank=False, default="1h")
+    late = models.BooleanField(default=False, blank=False)
+    is_recurring = models.BooleanField(default=False)
+    day = models.ForeignKey(Day, null=True, blank=True, on_delete=models.SET_NULL, related_name='booking_allocated_day')
+    venue = models.ForeignKey(Venue, null=True, blank=True, on_delete=models.SET_NULL, related_name='booking_allocated_venue')
 
 
     def __str__(self):
