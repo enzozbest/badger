@@ -14,7 +14,8 @@ LOCAL_STORE = not settings.USE_AWS_S3
 LOGO_PATH = settings.LOGO_PATH
 OUTPUT_PATH = settings.INVOICE_OUTPUT_PATH
 
-def generate_invoice(request_obj: Request):
+def generate_invoice(request_obj: Request) -> None:
+    LOCAL_STORE = not settings.USE_AWS_S3
     invoice: Invoice = request_obj.invoice
     buffer = BytesIO()
     path = f'{OUTPUT_PATH}/{invoice.invoice_id}.pdf'
@@ -22,6 +23,8 @@ def generate_invoice(request_obj: Request):
     if not LOCAL_STORE:
         pdf = canvas.Canvas(buffer, pagesize=A4)
     else:
+        if not os.path.exists(path):
+            os.makedirs(os.path.dirname(path), exist_ok=True)
         pdf = canvas.Canvas(buffer, pagesize=A4)
 
     width, height = A4
@@ -59,4 +62,5 @@ def generate_invoice(request_obj: Request):
     else:
         with open(path, "wb") as f:
             f.write(buffer.getvalue())
+
     buffer.close()
