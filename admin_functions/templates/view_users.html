@@ -4,14 +4,15 @@
     <h1 class="display-5 text-white">
         Registered Users 
     </h1>
-    <p class="text-white">Showing {{ count }} out of {{ total }} users:</p>
-    
-    <div class="mb-3">
-        <a href="{% url 'admin_dash' %}" class="text-decoration-none text-success">Go to the Administrator Dashboard</a>
-    </div>
 
     <!-- Filter Form -->
     <form method="get" class="bg-dark text-white p-3 rounded mb-4">
+        <p class="text-white">Showing {{ count }} out of {{ total }} users:</p>
+    
+        <div class="mb-3">
+            <a href="{% url 'admin_dash' %}" class="btn-outline-success">Go to the Administrator Dashboard</a>
+        </div>
+
         {{ filter.form.as_p }}
         <button type="submit" class="btn btn-outline-light btn-sm">Filter</button>
     </form>
