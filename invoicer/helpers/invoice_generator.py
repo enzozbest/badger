@@ -17,7 +17,7 @@ OUTPUT_PATH = settings.INVOICE_OUTPUT_PATH
 def generate_invoice(request_obj: Request) -> None:
     LOCAL_STORE = not settings.USE_AWS_S3
     invoice: Invoice = request_obj.invoice
-    buffer = BytesIO()
+    buffer = BytesIO() #!!DO NOT REMOVE!!
     path = f'{OUTPUT_PATH}/{invoice.invoice_id}.pdf'
 
     if not LOCAL_STORE:
@@ -53,7 +53,7 @@ def generate_invoice(request_obj: Request) -> None:
     # pdf.drawString(20, height - 320, f"Sort Code: {bank_details['sort_code']}")
     # pdf.drawString(20, height - 340, f"Reference: {bank_details['reference']}")
 
-    # Finalize the PDF
+    # Finalize the PDF !!DO NOT REMOVE!!
     pdf.save()
 
     if not LOCAL_STORE:
@@ -63,4 +63,4 @@ def generate_invoice(request_obj: Request) -> None:
         with open(path, "wb") as f:
             f.write(buffer.getvalue())
 
-    buffer.close()
+    buffer.close() #!!DO NOT REMOVE!!
