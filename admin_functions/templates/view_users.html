@@ -13,44 +13,48 @@
 
     <!-- Filter Form -->
     <form method="get">
-        {{ filter.form.as_p }} <button type="submit">Go</button>
+        {{ filter.form.as_p }}
+        {% for key, value in request.GET.items %}
+            {% if key not in filter.form.fields.keys and key != 'page' %}
+                <input type="hidden" name="{{ key }}" value="{{ value }}">
+            {% endif %}
+        {% endfor %}
+        <button type="submit">Go</button>
     </form>
 
     <!-- Table -->
     <table>
         <thead>
             <tr>
-                {% with request.GET.items as params %}
                 <th>
-                    <a href="?{% for key, value in params %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if current_sort == 'email' %}-email{% else %}email{% endif %}">
-                        Email {% if current_sort == 'email' %}↑{% elif current_sort == '-email' %}↓{% endif %}
-                    </a>
-                </th>
-                <th>
-                    <a href="?{% for key, value in params %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if current_sort == 'first_name' %}-first_name{% else %}first_name{% endif %}">
+                    <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if current_sort == 'first_name' %}-first_name{% else %}first_name{% endif %}">
                         First Name {% if current_sort == 'first_name' %}↑{% elif current_sort == '-first_name' %}↓{% endif %}
                     </a>
                 </th>
                 <th>
-                    <a href="?{% for key, value in params %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if current_sort == 'last_name' %}-last_name{% else %}last_name{% endif %}">
+                    <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if current_sort == 'last_name' %}-last_name{% else %}last_name{% endif %}">
                         Last Name {% if current_sort == 'last_name' %}↑{% elif current_sort == '-last_name' %}↓{% endif %}
                     </a>
                 </th>
                 <th>
-                    <a href="?{% for key, value in params %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if current_sort == 'user_type' %}-user_type{% else %}user_type{% endif %}">
+                    <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if current_sort == 'email' %}-email{% else %}email{% endif %}">
+                        Email {% if current_sort == 'email' %}↑{% elif current_sort == '-email' %}↓{% endif %}
+                    </a>
+                </th>
+                <th>
+                    <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if current_sort == 'user_type' %}-user_type{% else %}user_type{% endif %}">
                         Account Type {% if current_sort == 'user_type' %}↑{% elif current_sort == '-user_type' %}↓{% endif %}
                     </a>
                 </th>
-                {% endwith %}
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for user in users %}
             <tr>
-                <td>{{ user.email }}</td>
-                <td>{{ user.first_name }}</td>
                 <td>{{ user.last_name }}</td>
+                <td>{{ user.first_name }}</td>
+                <td>{{ user.email }}</td>
                 <td>{{ user.user_type }}</td>
                 <td>
                     {% if user.user_type != 'Admin' %}
@@ -70,15 +74,15 @@
     <div class="pagination">
         {% if is_paginated %}
             {% if page_obj.has_previous %}
-                <a href="?{% for key, value in params %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">First</a>
-                <a href="?{% for key, value in params %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Previous</a>
+                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">First</a>
+                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Previous</a>
             {% endif %}
 
             <span>Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
 
             {% if page_obj.has_next %}
-                <a href="?{% for key, value in params %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next</a>
-                <a href="?{% for key, value in params %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ paginator.num_pages }}">Last</a>
+                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next</a>
+                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ paginator.num_pages }}">Last</a>
             {% endif %}
         {% endif %}
     </div>
