@@ -12,6 +12,13 @@
     <div class="col-12">
       <a href = "{% url 'view_requests' %}">Click here to view your lesson requests</a>
     </div>
+    <div>
+        {% if user.is_tutor %}
+            <a href="{% url 'tutor_calendar' %}">View Your Lessons (Tutor Calendar)</a>
+        {% elif user.is_student %}
+            <a href="{% url 'student_calendar' %}">View Your Lessons (Student Calendar)</a>
+        {% endif %}
+    </div>
     <div class="col-12">
       {% if user.user_type == 'Admin'%}<a href = "{% url 'admin_dash' %}">Click here to go to the admin dashboard</a>
       {% endif %}

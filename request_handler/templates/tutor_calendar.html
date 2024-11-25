@@ -1,0 +1,22 @@
+<body>
+<h1>Tutor Calendar</h1>
+<div class="calendar">
+    <div class="row">
+        {% for day in week_days %}
+            <div class="col-md-2 border">
+                <h4>{{ day|date:"l" }}</h4> <!-- Day of the week -->
+                <p>{{ day|date:"d M Y" }}</p> <!-- Date -->
+                {% for booking in calendar_data.day %}
+                    <div class="booking">
+                        <p><strong>Student:</strong> {{ booking.student.username }}</p>
+                        <p><strong>Knowledge Area:</strong>{{ booking.knowledge_area }}</p>
+                        <p><strong>Venue:</strong>{{ booking.venue }}</p>
+                    </div>
+                {% empty %}
+                    <p>No bookings.</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+</body>

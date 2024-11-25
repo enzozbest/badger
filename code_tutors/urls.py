@@ -31,6 +31,7 @@ from admin_functions.views import small_views as small_views_view
 from admin_functions.views import make_user_admin as make_user_admin_view
 from admin_functions.views import allocate_requests as allocate_requests_view
 from request_handler.views import accept_request as accept_request_view
+from request_handler.views import calendar as calendar_view
 
 
 urlpatterns = [
@@ -58,7 +59,8 @@ urlpatterns = [
     path('delete-knowledge-area/<int:area_id>/', tutorial_views.DeleteKnowledgeArea, name='delete_knowledge_area'),
     path("admins/allocate_request/<int:request_id>/", allocate_requests_view.AllocateRequestView.as_view(), name="allocate_request"),
     path('accept_request/<int:request_id>/', accept_request_view.AcceptRequestView.as_view(), name="accept_request"),
-
+    path('tutor/calendar/', calendar_view.tutor_calendar, name='tutor_calendar'),
+    path('student/calendar/',calendar_view.student_calendar, name='student_calendar'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
