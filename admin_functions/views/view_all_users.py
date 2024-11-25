@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from admin_functions.helpers.mixins import SortingMixin
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.views.generic import ListView
 from user_system.models import User
@@ -7,26 +8,33 @@ from django.http import HttpResponse
 from django.shortcuts import reverse, render
 from django.http import HttpResponseRedirect
 
-class AllUsersView(LoginRequiredMixin, ListView):
+class AllUsersView(LoginRequiredMixin, SortingMixin, ListView):
     model = User
     template_name = 'view_users.html'
     context_object_name = 'users'
     paginate_by = 20
     ordering = ['pk']
     filterset_class = UserFilter
+    valid_sort_fields = ['email', 'first_name', 'last_name', 'user_type']
+
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        self.filterset = self.filterset_class(self.request.GET, queryset=queryset)
-        if self.filterset.is_valid():
-            return self.filterset.qs
-        return queryset
+
+        if hasattr(self, 'filterset_class'):
+            self.filterset = self.filterset_class(self.request.GET, queryset=queryset)
+            if self.filterset.is_valid():
+                queryset = self.filterset.qs
+
+        return self.get_sorting_queryset(queryset)
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['filter'] = self.filterset  # Pass the filter object to the template
         context['count'] = context['users'].count()
-        context['total'] = self.filterset.qs.count()
+        context['total'] = self.filterset.qs.count() if hasattr(self, 'filterset') else self.get_queryset().count()
+        context['current_sort'] = self.request.GET.get('sort', self.default_sort_field)  # 当前排序字段
         return context
 
     def get(self, request, *args, **kwargs):
