@@ -13,56 +13,56 @@
 
     <!-- Filter Form -->
     <form method="get">
-        {{ filter.form.as_p }} <button type="submit">Go</button>
+        {{ filter.form.as_p }}
+        {% for key, value in request.GET.items %}
+            {% if key not in filter.form.fields.keys and key != 'page' %}
+                <input type="hidden" name="{{ key }}" value="{{ value }}">
+            {% endif %}
+        {% endfor %}
+        <button type="submit">Go</button>
     </form>
 
     <!-- Table -->
     <table>
-        <thead>
-            <tr>
-                <th>Email</th>
-                <th>First name</th>
-                <th>Last name</th>
-                <th>Account type</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
+        {% include "partials/sorting_table_head.html" with valid_sorting_fields=valid_sorting_fields current_sort=current_sort %}
         <tbody>
             {% for user in users %}
                 <tr>
-                    <td>{{ user.email }}</td>
                     <td>{{ user.first_name }}</td>
                     <td>{{ user.last_name }}</td>
-                    <td>{{ user.user_type}}</td>
-                    <td>{% if user.user_type != 'Admin' %}
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.user_type }}</td>
+                    <td>
+                        {% if user.user_type != 'Admin' %}
                             <a href="{% url 'make_admin' user.id %}">Make Administrator</a>
                         {% endif %}
                     </td>
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="6">No users found.</td>
+                    <td colspan="5">No users found.</td>
                 </tr>
             {% endfor %}
         </tbody>
+        
     </table>
 
     <!-- Pagination -->
-   <div class="pagination">
-    {% if is_paginated %}
-        {% if page_obj.has_previous %}
-            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">First</a>
-            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Previous</a>
-        {% endif %}
+    <div class="pagination">
+        {% if is_paginated %}
+            {% if page_obj.has_previous %}
+                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">First</a>
+                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Previous</a>
+            {% endif %}
 
-        <span>Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+            <span>Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
 
-        {% if page_obj.has_next %}
-            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next</a>
-            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ paginator.num_pages }}">Last</a>
+            {% if page_obj.has_next %}
+                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next</a>
+                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ paginator.num_pages }}">Last</a>
+            {% endif %}
         {% endif %}
-    {% endif %}
-</div>
+    </div>
 
 </body>
 </html>

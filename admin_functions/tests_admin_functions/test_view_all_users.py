@@ -86,6 +86,69 @@ class ViewAllUsersTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['page_obj'].paginator.count, 52)
 
+class ViewAllUsersSortingTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='adminuser', email='admin@test.com', password='Password123', user_type='Admin'
+        )
+        self.users = [
+            User.objects.create(
+                username=f'user{i}',
+                first_name=f'First{i}',
+                last_name=f'Last{i}',
+                email=f'{chr(97+i)}@test.com',
+                user_type='Student' if i % 2 == 0 else 'Tutor'
+            ) for i in range(5)
+        ]
+
+    def test_sort_by_email(self):
+        self.client.login(username='adminuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?sort=email')
+        emails = [user.email for user in response.context['users']]
+        self.assertEqual(emails, sorted(emails))
+
+    def test_sort_by_email_descending(self):
+        self.client.login(username='adminuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?sort=-email')
+        emails = [user.email for user in response.context['users']]
+        self.assertEqual(emails, sorted(emails, reverse=True))
+
+    def test_sort_by_first_name(self):
+        self.client.login(username='adminuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?sort=first_name')
+        first_names = [user.first_name for user in response.context['users']]
+        self.assertEqual(first_names, sorted(first_names))
+
+    def test_sort_by_first_name_descending(self):
+        self.client.login(username='adminuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?sort=-first_name')
+        first_names = [user.first_name for user in response.context['users']]
+        self.assertEqual(first_names, sorted(first_names, reverse=True))
+
+    def test_sort_by_last_name(self):
+        self.client.login(username='adminuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?sort=last_name')
+        last_names = [user.last_name for user in response.context['users']]
+        self.assertEqual(last_names, sorted(last_names))
+
+    def test_sort_by_last_name_descending(self):
+        self.client.login(username='adminuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?sort=-last_name')
+        last_names = [user.last_name for user in response.context['users']]
+        self.assertEqual(last_names, sorted(last_names, reverse=True))
+
+    def test_sort_by_user_type(self):
+        self.client.login(username='adminuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?sort=user_type')
+        user_types = [user.user_type for user in response.context['users']]
+        self.assertEqual(user_types, sorted(user_types))
+
+    def test_sort_by_user_type_descending(self):
+        self.client.login(username='adminuser', password='Password123')
+        response = self.client.get(reverse('view_all_users') + '?sort=-user_type')
+        user_types = [user.user_type for user in response.context['users']]
+        self.assertEqual(user_types, sorted(user_types, reverse=True))
+
 class SearchUsersTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='adminuser', email='admin@test.com', password='Password123', user_type='Admin')
