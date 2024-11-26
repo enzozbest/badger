@@ -76,11 +76,11 @@
                                 {% if request.invoice is None%}
                                     <li> <a href="{% url 'generate_invoice' request.id%}">Generate Invoice</a> </li>
                                 {% else %}
-                                    <li> <a href="{% url 'generate_invoice' request.id %}">View Invoice</a> </li>
+                                    <li> <a href="{% url 'get_invoice' request.invoice.invoice_id %}">View Invoice</a> </li>
                                     {% if not request.invoice.payment_status %}
-                                        <li> <a href="{% url 'generate_invoice' request.id%}">Set as paid</a> </li>
+                                        <li> <a href="{% url 'set_payment_status' request.invoice.invoice_id 1%}">Set as paid</a> </li>
                                     {% else %}
-                                        <li> <a href="{% url 'generate_invoice' request.id%}">Set as unpaid</a> </li>
+                                        <li> <a href="{% url 'set_payment_status' request.invoice.invoice_id 0%}">Set as unpaid</a> </li>
                                     {% endif %}
                                 {% endif %}
                             {% endif %}
