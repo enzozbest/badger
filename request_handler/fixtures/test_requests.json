@@ -11,7 +11,8 @@
     "late": false,
     "venue_preference": "Online",
     "day": null,
-    "venue": null
+    "venue": null,
+    "invoice": null
   },
   {
     "student": "Charlie",
@@ -25,6 +26,7 @@
     "late": false,
     "venue_preference": "Online",
     "day": "Tuesday",
-    "venue": "Online"
+    "venue": "Online",
+    "invoice": null
   }
 ]

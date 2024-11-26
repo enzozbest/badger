@@ -27,6 +27,9 @@ from admin_functions.views import view_all_users as view_all_users_view
 from admin_functions.views import small_views as small_views_view
 from admin_functions.views import make_user_admin as make_user_admin_view
 from admin_functions.views import allocate_requests as allocate_requests_view
+from invoicer.views.generate_invoice_view import generate_invoice_for_request
+from invoicer.views.get_invoice_view import get_invoice
+from invoicer.views.set_payment_status_view import set_payment_status
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -52,6 +55,9 @@ urlpatterns = [
     path('add-knowledge-areas/', tutorial_views.AddKnowledgeAreas, name='add_knowledge_areas'),
     path('delete-knowledge-area/<int:area_id>/', tutorial_views.DeleteKnowledgeArea, name='delete_knowledge_area'),
     path("admins/allocate_request/<int:request_id>/", allocate_requests_view.AllocateRequestView.as_view(), name="allocate_request"),
+    path("admins/generate_invoice/<int:request_id>/", generate_invoice_for_request, name="generate_invoice"),
+    path("get_invoice/<str:invoice_id>", get_invoice, name='get_invoice'),
+    path("set_payment_status/<str:invoice_id>/<int:payment_status>", set_payment_status,name="set_payment_status"),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

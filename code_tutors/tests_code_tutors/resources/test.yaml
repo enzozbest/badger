@@ -1,0 +1,9 @@
+bucket_names:
+  invoicer: 'test-badger-2024-bucket'
+
+roles:
+  invoicer-s3: 'test-badger-2024-access-role'
+
+logo_name: 'test-logo.jpeg'
+
+
