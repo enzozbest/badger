@@ -13,6 +13,9 @@ def get_invoice(request: HttpRequest, invoice_id: str) -> HttpResponse:
         return HttpResponse('You cannot view invoices as a tutor', status=401)
 
     invoice = get_object_or_404(Invoice, invoice_id=invoice_id)
+    if not user.is_admin and not invoice.student == request.user:
+        return HttpResponse('You cannot view this invoice!', status=401)
+
     key = f'invoices/pdfs/{invoice.invoice_id}.pdf'
     url = s3.generate_access_url(key=key)
     return redirect(url, permanent=True)

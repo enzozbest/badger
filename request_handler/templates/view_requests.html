@@ -65,22 +65,28 @@
                     </td>
                     <td>
                         <ul>
-                            {% if user.user_type == 'Admin' and not request.allocated %}
-                                <li> <a href="{% url 'allocate_request' request.id%}">Allocate</a> </li>
+                            {% if not request.allocated %}
                                 {% if user.user_type != 'Tutor' %}
                                     <li> <a href="{% url 'edit_request' request.id %}">Update</a> </li>
                                     <li> <a href="{% url 'delete_request' request.id%}">Delete</a> </li>
                                 {% endif %}
-                            {% endif %}
-                            {% if user.user_type == 'Admin' and request.allocated %}
+                                {% if user.user_type == 'Admin'%}
+                                    <li> <a href="{% url 'allocate_request' request.id%}">Allocate</a> </li>
+                                {% endif %}
+                            {% else %}
+
                                 {% if request.invoice is None%}
-                                    <li> <a href="{% url 'generate_invoice' request.id%}">Generate Invoice</a> </li>
+                                    {% if user.user_type == 'Admin' %}
+                                        <li> <a href="{% url 'generate_invoice' request.id%}">Generate Invoice</a> </li>
+                                    {% endif %}
                                 {% else %}
                                     <li> <a href="{% url 'get_invoice' request.invoice.invoice_id %}">View Invoice</a> </li>
-                                    {% if not request.invoice.payment_status %}
-                                        <li> <a href="{% url 'set_payment_status' request.invoice.invoice_id 1%}">Set as paid</a> </li>
-                                    {% else %}
-                                        <li> <a href="{% url 'set_payment_status' request.invoice.invoice_id 0%}">Set as unpaid</a> </li>
+                                    {% if user.user_type == 'Admin' %}
+                                        {% if not request.invoice.payment_status %}
+                                            <li> <a href="{% url 'set_payment_status' request.invoice.invoice_id 1%}">Set as paid</a> </li>
+                                        {% else %}
+                                            <li> <a href="{% url 'set_payment_status' request.invoice.invoice_id 0%}">Set as unpaid</a> </li>
+                                        {% endif %}
                                     {% endif %}
                                 {% endif %}
                             {% endif %}
