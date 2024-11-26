@@ -2,10 +2,10 @@ from email.policy import default
 
 from django.core.exceptions import ValidationError
 from django.db import models
+
+from invoicer.models import Invoice
 from user_system.models import User, Day
 from user_system.models import User
-
-
 
 """ Class representing a venue for tutoring sessions.
 
@@ -23,7 +23,6 @@ This Model represents a request made by a student for lessons. It contains all t
 contact the student and formalise arrangements. These details include: the student's user information, which knowledge areas
 they would like tutoring for, which days of the week they are available, their preferred mode of attendance, etc.
 """
-
 class Request(models.Model):
     student = models.ForeignKey(User, default=None, null=True, on_delete=models.CASCADE, related_name='student')
     allocated = models.BooleanField(default=False, blank=True)
@@ -39,6 +38,7 @@ class Request(models.Model):
     is_recurring = models.BooleanField(default=False)
     day = models.ForeignKey(Day, null=True, blank=True, on_delete=models.SET_NULL, related_name='allocated_day')
     venue = models.ForeignKey(Venue, null=True, blank=True, on_delete=models.SET_NULL, related_name='allocated_venue')
+    invoice = models.ForeignKey(Invoice, null=True, blank=True, on_delete=models.SET_NULL, related_name='request_invoice')
 
     @property
     def student_email(self):
