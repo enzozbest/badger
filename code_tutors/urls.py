@@ -14,13 +14,10 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-
-
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path, re_path
-
+from django.urls import path
 from user_system import views as tutorial_views
 from request_handler.views import create_request as create_request_view, small_views as request_handler_views
 from request_handler.views import show_all_requests as view_requests_view
@@ -30,9 +27,9 @@ from admin_functions.views import view_all_users as view_all_users_view
 from admin_functions.views import small_views as small_views_view
 from admin_functions.views import make_user_admin as make_user_admin_view
 from admin_functions.views import allocate_requests as allocate_requests_view
-from request_handler.views import accept_request as accept_request_view
-from request_handler.views import calendar as calendar_view
-
+from invoicer.views.generate_invoice_view import generate_invoice_for_request
+from invoicer.views.get_invoice_view import get_invoice
+from invoicer.views.set_payment_status_view import set_payment_status
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -58,6 +55,9 @@ urlpatterns = [
     path('add-knowledge-areas/', tutorial_views.AddKnowledgeAreas, name='add_knowledge_areas'),
     path('delete-knowledge-area/<int:area_id>/', tutorial_views.DeleteKnowledgeArea, name='delete_knowledge_area'),
     path("admins/allocate_request/<int:request_id>/", allocate_requests_view.AllocateRequestView.as_view(), name="allocate_request"),
+    path("admins/generate_invoice/<int:request_id>/", generate_invoice_for_request, name="generate_invoice"),
+    path("get_invoice/<str:invoice_id>", get_invoice, name='get_invoice'),
+    path("set_payment_status/<str:invoice_id>/<int:payment_status>", set_payment_status,name="set_payment_status"),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
