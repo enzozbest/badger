@@ -71,8 +71,18 @@
                                     <li> <a href="{% url 'edit_request' request.id %}">Update</a> </li>
                                     <li> <a href="{% url 'delete_request' request.id%}">Delete</a> </li>
                                 {% endif %}
-                            {% elif user.user_type == 'Admin' and request.allocated and request.invoice == None%}
-                                <li> <a href="{% url 'generate_invoice' request.id%}">Generate Invoice</a> </li>
+                            {% endif %}
+                            {% if user.user_type == 'Admin' and request.allocated %}
+                                {% if request.invoice is None%}
+                                    <li> <a href="{% url 'generate_invoice' request.id%}">Generate Invoice</a> </li>
+                                {% else %}
+                                    <li> <a href="{% url 'generate_invoice' request.id %}">View Invoice</a> </li>
+                                    {% if not request.invoice.payment_status %}
+                                        <li> <a href="{% url 'generate_invoice' request.id%}">Set as paid</a> </li>
+                                    {% else %}
+                                        <li> <a href="{% url 'generate_invoice' request.id%}">Set as unpaid</a> </li>
+                                    {% endif %}
+                                {% endif %}
                             {% endif %}
                         </ul>
                     </td>
