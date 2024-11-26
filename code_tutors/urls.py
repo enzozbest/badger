@@ -60,7 +60,7 @@ urlpatterns = [
     path("admins/allocate_request/<int:request_id>/", allocate_requests_view.AllocateRequestView.as_view(), name="allocate_request"),
     path('accept_request/<int:request_id>/', accept_request_view.AcceptRequestView.as_view(), name="accept_request"),
     path('tutor/calendar/', calendar_view.tutor_calendar, name='tutor_calendar'),
-    path('student/calendar/',calendar_view.student_calendar, name='student_calendar'),
+    path('student/calendar/', calendar_view.student_calendar,name='student_calendar')
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

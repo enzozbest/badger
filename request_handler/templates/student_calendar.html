@@ -1,22 +1,55 @@
 <body>
-<h1>Student Calendar</h1>
+<h1>{{ calendar.name }} - Calendar</h1>
 <div class="calendar">
     <div class="row">
-        {% for day in week_days %}
-            <div class="col-md-2 border">
-                <h4>{{ day|date:"l" }}</h4> <!-- Day of the week -->
-                <p>{{ day|date:"d M Y" }}</p> <!-- Date -->
-                {% for booking in calendar_data.day %}
-                    <div class="booking">
-                        <p><strong>Student:</strong> {{ booking.tutor.username }}</p>
-                        <p><strong>Knowledge Area:</strong>{{ booking.knowledge_area }}</p>
-                        <p><strong>Venue:</strong>{{ booking.venue }}</p>
-                    </div>
-                {% empty %}
-                    <p>No bookings.</p>
+        <!--Add a button going to the next month-->
+            <!-- Display the calendar header with days of the week -->
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Sun</th>
+                        <th>Mon</th>
+                        <th>Tue</th>
+                        <th>Wed</th>
+                        <th>Thu</th>
+                        <th>Fri</th>
+                        <th>Sat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for week in month_days %}
+                    <tr>
+                        {% for day in week %}
+                            <td>
+                                {% if day %}
+                                <!-- Form to submit day click -->
+                                <form method="POST" action="{% url 'student_calendar'%}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-link">
+                                        {{ day }}
+                                    </button>
+                                    <input type="hidden" name="day" value="{{ day }}">
+                                </form>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
                 {% endfor %}
-            </div>
-        {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Display events for the selected day -->
+            {% if events %}
+            <h3>Events for {{ day }}-{{ month }}-{{ year }}</h3>
+            <ul>
+                {% for event in events %}
+                    <li>
+                        <strong>{{ event.title }}</strong> - {{ event.start_time.time }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
     </div>
 </div>
 </body>
