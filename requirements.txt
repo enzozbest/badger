@@ -14,13 +14,4 @@ sqlparse==0.5.1
 typing_extensions==4.12.2
 simplejson==3.19.3
 django-filter==22.1
-boto3==1.35.67
-botocore==1.35.67
-jmespath==1.0.1
-s3transfer==0.10.4
-urllib3==2.2.3
-chardet==5.2.0
-pillow==11.0.0
-reportlab==4.2.5
-pyyaml==6.0.2
 django-scheduler==0.10.1
