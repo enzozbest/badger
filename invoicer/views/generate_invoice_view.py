@@ -23,11 +23,13 @@ def generate_invoice_for_request(http_request: HttpRequest, request_id: int) -> 
     total_cost = calculate_cost(tutor=request_obj.tutor, request_id=request_obj.id)
 
     invoice = create_invoice_object(student=student, invoice_id=invoice_id, total_cost=total_cost)
+    invoice.save()
+
     request_obj.invoice = invoice
     request_obj.save()
     ig.generate_invoice(request_obj)
 
-    return HttpResponse(f"Invoice generated successfully!", status=201)
+    return HttpResponse("Invoice generated successfully!", status=201)
 
 
 def create_invoice_object(student: User, invoice_id:str, total_cost: float) -> Invoice:
