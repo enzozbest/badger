@@ -15,7 +15,7 @@ class AllUsersView(LoginRequiredMixin, SortingMixin, ListView):
     paginate_by = 20
     ordering = ['pk']
     filterset_class = UserFilter
-    valid_sort_fields = ['email', 'first_name', 'last_name', 'user_type']
+    valid_sort_fields = ['first_name', 'last_name', 'email', 'user_type']
 
 
     def get_queryset(self):
@@ -31,10 +31,13 @@ class AllUsersView(LoginRequiredMixin, SortingMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['filter'] = self.filterset  # Pass the filter object to the template
-        context['count'] = context['users'].count()
-        context['total'] = self.filterset.qs.count() if hasattr(self, 'filterset') else self.get_queryset().count()
-        context['current_sort'] = self.request.GET.get('sort', self.default_sort_field)  # 当前排序字段
+        context.update({
+            'filter': self.filterset,
+            'count': self.object_list.count(),
+            'total': self.filterset.qs.count() if hasattr(self, 'filterset') else self.get_queryset().count(),
+            'valid_sorting_fields': {field: field.replace('_', ' ').title() for field in self.valid_sort_fields},
+            'current_sort': self.request.GET.get('sort', self.default_sort_field),
+        })
         return context
 
     def get(self, request, *args, **kwargs):

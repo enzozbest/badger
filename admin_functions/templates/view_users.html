@@ -24,50 +24,27 @@
 
     <!-- Table -->
     <table>
-        <thead>
-            <tr>
-                <th>
-                    <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if current_sort == 'first_name' %}-first_name{% else %}first_name{% endif %}">
-                        First Name {% if current_sort == 'first_name' %}↑{% elif current_sort == '-first_name' %}↓{% endif %}
-                    </a>
-                </th>
-                <th>
-                    <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if current_sort == 'last_name' %}-last_name{% else %}last_name{% endif %}">
-                        Last Name {% if current_sort == 'last_name' %}↑{% elif current_sort == '-last_name' %}↓{% endif %}
-                    </a>
-                </th>
-                <th>
-                    <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if current_sort == 'email' %}-email{% else %}email{% endif %}">
-                        Email {% if current_sort == 'email' %}↑{% elif current_sort == '-email' %}↓{% endif %}
-                    </a>
-                </th>
-                <th>
-                    <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if current_sort == 'user_type' %}-user_type{% else %}user_type{% endif %}">
-                        Account Type {% if current_sort == 'user_type' %}↑{% elif current_sort == '-user_type' %}↓{% endif %}
-                    </a>
-                </th>
-                <th>Actions</th>
-            </tr>
-        </thead>
+        {% include "partials/sorting_table_head.html" with valid_sorting_fields=valid_sorting_fields current_sort=current_sort %}
         <tbody>
             {% for user in users %}
-            <tr>
-                <td>{{ user.last_name }}</td>
-                <td>{{ user.first_name }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.user_type }}</td>
-                <td>
-                    {% if user.user_type != 'Admin' %}
-                        <a href="{% url 'make_admin' user.id %}">Make Administrator</a>
-                    {% endif %}
-                </td>
-            </tr>
+                <tr>
+                    <td>{{ user.first_name }}</td>
+                    <td>{{ user.last_name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.user_type }}</td>
+                    <td>
+                        {% if user.user_type != 'Admin' %}
+                            <a href="{% url 'make_admin' user.id %}">Make Administrator</a>
+                        {% endif %}
+                    </td>
+                </tr>
             {% empty %}
                 <tr>
-                    <td colspan="6">No users found.</td>
+                    <td colspan="5">No users found.</td>
                 </tr>
             {% endfor %}
         </tbody>
+        
     </table>
 
     <!-- Pagination -->
