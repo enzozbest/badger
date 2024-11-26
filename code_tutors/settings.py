@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'code_tutors',
     'request_handler',
     'admin_functions',
-    'schedule'
 ]
 
 MIDDLEWARE = [
