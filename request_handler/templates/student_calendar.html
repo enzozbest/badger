@@ -2,18 +2,24 @@
 <h1>{{ calendar.name }} - Calendar</h1>
 <div class="calendar">
     <div class="row">
-        <!--Add a button going to the next month-->
+        <div class="row">
+            <!-- Add navigation buttons -->
+            <div class="col-12 text-center mb-3">
+                <a href="?year={{ prev_year }}&month={{ prev_month }}">Previous Month</a>
+                <a href="?year={{ next_year }}&month={{ next_month }}">Next Month</a>
+            </div>
+            <h3> {{month}}</h3>
             <!-- Display the calendar header with days of the week -->
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>Sun</th>
                         <th>Mon</th>
                         <th>Tue</th>
                         <th>Wed</th>
                         <th>Thu</th>
                         <th>Fri</th>
                         <th>Sat</th>
+                        <th>Sun</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -29,6 +35,8 @@
                                         {{ day }}
                                     </button>
                                     <input type="hidden" name="day" value="{{ day }}">
+                                    <input type="hidden" name="month" value="{{ month }}">
+                                    <input type="hidden" name="year" value="{{ year }}">
                                 </form>
                                 {% endif %}
                             </td>
@@ -44,7 +52,7 @@
             <ul>
                 {% for event in events %}
                     <li>
-                        <strong>{{ event.title }}</strong> - {{ event.start_time.time }}
+                        {{event}}
                     </li>
                 {% endfor %}
             </ul>

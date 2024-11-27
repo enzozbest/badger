@@ -6,6 +6,8 @@ from django.db import models
 from invoicer.models import Invoice
 from user_system.models import User, Day
 from user_system.models import User
+import datetime
+
 
 """ Class representing a venue for tutoring sessions.
 
@@ -95,11 +97,11 @@ class Booking(models.Model):
     term = models.CharField(max_length=255, null=True)
     frequency = models.CharField(max_length=255, null=True, default="Weekly")
     duration = models.CharField(max_length=255, blank=False, default="1h")
-    late = models.BooleanField(default=False, blank=False)
     is_recurring = models.BooleanField(default=False)
     day = models.ForeignKey(Day, null=True, blank=True, on_delete=models.SET_NULL, related_name='booking_allocated_day')
     venue = models.ForeignKey(Venue, null=True, blank=True, on_delete=models.SET_NULL, related_name='booking_allocated_venue')
+    date = models.DateField(null=False, blank=False, default=datetime.date(1900, 1, 1)) #Could be changed to a datetimefield if we want to include time availability
 
 
     def __str__(self):
-        return f"{self.student} -> {self.tutor} ({self.day})"
+        return f"{self.student} -> {self.tutor} ({self.day}) {self.date}"
