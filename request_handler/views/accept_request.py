@@ -51,6 +51,7 @@ class AcceptRequestView(LoginRequiredMixin, View):
         #How does biweekly work, since we would need two days for the allocated request
 
         sessions = 0
+        print(lesson_request.frequency)
         match lesson_request.frequency:
             case "Weekly":
                 sessions = 15
@@ -58,7 +59,8 @@ class AcceptRequestView(LoginRequiredMixin, View):
                 sessions = 30
             case "Fortnightly":
                 sessions = 7
-
+        print(sessions)
+        print(f'venue type {lesson_request.venue} {type(lesson_request.venue)}')
         #Now add each of the sessions, starting with the booking_date
         for i in range(0,sessions):
             try:
@@ -75,6 +77,7 @@ class AcceptRequestView(LoginRequiredMixin, View):
                     is_recurring=lesson_request.is_recurring,
                     date=booking_date,
                 )
+                print("added")
                 match lesson_request.frequency:
                     case "Weekly":
                         booking_date += timedelta(days=7)
@@ -83,11 +86,13 @@ class AcceptRequestView(LoginRequiredMixin, View):
                         #Is this fine, since we didn't discuss 2 day availability
                     case "Fortnightly":
                         booking_date += timedelta(days=14)
+                print("added session")
 
             except Exception as e:
                 print(f"Error creating booking: {e}")
             
         lesson_request.delete()
+        print("helloooo")
         return redirect('view_requests')
 
     

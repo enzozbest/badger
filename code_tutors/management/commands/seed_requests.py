@@ -18,7 +18,7 @@ class Command(BaseCommand):
         self.faker.add_provider(term_provider.TermProvider)
         self.faker.add_provider(user_provider.UserProvider)
         self.faker.add_provider(venue_provider.VenueProvider)
-        self.frequencies = ['Weekly', 'Fortnightly', 'Bi-weekly', 'Monthly']
+        self.frequencies = ['Weekly', 'Fortnightly', 'Biweekly', 'Monthly'] #There is currently no code to handle monthly
 
 
     def handle(self, *args, **options):

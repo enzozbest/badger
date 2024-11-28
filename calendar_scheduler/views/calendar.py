@@ -107,7 +107,6 @@ def student_calendar(request):
     # Handle form submission for selecting a day
     if request.method == "POST":
         bookings = Booking.objects.filter(student=request.user)
-        week_days = get_week_days()
         events = []
         print(bookings)
         for booking in bookings:
