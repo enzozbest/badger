@@ -2,7 +2,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from datetime import datetime,date,timedelta
-from request_handler.models import Request, Booking
+from request_handler.models import Request
+from calendar_scheduler.models import Booking
 
 def get_first_weekday(year, month, day):
         """
@@ -49,7 +50,7 @@ class AcceptRequestView(LoginRequiredMixin, View):
 
         #How does biweekly work, since we would need two days for the allocated request
 
-        session = 0
+        sessions = 0
         match lesson_request.frequency:
             case "Weekly":
                 sessions = 15

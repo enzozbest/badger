@@ -30,8 +30,8 @@ from admin_functions.views import allocate_requests as allocate_requests_view
 from invoicer.views.generate_invoice_view import generate_invoice_for_request
 from invoicer.views.get_invoice_view import get_invoice
 from invoicer.views.set_payment_status_view import set_payment_status
-from request_handler.views.calendar import tutor_calendar as tutor_calendar_view
-from request_handler.views.calendar import student_calendar as student_calendar_view
+from calendar_scheduler.views.calendar import tutor_calendar as tutor_calendar_view
+from calendar_scheduler.views.calendar import student_calendar as student_calendar_view
 from request_handler.views import accept_request as accept_request_view
 
 urlpatterns = [

@@ -1,7 +1,7 @@
 from calendar import Calendar
 
 from django.shortcuts import render
-from request_handler.models import Booking
+from calendar_scheduler.models import Booking
 from schedule.models import Calendar, Event
 from datetime import datetime,date,timedelta
 from django.contrib.auth.decorators import login_required
@@ -109,7 +109,7 @@ def student_calendar(request):
         bookings = Booking.objects.filter(student=request.user)
         week_days = get_week_days()
         events = []
-        
+        print(bookings)
         for booking in bookings:
             if booking.date == date(year,month,day):
                 events.append(booking)

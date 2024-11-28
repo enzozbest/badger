@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'request_handler',
     'admin_functions',
     'invoicer',
-    'schedule'
+    'schedule',
+    'calendar_scheduler'
 ]
 
 MIDDLEWARE = [
