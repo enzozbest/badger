@@ -10,6 +10,10 @@ def create_default_calendar(apps,sender,**kwargs):
         slug="student",
         defaults={"name": "Student Calendar"}
     )
+    Calendar.objects.get_or_create(
+        slug="tutor",
+        defaults={"name": "Tutor Calendar"}
+    )
 
 class Migration(migrations.Migration):
 

@@ -43,22 +43,77 @@ def get_week_days():
 def tutor_calendar(request):
     if not request.user.is_tutor:
         return render(request, '403.html') # Make this file
-    bookings = Booking.objects.filter(tutor=request.user)
+    
+    calendar_slug = "tutor"
+    try:
+        calendar = Calendar.objects.get(slug=calendar_slug)
+    except Calendar.DoesNotExist:
+        return render(request, "calendar/error.html", {"message": "Calendar not found."}) #Still need to make this page
 
-    week_days = get_week_days()
-    calendar_data = {day: [] for day in week_days}
-    for booking in bookings:
-        for day in week_days:
-            print(booking.day)
-            print(booking.day.day)
-            print(day.strftime("%A"))
+    # Get today's date for the default display
+    today = datetime.today()
+    year = today.year
+    month = today.month
+    day = None
+    
 
-            if booking.day and booking.day.day == day.strftime('%A'): ### GIVES MONDAY MONDAY SUNDAY ###
-                calendar_data[day].append(booking)
-            else:
-                print("NOT EQUAL DAYS") ##### THE DAYS ARE NOT EQUAL SO THIS IS NOT WORKING #######
+    # Handle navigation for previous and next months
+    if "month" in request.GET and "year" in request.GET:
+        month = int(request.GET["month"])
+        year = int(request.GET["year"])
+    elif request.method == "POST":
+        # Preserve the selected month and year when a day is clicked
+        month = int(request.POST.get("month", month))
+        year = int(request.POST.get("year", year))
+        day = int(request.POST.get("day"))  # Get the clicked day from the form
 
-    return render(request, 'tutor_calendar.html', {'week_days': week_days, 'calendar_data': calendar_data})
+    # Ensure month/year remain valid
+    if month < 1:
+        month = 12
+        year -= 1
+    elif month > 12:
+        month = 1
+        year += 1
+
+    # Compute previous and next month/year
+    prev_month = month - 1 if month > 1 else 12
+    prev_year = year - 1 if month == 1 else year
+    next_month = month + 1 if month < 12 else 1
+    next_year = year + 1 if month == 12 else year
+
+    month_days = get_month_days(year,month)
+    events = []
+
+    #Also how to make it automatically create a calendar when seeded 
+
+    # Handle form submission for selecting a day
+    if request.method == "POST":
+        bookings = Booking.objects.filter(tutor=request.user)
+        events = []
+        print(bookings)
+        for booking in bookings:
+            if booking.date == date(year,month,day):
+                events.append(booking)
+                print(booking)
+
+    return render(
+        request,
+        'tutor_calendar.html',
+        {
+            "calendar": calendar,
+            "year": year,
+            "month": month,
+            "month_days": month_days,
+            "events": events,
+            "day": day,
+            "prev_month": prev_month,
+            "prev_year": prev_year,
+            "next_month": next_month,
+            "next_year": next_year,
+        }
+    )
+
+   
 
 @login_required
 def student_calendar(request):

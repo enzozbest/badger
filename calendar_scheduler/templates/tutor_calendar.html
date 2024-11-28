@@ -1,22 +1,64 @@
 <body>
-<h1>Tutor Calendar</h1>
-<div class="calendar">
-    <div class="row">
-        {% for day in week_days %}
-            <div class="col-md-2 border">
-                <h4>{{ day|date:"l" }}</h4> <!-- Day of the week -->
-                <p>{{ day|date:"d M Y" }}</p> <!-- Date -->
-                {% for booking in calendar_data.day %}
-                    <div class="booking">
-                        <p><strong>Student:</strong> {{ booking.student.username }}</p>
-                        <p><strong>Knowledge Area:</strong>{{ booking.knowledge_area }}</p>
-                        <p><strong>Venue:</strong>{{ booking.venue }}</p>
-                    </div>
-                {% empty %}
-                    <p>No bookings.</p>
-                {% endfor %}
-            </div>
-        {% endfor %}
+    <h1>{{ calendar.name }} - Calendar</h1>
+    <div class="calendar">
+        <div class="row">
+            <div class="row">
+                <!-- Add navigation buttons -->
+                <div class="col-12 text-center mb-3">
+                    <a href="?year={{ prev_year }}&month={{ prev_month }}">Previous Month</a>
+                    <a href="?year={{ next_year }}&month={{ next_month }}">Next Month</a>
+                </div>
+                <h3> {{month}}</h3>
+                <!-- Display the calendar header with days of the week -->
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Mon</th>
+                            <th>Tue</th>
+                            <th>Wed</th>
+                            <th>Thu</th>
+                            <th>Fri</th>
+                            <th>Sat</th>
+                            <th>Sun</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for week in month_days %}
+                        <tr>
+                            {% for day in week %}
+                                <td>
+                                    {% if day %}
+                                    <!-- Form to submit day click -->
+                                    <form method="POST" action="{% url 'tutor_calendar'%}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-link">
+                                            {{ day }}
+                                        </button>
+                                        <input type="hidden" name="day" value="{{ day }}">
+                                        <input type="hidden" name="month" value="{{ month }}">
+                                        <input type="hidden" name="year" value="{{ year }}">
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+    
+                <!-- Display events for the selected day -->
+                {% if events %}
+                <h3>Events for {{ day }}-{{ month }}-{{ year }}</h3>
+                <ul>
+                    {% for event in events %}
+                        <li>
+                            {{event}}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+    
+        </div>
     </div>
-</div>
-</body>
+    </body>
+    
