@@ -1,5 +1,5 @@
 <body>
-    <h1>{{ calendar.name }} - Calendar</h1>
+    <h1>Tutor - Calendar</h1>
     <div class="calendar">
         <div class="row">
             <div class="row">
@@ -29,7 +29,7 @@
                                 <td>
                                     {% if day %}
                                     <!-- Form to submit day click -->
-                                    <form method="POST" action="{% url 'tutor_calendar'%}">
+                                    <form method="GET" action="{% url 'tutor_calendar'%}">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-link">
                                             {{ day }}
@@ -57,7 +57,6 @@
                     {% endfor %}
                 </ul>
             {% endif %}
-    
         </div>
     </div>
     </body>

@@ -25,19 +25,14 @@ def get_first_weekday(year, month, day):
 class AcceptRequestView(LoginRequiredMixin, View):
     def post(self, request, request_id):
         lesson_request = get_object_or_404(Request, id=request_id, allocated=True, tutor=request.user)
-        #Bookings will be created as lessons, i.e. there will be a booking per session 
-        #We need lesson_request.frequency
-        #lesson_request.is_recurring
 
         today = datetime.today()
         current_year = today.year
         current_month = today.month
         first_term = lesson_request.term
         
-        #Remember 15 week terms
         match first_term:
             case "September":
-                #We want to find the first date in september where it matches the chosen day
                 booking_date = get_first_weekday(current_year,9,lesson_request.day)
             case "January" if current_month>8:
                 booking_date = get_first_weekday(current_year+1,1,lesson_request.day)
@@ -48,10 +43,7 @@ class AcceptRequestView(LoginRequiredMixin, View):
             case "May" if current_month<6:
                 booking_date = get_first_weekday(current_year,5,lesson_request.day)
 
-        #How does biweekly work, since we would need two days for the allocated request
-
         sessions = 0
-        print(lesson_request.frequency)
         match lesson_request.frequency:
             case "Weekly":
                 sessions = 15
@@ -59,8 +51,7 @@ class AcceptRequestView(LoginRequiredMixin, View):
                 sessions = 30
             case "Fortnightly":
                 sessions = 7
-        print(sessions)
-        print(f'venue type {lesson_request.venue} {type(lesson_request.venue)}')
+
         #Now add each of the sessions, starting with the booking_date
         for i in range(0,sessions):
             try:
@@ -77,7 +68,6 @@ class AcceptRequestView(LoginRequiredMixin, View):
                     is_recurring=lesson_request.is_recurring,
                     date=booking_date,
                 )
-                print("added")
                 match lesson_request.frequency:
                     case "Weekly":
                         booking_date += timedelta(days=7)
@@ -86,13 +76,11 @@ class AcceptRequestView(LoginRequiredMixin, View):
                         #Is this fine, since we didn't discuss 2 day availability
                     case "Fortnightly":
                         booking_date += timedelta(days=14)
-                print("added session")
 
             except Exception as e:
                 print(f"Error creating booking: {e}")
             
         lesson_request.delete()
-        print("helloooo")
         return redirect('view_requests')
 
     

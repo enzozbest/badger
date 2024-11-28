@@ -4,7 +4,9 @@ from django.shortcuts import render
 from calendar_scheduler.models import Booking
 from schedule.models import Calendar, Event
 from datetime import datetime,date,timedelta
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views import View
+from django.http import HttpRequest, HttpResponse
 
 def get_month_days(year, month):
     # Get the first day of the month and the total days in the month
@@ -38,34 +40,13 @@ def get_week_days():
     today = date.today()
     start_of_week = today - timedelta(days=today.weekday())
     return [start_of_week + timedelta(days=i) for i in range(7)]
-
-
-def tutor_calendar(request):
-    if not request.user.is_tutor:
-        return render(request, '403.html') # Make this file
-    
-    calendar_slug = "tutor"
-    try:
-        calendar = Calendar.objects.get(slug=calendar_slug)
-    except Calendar.DoesNotExist:
-        return render(request, "calendar/error.html", {"message": "Calendar not found."}) #Still need to make this page
-
+        
+def retrieve_calendar_events(calendar,request):
     # Get today's date for the default display
     today = datetime.today()
-    year = today.year
-    month = today.month
-    day = None
-    
-
-    # Handle navigation for previous and next months
-    if "month" in request.GET and "year" in request.GET:
-        month = int(request.GET["month"])
-        year = int(request.GET["year"])
-    elif request.method == "POST":
-        # Preserve the selected month and year when a day is clicked
-        month = int(request.POST.get("month", month))
-        year = int(request.POST.get("year", year))
-        day = int(request.POST.get("day"))  # Get the clicked day from the form
+    year = int(request.GET.get("year", today.year))
+    month = int(request.GET.get("month", today.month))
+    day = int(request.GET.get("day", 0))  # Default to 0 if no day is provided
 
     # Ensure month/year remain valid
     if month < 1:
@@ -80,99 +61,18 @@ def tutor_calendar(request):
     prev_year = year - 1 if month == 1 else year
     next_month = month + 1 if month < 12 else 1
     next_year = year + 1 if month == 12 else year
-
-    month_days = get_month_days(year,month)
-    events = []
-
-    #Also how to make it automatically create a calendar when seeded 
-
-    # Handle form submission for selecting a day
-    if request.method == "POST":
-        bookings = Booking.objects.filter(tutor=request.user)
-        events = []
-        print(bookings)
-        for booking in bookings:
-            if booking.date == date(year,month,day):
-                events.append(booking)
-                print(booking)
-
-    return render(
-        request,
-        'tutor_calendar.html',
-        {
-            "calendar": calendar,
-            "year": year,
-            "month": month,
-            "month_days": month_days,
-            "events": events,
-            "day": day,
-            "prev_month": prev_month,
-            "prev_year": prev_year,
-            "next_month": next_month,
-            "next_year": next_year,
-        }
-    )
-
-   
-
-@login_required
-def student_calendar(request):
-    calendar_slug = "student"
-    try:
-        calendar = Calendar.objects.get(slug=calendar_slug)
-    except Calendar.DoesNotExist:
-        return render(request, "calendar/error.html", {"message": "Calendar not found."}) #Still need to make this page
-
-    # Get today's date for the default display
-    today = datetime.today()
-    year = today.year
-    month = today.month
-    day = None
     
-
-    # Handle navigation for previous and next months
-    if "month" in request.GET and "year" in request.GET:
-        month = int(request.GET["month"])
-        year = int(request.GET["year"])
-    elif request.method == "POST":
-        # Preserve the selected month and year when a day is clicked
-        month = int(request.POST.get("month", month))
-        year = int(request.POST.get("year", year))
-        day = int(request.POST.get("day"))  # Get the clicked day from the form
-
-    # Ensure month/year remain valid
-    if month < 1:
-        month = 12
-        year -= 1
-    elif month > 12:
-        month = 1
-        year += 1
-
-    # Compute previous and next month/year
-    prev_month = month - 1 if month > 1 else 12
-    prev_year = year - 1 if month == 1 else year
-    next_month = month + 1 if month < 12 else 1
-    next_year = year + 1 if month == 12 else year
-
     month_days = get_month_days(year,month)
     events = []
 
-    #Also how to make it automatically create a calendar when seeded 
-
-    # Handle form submission for selecting a day
-    if request.method == "POST":
-        bookings = Booking.objects.filter(student=request.user)
-        events = []
-        print(bookings)
-        for booking in bookings:
-            if booking.date == date(year,month,day):
-                events.append(booking)
-                print(booking)
-
-    return render(
-        request,
-        'student_calendar.html',
-        {
+    if day:
+        selected_date = date(year, month, day)
+        if request.user.user_type == 'Student':
+            events = Booking.objects.filter(student=request.user, date=selected_date)
+        elif request.user.user_type == 'Tutor':
+            events = Booking.objects.filter(tutor=request.user, date=selected_date)
+    
+    return {
             "calendar": calendar,
             "year": year,
             "month": month,
@@ -184,4 +84,26 @@ def student_calendar(request):
             "next_month": next_month,
             "next_year": next_year,
         }
-    )
+
+class TutorCalendarView(LoginRequiredMixin,View):
+    def get(self, request: HttpRequest) -> HttpResponse:
+        print(request.user.user_type)
+        if not request.user.is_tutor:
+            return render(request, 'permission_denied.html', status=401)
+        try:
+            calendar = Calendar.objects.get(slug='tutor')
+            data = retrieve_calendar_events(calendar,request)
+            return render( request,'tutor_calendar.html', data)
+        except Calendar.DoesNotExist:
+            return render(request, "calendar/error.html", {"message": "Calendar not found."}) #Still need to make this page
+        
+class StudentCalendarView(LoginRequiredMixin,View):
+    def get(self, request: HttpRequest) -> HttpResponse:
+        if not request.user.is_student:
+            return render(request, 'permission_denied.html', status=401)
+        try:
+            calendar = Calendar.objects.get(slug='tutor')
+            data = retrieve_calendar_events(calendar,request)
+            return render( request,'student_calendar.html', data)
+        except Calendar.DoesNotExist:
+            return render(request, "calendar/error.html", {"message": "Calendar not found."}) #Still need to make this page

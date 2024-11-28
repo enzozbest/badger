@@ -30,9 +30,8 @@ from admin_functions.views import allocate_requests as allocate_requests_view
 from invoicer.views.generate_invoice_view import generate_invoice_for_request
 from invoicer.views.get_invoice_view import get_invoice
 from invoicer.views.set_payment_status_view import set_payment_status
-from calendar_scheduler.views.calendar import tutor_calendar as tutor_calendar_view
-from calendar_scheduler.views.calendar import student_calendar as student_calendar_view
 from request_handler.views import accept_request as accept_request_view
+from calendar_scheduler.views import calendar as calendar_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -62,8 +61,8 @@ urlpatterns = [
     path("get_invoice/<str:invoice_id>", get_invoice, name='get_invoice'),
     path("set_payment_status/<str:invoice_id>/<int:payment_status>", set_payment_status,name="set_payment_status"),
     path('accept_request/<int:request_id>/', accept_request_view.AcceptRequestView.as_view(), name="accept_request"),
-    path('tutor/calendar/', tutor_calendar_view, name='tutor_calendar'),
-    path('student/calendar/', student_calendar_view,name='student_calendar')
+    path('tutor/calendar/', calendar_view.TutorCalendarView.as_view(), name='tutor_calendar'),
+    path('student/calendar/', calendar_view.StudentCalendarView.as_view(),name='student_calendar')
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
