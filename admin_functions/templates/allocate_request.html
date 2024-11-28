@@ -6,19 +6,15 @@
         <div class="col-md-8">
             <div class="card bg-dark text-white shadow-sm rounded-3">
                 <div class="card-body">
-                    <h1 class="card-title text-center">Allocate Request #{{ lesson_request.id }}</h1>
-                    <p><strong>Student:</strong> {{ lesson_request.student.full_name }}</p>
-                    <p><strong>Requested Area:</strong> {{ lesson_request.knowledge_area }}</p>
+                    <h1 class="card-title text-center">Allocate Request #{{ lesson_request.id|default:"Unknown" }}</h1>
+                    <p><strong>Student:</strong> {{ lesson_request.student.full_name|default:"Unknown" }}</p>
+                    <p><strong>Requested Area:</strong> {{ lesson_request.knowledge_area|default:"Not specified" }}</p>
                     <p><strong>Venue Preference:</strong> 
-                        {% if lesson_request.venue_preference %}
-                            {{ lesson_request.venue_preference }}
-                        {% else %}
-                            No venue preference
-                        {% endif %}
+                        {{ lesson_request.venue_preference|default:"No venue preference" }}
                     </p>
                     <form method="post" class="mt-4">
                         {% csrf_token %}
-                        {{ form.as_p }}
+                        {{ form.as_p|default:"No form available" }}
                         <div class="text-center">
                             <button type="submit" class="btn btn-primary w-100">Allocate</button>
                         </div>

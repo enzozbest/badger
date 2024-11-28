@@ -9,7 +9,7 @@
             <p>Are you sure you want to delete this request?</p>
 
             <!-- Include request details using _single_request.html partial -->
-            {% include 'partials/_single_request.html' with request=request_instance %}
+            {% include 'partials/_single_request.html' with request=request_instance|default_if_none:"" %}
 
             <form method="post" action="{% url 'confirm_delete_request' request_instance.id %}">
                 {% csrf_token %}

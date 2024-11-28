@@ -10,9 +10,11 @@
                 <div class="card-body">
                     <p class="text-muted">Fill in the details below to update your tutoring request.</p>
                     
-                    <!-- Check if request_instance.id is displayed correctly -->
+                    <!-- Display request instance ID or fallback -->
                     {% if request_instance and request_instance.id %}
                         <p class="text-white">ID of the request instance: <strong>{{ request_instance.id }}</strong></p>
+                    {% else %}
+                        <p class="text-warning">No request instance found.</p>
                     {% endif %}
 
                     <!-- Display non-field form errors if they exist -->
@@ -22,7 +24,7 @@
                         </div>
                     {% endif %}
 
-                    <!-- Form action with request_instance.id -->
+                    <!-- Form for editing request -->
                     <form method="POST" action="{% url 'edit_request' request_instance.id %}">
                         {% csrf_token %}
                         {% include 'partials/_request_form_fields.html' %}

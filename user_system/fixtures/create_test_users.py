@@ -2,7 +2,7 @@ import json
 from code_tutors.management.commands.seed_users import add_knowledge_areas
 from user_system.models import User, Day, KnowledgeArea
 
-def create_test_user():
+def create_test_user() -> None:
     with open('user_system/fixtures/test_users.json', 'r') as file:
         users = json.load(file)
 

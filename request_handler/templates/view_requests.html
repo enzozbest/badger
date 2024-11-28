@@ -2,27 +2,24 @@
 {% load static %}
 {% block content %}
 <div class="container mt-5">
-    <!-- Tutoring Requests Section -->
     <h1 class="display-5 text-white">Tutoring Requests</h1>
     <p class="text-white">Showing {{ count }} out of {{ total }} requests:</p>
     <div class="mb-3">
         <a href="{% url 'dashboard' %}" class="text-decoration-none text-success">Go to Dashboard</a>
     </div>
     
-    <!-- Filter Form -->
     <form method="get" class="bg-dark text-white p-3 rounded mb-4">
         {{ filter.form.as_p }}
         <button type="submit" class="btn btn-outline-light btn-sm">Filter</button>
     </form>
-    
+
     {% if requests %}
-        <!-- Requests Cards Grid -->
         <div class="row row-cols-1 row-cols-md-4 g-4">
             {% for request in requests %}
                 <div class="col">
                     <div class="card h-100 bg-dark text-white rounded-3 shadow-sm">
                         <div class="card-body">
-                            <p class="card-text">
+                            <p>
                                 <strong>Student:</strong> {{ request.student.first_name }} {{ request.student.last_name }}<br>
                                 <strong>Email:</strong> {{ request.student.email }}<br>
                                 <strong>Requested Area:</strong> {{ request.knowledge_area }}<br>
@@ -34,12 +31,6 @@
                                         <li>No Venue Preference</li>
                                     {% endfor %}
                                 </ul>
-                                <strong>On Time?</strong> 
-                                {% if request.late %}
-                                    <span class="text-danger">Late Request</span>
-                                {% else %}
-                                    <span class="text-success">On Time</span>
-                                {% endif %}<br>
                                 <strong>Status:</strong> 
                                 {% if request.allocated %}
                                     Allocated to {{ request.tutor_name }}
@@ -49,35 +40,21 @@
                             </p>
                         </div>
                         <div class="card-footer">
-                            <div class="d-flex justify-content-between">
-                                {% if user.user_type == 'Admin' and not request.allocated %}
-                                    <a href="{% url 'allocate_request' request.id %}" class="btn btn-warning btn-sm">Allocate</a>
-                                {% endif %}
-                                {% if user.user_type != 'Tutor' %}
-                                    <a href="{% url 'edit_request' request.id %}" class="btn btn-info btn-sm">Update</a>
-                                    <a href="{% url 'delete_request' request.id %}" class="btn btn-danger btn-sm">Delete</a>
-                                {% endif %}
-                            </div>
+                            {% if user.user_type == 'Admin' %}
+                                <a href="{% url 'allocate_request' request.id %}" class="btn btn-warning btn-sm">Allocate</a>
+                            {% endif %}
+                            <a href="{% url 'edit_request' request.id %}" class="btn btn-info btn-sm">Update</a>
+                            <a href="{% url 'delete_request' request.id %}" class="btn btn-danger btn-sm">Delete</a>
                         </div>
                     </div>
-                </div>
-            {% empty %}
-                <div class="col-12">
-                    <p class="text-muted text-center">No requests found.</p>
                 </div>
             {% endfor %}
         </div>
 
-        <!-- Include Paginator Partial -->
         {% include 'partials/_pagination.html' %}
 
     {% else %}
-        <!-- No Requests Message -->
-        <div class="row">
-            <div class="col-12">
-                <p class="text-muted">You have no current requests.</p>
-            </div>
-        </div>
+        <p class="text-muted text-center">You have no current requests.</p>
     {% endif %}
 </div>
 {% endblock %}

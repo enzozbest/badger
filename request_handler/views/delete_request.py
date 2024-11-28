@@ -6,6 +6,11 @@ from request_handler.models import Request
 from django.contrib import messages
 from django.http import Http404
 
+""" Class to represent the deletion of a request
+
+This class is used as a view for the website. This class defines the get() method to return an error as get requests
+should not be allowed, and the post() method to handle the deletion of a request.
+"""
 
 class DeleteRequestView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
@@ -21,6 +26,14 @@ class DeleteRequestView(LoginRequiredMixin, View):
         except (Http404, Exception) as e:  # Handle unexpected exceptions
             messages.error(request, f'There was an error deleting this request: {str(e)}')
             return redirect('view_requests')
+
+
+""" Class to represent confirming the deletion of a request
+
+This class is used as a view for the website. This class defines the get() method to confirm that the user is sure that 
+they want to delete the request, and the post() method handles the deletion of a request.
+get_request_instance() is a helper method used to retrieve a request object.
+"""
 
 class ConfirmDeleteRequestView(View):
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
