@@ -87,7 +87,6 @@ def retrieve_calendar_events(calendar,request):
 
 class TutorCalendarView(LoginRequiredMixin,View):
     def get(self, request: HttpRequest) -> HttpResponse:
-        print(request.user.user_type)
         if not request.user.is_tutor:
             return render(request, 'permission_denied.html', status=401)
         try:
