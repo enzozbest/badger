@@ -1,6 +1,6 @@
 from calendar import Calendar
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from calendar_scheduler.models import Booking
 from schedule.models import Calendar, Event
 from datetime import datetime,date,timedelta
@@ -8,6 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.http import HttpRequest, HttpResponse
 
+''' Returns all the days for a particular month as a list, per the year and month parameters '''
 def get_month_days(year, month):
     # Get the first day of the month and the total days in the month
     first_day = datetime(year, month, 1)
@@ -41,6 +42,12 @@ def get_week_days():
     start_of_week = today - timedelta(days=today.weekday())
     return [start_of_week + timedelta(days=i) for i in range(7)]
         
+''' Retrieves all relevant tutoring sessions for a particular day 
+
+The day is associated with the day attribute of the request parameter
+
+The calendar parameter is a Calendar object from django-scheduler/schedule
+'''
 def retrieve_calendar_events(calendar,request):
     # Get today's date for the default display
     today = datetime.today()
@@ -94,7 +101,7 @@ class TutorCalendarView(LoginRequiredMixin,View):
             data = retrieve_calendar_events(calendar,request)
             return render( request,'tutor_calendar.html', data)
         except Calendar.DoesNotExist:
-            return render(request, "calendar/error.html", {"message": "Calendar not found."}) #Still need to make this page
+            return render(request, 'dashboard',status=404)
         
 class StudentCalendarView(LoginRequiredMixin,View):
     def get(self, request: HttpRequest) -> HttpResponse:
@@ -105,4 +112,4 @@ class StudentCalendarView(LoginRequiredMixin,View):
             data = retrieve_calendar_events(calendar,request)
             return render( request,'student_calendar.html', data)
         except Calendar.DoesNotExist:
-            return render(request, "calendar/error.html", {"message": "Calendar not found."}) #Still need to make this page
+            return render(request, 'dashboard',status=404)
