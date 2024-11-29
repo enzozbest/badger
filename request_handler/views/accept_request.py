@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
-from datetime import datetime,date,timedelta
+from datetime import date,datetime,timedelta, time
 from request_handler.models import Request
 from calendar_scheduler.models import Booking
 
@@ -20,7 +20,8 @@ def get_first_weekday(year, month, day):
         days_to_weekday = (daysList.index(day.day) - first_day.day + 7) % 7
         # Add the difference to the first day
         first_weekday = first_day + timedelta(days=days_to_weekday + 1)
-        return first_weekday
+        lesson_time = time(12,0)
+        return datetime.combine(first_weekday,lesson_time)
 
 class AcceptRequestView(LoginRequiredMixin, View):
     def post(self, request, request_id):
@@ -51,7 +52,8 @@ class AcceptRequestView(LoginRequiredMixin, View):
                 sessions = 30
             case "Fortnightly":
                 sessions = 7
-
+        print(lesson_request.term)
+        print(booking_date)
         #Now add each of the sessions, starting with the booking_date
         for i in range(0,sessions):
             try:
@@ -66,7 +68,10 @@ class AcceptRequestView(LoginRequiredMixin, View):
                     frequency=lesson_request.frequency,
                     duration=lesson_request.duration,
                     is_recurring=lesson_request.is_recurring,
-                    date=booking_date,
+                    date=booking_date.date(),
+                    start= booking_date,
+                    end=booking_date,
+                    title = f"Tutor session between {lesson_request.student.first_name} {lesson_request.student.last_name} and {lesson_request.tutor_name}"
                 )
                 match lesson_request.frequency:
                     case "Weekly":

@@ -27,11 +27,27 @@
                         {% for day in week %}
                         <td>
                             {% if day %}
+                                <!-- Display events for the day -->
+                                <h3>{{ day }}</h3>
+                                <ul>
+                                    {% for event in events %}
+                                        {% for i in event %}
+                                            {% if i.date.day == day %}
+                                                <li>{{ i.title }}</li>
+                                                <li>{{ i.knowledge_area }}</li>
+                                                <li>{{ i.duration }}</li>
+                                                <li>{{ i.venue }}</li>
+                                                <li>Recurring: {{ i.is_recurring }}</li>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                    {% endfor %}
+                                </ul>
+
                             <!-- Form to submit day click -->
                             <form method="GET" action="{% block calendar_action %}{% endblock %}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-link">{{ day }}</button>
-                                <input type="hidden" name="day" value="{{ day }}">
+                                <button type="submit" class="btn btn-link">Cancel</button>
                                 <input type="hidden" name="month" value="{{ month }}">
                                 <input type="hidden" name="year" value="{{ year }}">
                             </form>
@@ -42,16 +58,6 @@
                     {% endfor %}
                 </tbody>
             </table>
-
-            <!-- Display events for the selected day -->
-            {% if events %}
-            <h3>Events for {{ day }}-{{ month }}-{{ year }}</h3>
-            <ul>
-                {% for event in events %}
-                <li>{{ event }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
         </div>
     </div>
 </body>

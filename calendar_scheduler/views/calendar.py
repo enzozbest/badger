@@ -53,7 +53,6 @@ def retrieve_calendar_events(calendar,request):
     today = datetime.today()
     year = int(request.GET.get("year", today.year))
     month = int(request.GET.get("month", today.month))
-    day = int(request.GET.get("day", 0))  # Default to 0 if no day is provided
 
     # Ensure month/year remain valid
     if month < 1:
@@ -71,14 +70,20 @@ def retrieve_calendar_events(calendar,request):
     
     month_days = get_month_days(year,month)
     events = []
-
-    if day:
-        selected_date = date(year, month, day)
-        if request.user.user_type == 'Student':
-            events = Booking.objects.filter(student=request.user, date=selected_date)
-        elif request.user.user_type == 'Tutor':
-            events = Booking.objects.filter(tutor=request.user, date=selected_date)
     
+    for day in range(1,31):
+        try:
+            selected_date = date(year, month, day)
+            if request.user.user_type == 'Student':
+                newEvent = Booking.objects.filter(student=request.user, date=selected_date)
+                if(newEvent.exists()): #Only append events where the queryset isn't empty
+                    events.append(newEvent)
+            elif request.user.user_type == 'Tutor':
+                newEvent = Booking.objects.filter(tutor=request.user, date=selected_date)
+                if(newEvent.exists()): #Only append events where the queryset isn't empty
+                    events.append(newEvent)
+        except ValueError:
+            break
     return {
             "calendar": calendar,
             "year": year,
