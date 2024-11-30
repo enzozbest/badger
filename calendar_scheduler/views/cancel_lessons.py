@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from calendar_scheduler.models import Booking
 from datetime import date
 
@@ -67,6 +67,6 @@ class CancelLessonsView(LoginRequiredMixin,View):
                 cancel_recurring(lesson_id)
 
         if request.user.is_student:
-            return render(request,'student_calendar.html')
+            return redirect('student_calendar')
         else:
-            return render(request, 'tutor_calendar.html') 
+            return redirect('tutor_calendar')
