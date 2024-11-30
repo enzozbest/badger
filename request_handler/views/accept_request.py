@@ -4,6 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from datetime import date,datetime,timedelta, time
 from request_handler.models import Request
 from calendar_scheduler.models import Booking
+from django.db.models import Max
 
 def get_first_weekday(year, month, day):
         """
@@ -52,13 +53,22 @@ class AcceptRequestView(LoginRequiredMixin, View):
                 sessions = 30
             case "Fortnightly":
                 sessions = 7
-        print(lesson_request.term)
-        print(booking_date)
+        
+        #NEED TO GET THE LESSON_IDENTIFIER OF THE LAST REQUEST SO THAT THIS BATCH CAN HAVE THE NEW ONE
+        #Retrieves the lesson_identifier of the last group of bookings
+        last_identifier = Booking.objects.aggregate(Max('lesson_identifier'))['lesson_identifier__max']
+        print(last_identifier)
+        if last_identifier == None:
+            new_identifier = 1
+        else:
+            new_identifier = last_identifier + 1
+        
         #Now add each of the sessions, starting with the booking_date
         for i in range(0,sessions):
             try:
                 # Create a new Booking object based on the allocated request
                 Booking.objects.create(
+                    lesson_identifier = new_identifier,
                     tutor=request.user,
                     student=lesson_request.student,
                     knowledge_area=lesson_request.knowledge_area,
