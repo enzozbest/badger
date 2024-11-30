@@ -2,8 +2,8 @@
     <h1>{{ title }}</h1>
     <div class="calendar">
         <div class="row">
-            <!-- Add navigation buttons -->
-            <div class="col-12 text-center mb-3">
+            <!-- Month navigation buttons -->
+            <div>
                 <a href="?year={{ prev_year }}&month={{ prev_month }}">Previous Month</a>
                 <a href="?year={{ next_year }}&month={{ next_month }}">Next Month</a>
             </div>
@@ -38,20 +38,22 @@
                                                 <li>{{ i.duration }}</li>
                                                 <li>{{ i.venue }}</li>
                                                 <li>Recurring: {{ i.is_recurring }}</li>
-                                                <li> --------------</li>
+                                                <!-- Form to submit lesson cancellation -->
+                                                <form method="GET" action="{% block calendar_action %}{% endblock %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit">Cancel</button>
+                                                    <input type="hidden" name="day" value="{{ day }}">
+                                                    <input type="hidden" name="month" value="{{ month }}">
+                                                    <input type="hidden" name="year" value="{{ year }}">
+                                                    <input type="hidden" name="recurring" value="{{ i.is_recurring }}">
+                                                    <input type="hidden" name="lesson" value="{{ i.lesson_identifier }}">
+                                                </form>
+                                                <p> --------------</p>
                                             {% endif %}
                                         {% endfor %}
                                         
                                     {% endfor %}
                                 </ul>
-
-                            <!-- Form to submit day click -->
-                            <form method="GET" action="{% block calendar_action %}{% endblock %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-link">Cancel</button>
-                                <input type="hidden" name="month" value="{{ month }}">
-                                <input type="hidden" name="year" value="{{ year }}">
-                            </form>
                             {% endif %}
                         </td>
                         {% endfor %}

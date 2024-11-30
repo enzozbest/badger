@@ -32,6 +32,7 @@ from invoicer.views.get_invoice_view import get_invoice
 from invoicer.views.set_payment_status_view import set_payment_status
 from request_handler.views import accept_request as accept_request_view
 from calendar_scheduler.views import calendar as calendar_view
+from calendar_scheduler.views import cancel_lessons as cancel_lessons_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -62,7 +63,9 @@ urlpatterns = [
     path("set_payment_status/<str:invoice_id>/<int:payment_status>", set_payment_status,name="set_payment_status"),
     path('accept_request/<int:request_id>/', accept_request_view.AcceptRequestView.as_view(), name="accept_request"),
     path('tutor/calendar/', calendar_view.TutorCalendarView.as_view(), name='tutor_calendar'),
-    path('student/calendar/', calendar_view.StudentCalendarView.as_view(),name='student_calendar')
+    path('student/calendar/', calendar_view.StudentCalendarView.as_view(),name='student_calendar'),
+    path('tutor/calendar/cancel/', cancel_lessons_view.CancelLessonsView.as_view(), name='tutor_cancel_lessons'),
+    path('student/calendar/cancel/', cancel_lessons_view.CancelLessonsView.as_view(),name='student_cancel_lessons')
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

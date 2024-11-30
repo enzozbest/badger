@@ -1,8 +1,7 @@
 from calendar import Calendar
-
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from calendar_scheduler.models import Booking
-from schedule.models import Calendar, Event
+from schedule.models import Calendar
 from datetime import datetime,date,timedelta
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View

@@ -54,10 +54,8 @@ class AcceptRequestView(LoginRequiredMixin, View):
             case "Fortnightly":
                 sessions = 7
         
-        #NEED TO GET THE LESSON_IDENTIFIER OF THE LAST REQUEST SO THAT THIS BATCH CAN HAVE THE NEW ONE
         #Retrieves the lesson_identifier of the last group of bookings
         last_identifier = Booking.objects.aggregate(Max('lesson_identifier'))['lesson_identifier__max']
-        print(last_identifier)
         if last_identifier == None:
             new_identifier = 1
         else:
