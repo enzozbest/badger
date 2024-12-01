@@ -8,8 +8,8 @@ class TestYamlLoader(TestCase):
         self.file = yaml_loader.load_yaml('code_tutors/tests_code_tutors/resources/test.yaml')
 
     def tearDown(self):
-        yaml_loader.__yaml_file = None
-        yaml_loader.__yaml_path = None
+        yaml_loader._yaml_file = None
+        yaml_loader._yaml_path = None
 
     def test_yaml_loader_cache(self):
         file = yaml_loader.load_yaml('code_tutors/tests_code_tutors/resources/test.yaml')

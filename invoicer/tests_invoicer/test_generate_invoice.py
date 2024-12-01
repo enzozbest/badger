@@ -58,7 +58,7 @@ class TestGenerateInvoice(TestCase):
         url = s3.generate_access_url(key=key)
         self.assertIsNotNone(url)
         self.assertTrue(isinstance(url, str))
-        s3.__delete(key)
+        s3._delete(key)
 
     # ----TEST HELPERS-----#
     def generate_invoice(self) -> HttpResponse:

@@ -1,7 +1,11 @@
 import django.forms as forms
+
 from user_system.models import Day, User
 
+
 class AllocationForm(forms.Form):
+    """Class to represent the form which Admins use to allocate a student's tutoring request to a suitable tutor."""
+
     day = forms.ModelChoiceField(
         label='Choose a day for the allocation',
         queryset=Day.objects.none(),
@@ -15,6 +19,7 @@ class AllocationForm(forms.Form):
         venues = kwargs.pop('venues')
         super().__init__(*args, **kwargs)
 
+        # Manually populate some fields based on what the tutoring request specifies.
         self.fields['day'].queryset = student.availability.all()
         self.fields['venue'].choices = [
             (venue.id, venue.venue) for venue in venues

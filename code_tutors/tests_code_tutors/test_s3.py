@@ -10,7 +10,7 @@ class TestS3(TestCase):
         self.file_key = 'pdfs/test.pdf'
 
     def tearDown(self):
-        s3.__delete(self.file_key)
+        s3._delete(self.file_key)
 
     def test_upload_file(self):
         with open(self.test_file_path, 'rb') as f:

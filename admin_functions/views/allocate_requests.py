@@ -1,28 +1,38 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
-from django.shortcuts import reverse
-from request_handler.models import Request, User, Venue
+
 from admin_functions.forms import AllocationForm
-from user_system.models import KnowledgeArea, Day
+from request_handler.models import Request, User, Venue
+from user_system.models import Day, KnowledgeArea
 
 
 class AllocateRequestView(LoginRequiredMixin, View):
-    def get(self, request, request_id):
-        lesson_request, suitable_tutors, venues = get_tuple(request_id)
+    """Class-based view for the tutoring request allocation functionality.
+
+    The AllocateRequestView allows an Admin user to allocate a request from a student whose current allocation status is
+    set to "unallocated". This allocation takes into account all relevant factors: tutor expertise, student and tutor
+    availability, etc.
+
+    This class defines the acceptable HTTP methods for its URL and what the server should return to the client based on
+    the method that was used.
+    """
+
+    def get(self, http_request, request_id):
+        lesson_request, suitable_tutors, venues = _get_tuple(request_id)
 
         if lesson_request.allocated:
-            return render(request, 'already_allocated_error.html', status=409)
+            return render(http_request, 'already_allocated_error.html', status=409)
 
         form = AllocationForm(student=lesson_request.student, tutors=suitable_tutors, venues=venues)
 
-        return render(request, "allocate_request.html", {
+        return render(http_request, "allocate_request.html", {
             "form": form,
             "lesson_request": lesson_request,
         })
 
     def post(self, request, request_id):
-        lesson_request, suitable_tutors, venues = get_tuple(request_id)
+        lesson_request, suitable_tutors, venues = _get_tuple(request_id)
         if lesson_request.allocated:
             return render(request, 'already_allocated_error.html', status=409)
 
@@ -31,23 +41,29 @@ class AllocateRequestView(LoginRequiredMixin, View):
             tutor = form.cleaned_data['tutor']
             day = form.cleaned_data['day']
             venue = form.cleaned_data['venue']
-            allocate(lesson_request, tutor, Venue.objects.get(id=int(venue)), day)
-            update_availabilities(lesson_request, day)
+            _allocate(lesson_request, tutor, Venue.objects.get(id=int(venue)), day)
+            _update_availabilities(lesson_request, day)
             return redirect("view_requests")
 
         return render(request, "allocate_request.html", {
             "form": form,
-            "lesson_request": lesson_request,})
+            "lesson_request": lesson_request, })
 
     def dispatch(self, request, *args, **kwargs):
+        """Customise the dispatch method of the LoginRequiredMixin
+
+        This function redirects an HTTP request from an unauthenticated user to the login page, and an authenticated
+        user with insufficient privileges to a page where they are informed of their lack of permissions.
+        """
         if not request.user.is_authenticated:
             return self.handle_no_permission()
         if not request.user.is_admin:
             return render(request, 'permission_denied.html', status=401)
         return super().dispatch(request, *args, **kwargs)
 
-def get_tuple(id: int) -> tuple:
-    lesson_request = get_object_or_404(Request, id=id)
+
+def _get_tuple(request_id: int) -> tuple:
+    lesson_request = get_object_or_404(Request, id=request_id)
     student = lesson_request.student
     knowledge_area = lesson_request.knowledge_area
     knowledge_area_ids = KnowledgeArea.objects.filter(subject=knowledge_area).values_list('id', flat=True)
@@ -67,14 +83,15 @@ def get_tuple(id: int) -> tuple:
     return lesson_request, suitable_tutors, venues
 
 
-def allocate(lesson_request: Request, tutor: User, venue: Venue, day: Day) -> None:
+def _allocate(lesson_request: Request, tutor: User, venue: Venue, day: Day) -> None:
     lesson_request.tutor = tutor
     lesson_request.day = day
     lesson_request.venue = venue
     lesson_request.allocated = True
     lesson_request.save()
 
-def update_availabilities(lesson_request: Request, day: Day) -> None:
+
+def _update_availabilities(lesson_request: Request, day: Day) -> None:
     lesson_request.student.availability.remove(day)
     lesson_request.tutor.availability.remove(day)
     lesson_request.student.save()
