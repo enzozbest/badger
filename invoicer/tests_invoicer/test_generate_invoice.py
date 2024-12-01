@@ -46,7 +46,7 @@ class TestGenerateInvoice(TestCase):
     def test_you_cannot_generate_invoices_if_they_already_exist(self):
         self.assertions_for_local_invoice(self.generate_invoice())
         self.client.force_login(self.admin)
-        response = self.client.get(reverse('generate_invoice', kwargs={"request_id": self.request.id}))
+        response = self.client.get(reverse('generate_invoice', kwargs={"tutoring_request_id": self.request.id}))
         self.assertEqual(response.status_code, 204)
         os.remove(self.path)
 
@@ -63,7 +63,7 @@ class TestGenerateInvoice(TestCase):
     # ----TEST HELPERS-----#
     def generate_invoice(self) -> HttpResponse:
         self.client.force_login(self.admin)
-        return self.client.get(reverse("generate_invoice", kwargs={"request_id": self.request.id}))
+        return self.client.get(reverse("generate_invoice", kwargs={"tutoring_request_id": self.request.id}))
 
     def assertions_for_local_invoice(self, response: HttpResponse) -> None:
         with open(self.path, 'rb') as file:
