@@ -1,9 +1,18 @@
 import json
-from request_handler.models import Venue, Request
-from user_system.models import User, Day
+
+from request_handler.models import Request, Venue
+from user_system.models import Day, User
 
 
 def create_test_requests():
+    """Function to create the requests set in the fixture test_requests.json
+
+    This function parses the JSON file and, for each fixed request, generates a corresponding Request model object so that
+    the requests are available in the database.
+    This code has deliberately not been refactored to keep this loader simple: should any changes need to be made to the
+    fixtures, you will always need only alter the JSON fixture. This code should never be changed.
+    """
+
     with open('request_handler/fixtures/test_requests.json', 'r') as file:
         requests_json = json.load(file)
 
@@ -14,7 +23,6 @@ def create_test_requests():
             try:
                 student = User.objects.get(first_name=student_json)
                 request_json['student'] = student
-
             except User.DoesNotExist:
                 print("User not found!")
 
