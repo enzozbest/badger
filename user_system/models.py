@@ -10,7 +10,7 @@ class Day(models.Model):
     This Model is necessary for the ManyToMany relationships in Request to work, as they must be between model instances.
     Days are represented in the database as a string (their name) and an automatically assigned id (primary key).
     """
-    
+
     day = models.CharField(max_length=10, unique=True)
 
     def __str__(self):
@@ -38,8 +38,10 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
     availability = models.ManyToManyField(Day, blank=False, default=None)
-    hourly_rate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True,
+    hourly_rate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, default=10.0,
                                       help_text="Enter your hourly rate in GBP.")
+    student_max_rate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, default=10.0,
+                                           help_text="Enter the maximum hourly rate you are willing to pay, in GBP.")
     models.pk = email
 
     @property
