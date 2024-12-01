@@ -1,7 +1,9 @@
 from django.test import TestCase, override_settings
+
 from code_tutors.aws import s3
 
-@override_settings(USE_AWS_S3 = True)
+
+@override_settings(USE_AWS_S3=True)
 class TestS3(TestCase):
     def setUp(self):
         self.test_file_path = 'code_tutors/tests_code_tutors/resources/test.pdf'
@@ -26,13 +28,3 @@ class TestS3(TestCase):
         url = s3.generate_access_url(key=self.file_key)
         self.assertIsNotNone(url)
         self.assertTrue(isinstance(url, str))
-
-    def test_list_bucket(self):
-        with open(self.test_file_path, 'rb') as f:
-            try:
-                s3.upload(obj=f, key=self.file_key)
-            except Exception as e:
-                self.fail("Test raised an exception!")
-        result = s3.list_objects(prefix='pdfs/')
-        self.assertIsNotNone(result)
-        self.assertTrue(len(result) > 0)

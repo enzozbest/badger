@@ -1,13 +1,13 @@
 from django.test import TestCase
 from django.urls import reverse
-from django.core.management import call_command
-from user_system.models import User
-from user_system.models import KnowledgeArea
+
+from user_system.models import KnowledgeArea, User
+
 
 class AddKnowledgeAreasTest(TestCase):
     def setUp(self):
         from user_system.fixtures import create_test_users
-        create_test_users.create_test_user()
+        create_test_users.create_test_users()
 
         self.tutor_user = User.objects.get(user_type=User.ACCOUNT_TYPE_TUTOR)
         self.student_user = User.objects.get(user_type=User.ACCOUNT_TYPE_STUDENT)
@@ -52,5 +52,3 @@ class AddKnowledgeAreasTest(TestCase):
         self.assertEqual(knowledge_areas[0].subject, 'Python')
         self.assertEqual(knowledge_areas[1].subject, 'Scala')
         self.assertEqual(knowledge_areas[2].subject, 'Java')
-
-

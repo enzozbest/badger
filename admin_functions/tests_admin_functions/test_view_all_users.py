@@ -1,13 +1,16 @@
 from django.test import TestCase
 from django.urls import reverse
+
 from user_system.models import User
+
 
 class ViewAllUsersTestCase(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', email='test@test.com', password='Password123', user_type='Admin')
+        self.user = User.objects.create_user(username='testuser', email='test@test.com', password='Password123',
+                                             user_type='Admin')
         for i in range(51):
             User.objects.create(username='@user{}'.format(i), password='Password123', email='user{}@test.com'.format(i),
-                                user_type= 'Student' if i % 2 == 0 else 'Tutor')
+                                user_type='Student' if i % 2 == 0 else 'Tutor')
 
     def test_post_request_not_allowed(self):
         self.client.login(username='testuser', password='Password123')
@@ -21,19 +24,18 @@ class ViewAllUsersTestCase(TestCase):
         self.assertTemplateUsed(response, 'log_in.html')
 
     def test_student_cannot_send_request(self):
-        student = User.objects.create_user(username='testuser2', email='test2@test.com', password='Password123', user_type='Student')
+        student = User.objects.create_user(username='testuser2', email='test2@test.com', password='Password123',
+                                           user_type='Student')
         self.client.login(username='testuser2', password='Password123')
         response = self.client.get(reverse('view_all_users'))
-        self.assertEqual(response.status_code, 401)
-        #self.assertTemplateUsed(response, 'permission_denied.html')
+        self.assertEqual(response.status_code, 403)
 
     def test_tutor_cannot_send_request(self):
         tutor = User.objects.create_user(username='testuser2', email='test2@test.com', password='Password123',
-                                           user_type='Tutor')
+                                         user_type='Tutor')
         self.client.login(username='testuser2', password='Password123')
         response = self.client.get(reverse('view_all_users'))
-        self.assertEqual(response.status_code, 401)
-
+        self.assertEqual(response.status_code, 403)
 
     def test_admin_can_send_request(self):
         self.client.login(username='testuser', password='Password123')
@@ -43,8 +45,8 @@ class ViewAllUsersTestCase(TestCase):
 
     def test_pagination_works_correctly(self):
         self.client.login(username='testuser', password='Password123')
-        #Use loop to check that navigation between pages will work correctly (in this case, pages 1 and 2 each have
-        #20 users).
+        # Use loop to check that navigation between pages will work correctly (in this case, pages 1 and 2 each have
+        # 20 users).
         for i in range(1, 3):
             response = self.client.get(reverse('view_all_users') + f'?page={i}')
             self.assertEqual(response.status_code, 200)
@@ -86,13 +88,18 @@ class ViewAllUsersTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['page_obj'].paginator.count, 52)
 
+
 class SearchUsersTestCase(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='adminuser', email='admin@test.com', password='Password123', user_type='Admin')
+        self.user = User.objects.create_user(username='adminuser', email='admin@test.com', password='Password123',
+                                             user_type='Admin')
         self.users = [
-            User.objects.create(first_name="Alice", last_name="Anderson", username="alice", email="alice@test.com", user_type='Student'),
-            User.objects.create(first_name="Bob", last_name="Brown", username="bob", email="bob@test.com", user_type='Student'),
-            User.objects.create(first_name="Charlie", last_name="Chaplin", username="charlie", email="charlie@test.com", user_type='Tutor'),
+            User.objects.create(first_name="Alice", last_name="Anderson", username="alice", email="alice@test.com",
+                                user_type='Student'),
+            User.objects.create(first_name="Bob", last_name="Brown", username="bob", email="bob@test.com",
+                                user_type='Student'),
+            User.objects.create(first_name="Charlie", last_name="Chaplin", username="charlie", email="charlie@test.com",
+                                user_type='Tutor'),
         ]
 
     def test_search_by_first_name(self):
@@ -120,7 +127,7 @@ class SearchUsersTestCase(TestCase):
 
     def test_search_combined_with_filter(self):
         self.client.login(username='adminuser', password='Password123')
-        response = self.client.get(reverse('view_all_users') + '?user_type=Student&search=Alice') #?q=Alice&page=2'
+        response = self.client.get(reverse('view_all_users') + '?user_type=Student&search=Alice')  # ?q=Alice&page=2'
         self.assertEqual(response.status_code, 200)
         search_results = response.context['page_obj'].object_list
         self.assertEqual(len(search_results), 1)

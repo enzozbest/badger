@@ -2,17 +2,18 @@
 from django.contrib.auth.hashers import check_password
 from django.test import TestCase
 from django.urls import reverse
-from django.core.management import call_command
+
 from user_system.forms import SignUpForm
 from user_system.models import User
 from user_system.tests_user_system.helpers import LogInTester
+
 
 class SignUpViewTestCase(TestCase, LogInTester):
     """Tests of the sign up view."""
 
     def setUp(self):
         from user_system.fixtures import create_test_users
-        create_test_users.create_test_user()
+        create_test_users.create_test_users()
 
         self.url = reverse('sign_up')
         self.form_input = {
@@ -27,7 +28,7 @@ class SignUpViewTestCase(TestCase, LogInTester):
         self.user = User.objects.get(username='@johndoe')
 
     def test_sign_up_url(self):
-        self.assertEqual(self.url,'/sign_up/')
+        self.assertEqual(self.url, '/sign_up/')
 
     def test_get_sign_up(self):
         response = self.client.get(self.url)
@@ -61,7 +62,7 @@ class SignUpViewTestCase(TestCase, LogInTester):
         before_count = User.objects.count()
         response = self.client.post(self.url, self.form_input, follow=True)
         after_count = User.objects.count()
-        self.assertEqual(after_count, before_count+1)
+        self.assertEqual(after_count, before_count + 1)
         response_url = reverse('dashboard')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'dashboard.html')

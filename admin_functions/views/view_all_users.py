@@ -1,13 +1,22 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.views.generic import ListView
-from user_system.models import User
-from admin_functions.helpers.filters import UserFilter
-from django.http import HttpResponse
-from django.shortcuts import reverse, render
 from django.http import HttpResponseRedirect
+from django.shortcuts import render, reverse
+from django.views.generic import ListView
+
+from admin_functions.helpers.filters import UserFilter
+from user_system.models import User
+
 
 class AllUsersView(LoginRequiredMixin, ListView):
+    """Class-based ListView to display all users registered in the database.
+
+    When entering the page, the user will see a paginated, sortable, filterable, searchable list of all users in the
+    database. This is properly formatted.
+    Only Admin users can have access to this page, so the dispatch method of LoginRequiredMixin is overridden to reflect
+    that.
+    """
+
     model = User
     template_name = 'view_users.html'
     context_object_name = 'users'
@@ -51,5 +60,5 @@ class AllUsersView(LoginRequiredMixin, ListView):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
         if not request.user.user_type == 'Admin':
-            return render(request, 'permission_denied.html', status=401)
+            return render(request, 'permission_denied.html', status=403)
         return super().dispatch(request, *args, **kwargs)
