@@ -53,7 +53,8 @@ class Command(BaseCommand):
         try:
             self.create_user(data)
         except Exception as e:
-            print(f"Failed to create user: {data['username']} - {e}")
+            pass
+            # print(f"Failed to create user: {data['username']} - {e}")
 
     def create_user(self, data):
         user_obj = User.objects.create_user(
@@ -72,9 +73,15 @@ class Command(BaseCommand):
         if data['user_type'] == 'Tutor':
             add_knowledge_areas(user_obj, random_knowledge_areas(5, self.faker))
             set_tutor_hourly_rate(user_obj, 5, 40)
+            user_obj.student_max_rate = None
 
         if data['user_type'] == 'Student':
             set_student_max_hourly_rate(user_obj, 5, 40)
+            user_obj.hourly_rate = None
+
+        if data['user_type'] == 'Admin':
+            user_obj.hourly_rate = None
+            user_obj.student_max_rate = None
 
         user_obj.save()
 
