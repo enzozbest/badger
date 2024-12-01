@@ -1,15 +1,15 @@
 from django.contrib.auth.hashers import check_password
 from django.test import TestCase
-from django.core.management import call_command
-from user_system.models import User
+
 from user_system.forms import PasswordForm
+from user_system.models import User
+
 
 class PasswordFormTestCase(TestCase):
 
     def setUp(self):
-
         from user_system.fixtures import create_test_users
-        create_test_users.create_test_user()
+        create_test_users.create_test_users()
         self.user = User.objects.get(username='@johndoe')
         self.form_input = {
             'password': 'Password123',

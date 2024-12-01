@@ -3,15 +3,17 @@ from decimal import Decimal
 
 from django import forms
 from django.test import TestCase
+
 from user_system.forms import UserForm
 from user_system.models import User
+
 
 class UserFormTestCase(TestCase):
     """Unit tests_user_system of the user form."""
 
     def setUp(self):
         from user_system.fixtures import create_test_users
-        create_test_users.create_test_user()
+        create_test_users.create_test_users()
         self.form_input = {
             'first_name': 'Enzo',
             'last_name': 'Bestetti',

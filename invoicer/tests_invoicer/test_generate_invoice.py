@@ -15,7 +15,7 @@ from user_system.models import Day, KnowledgeArea, User
 class TestGenerateInvoice(TestCase):
 
     def setUp(self):
-        create_fixtures.create_test_user()
+        create_fixtures.create_test_users()
         self.student = User.objects.get(user_type='Student')
         self.tutor = User.objects.get(user_type='Tutor')
         self.admin = User.objects.get(user_type='Admin')

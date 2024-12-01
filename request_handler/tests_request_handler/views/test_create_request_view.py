@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from request_handler.models import Venue
-from user_system.fixtures.create_test_users import create_test_user
+from user_system.fixtures.create_test_users import create_test_users
 from user_system.models import Day, User
 
 INVALID_REQUEST_ID = 999
@@ -12,7 +12,7 @@ INVALID_REQUEST_ID = 999
 
 class TestViews(TestCase):
     def setUp(self):
-        create_test_user()
+        create_test_users()
         self.monday, _ = Day.objects.get_or_create(day='Monday')
         self.online, _ = Venue.objects.get_or_create(venue='Online')
         self.student = User.objects.get(username='@charlie')

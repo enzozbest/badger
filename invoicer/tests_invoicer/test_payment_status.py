@@ -9,13 +9,13 @@ from invoicer.helpers.generate_invoice_id import generate_invoice_id
 from invoicer.models import get_latest_id_number
 from request_handler.fixtures.create_test_requests import create_test_requests
 from request_handler.models import Request
-from user_system.fixtures.create_test_users import create_test_user
+from user_system.fixtures.create_test_users import create_test_users
 from user_system.models import User
 
 
 class TestPaymentStatus(TestCase):
     def setUp(self):
-        create_test_user()
+        create_test_users()
         create_test_requests()
         self.admin = User.objects.get(user_type='Admin')
         self.request_alloc = Request.objects.get(allocated=True)

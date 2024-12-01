@@ -4,16 +4,18 @@ from decimal import Decimal
 from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
+
 from user_system.forms import UserForm
 from user_system.models import User
 from user_system.tests_user_system.helpers import reverse_with_next
+
 
 class ProfileViewTest(TestCase):
     """Test suite for the profile view."""
 
     def setUp(self):
         from user_system.fixtures import create_test_users
-        create_test_users.create_test_user()
+        create_test_users.create_test_users()
 
         self.user = User.objects.get(username='@johndoe')
 
@@ -132,4 +134,3 @@ class ProfileViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.student_user.refresh_from_db()
         self.assertIsNone(self.student_user.hourly_rate)
-

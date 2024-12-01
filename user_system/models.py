@@ -1,15 +1,18 @@
-from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
 from django.db import models
 from libgravatar import Gravatar
 
-""" Class representing a day of the week
 
-This Model is necessary for the ManyToMany relationships in Request to work, as they must be between model instances.
-Days are represented in the database as a string (their name) and an automatically assigned id (primary key).
-"""
 class Day(models.Model):
+    """ Class representing a day of the week
+
+    This Model is necessary for the ManyToMany relationships in Request to work, as they must be between model instances.
+    Days are represented in the database as a string (their name) and an automatically assigned id (primary key).
+    """
+    
     day = models.CharField(max_length=10, unique=True)
+
     def __str__(self):
         return self.day
 
@@ -35,7 +38,8 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
     availability = models.ManyToManyField(Day, blank=False, default=None)
-    hourly_rate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, help_text="Enter your hourly rate in GBP.")
+    hourly_rate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True,
+                                      help_text="Enter your hourly rate in GBP.")
     models.pk = email
 
     @property
@@ -89,4 +93,3 @@ class KnowledgeArea(models.Model):
 
     def __str__(self):
         return self.subject
-
