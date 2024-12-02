@@ -20,7 +20,7 @@ def generate_invoice_for_request(http_request: HttpRequest, tutoring_request_id:
     :param tutoring_request_id: the tutoring request id
     :return: an appropriate HTTP response.
     """
-    
+
     request_obj = Request.objects.get(id=tutoring_request_id)
 
     if request_obj.invoice is not None:
@@ -46,12 +46,6 @@ def generate_invoice_for_request(http_request: HttpRequest, tutoring_request_id:
 
 
 def create_invoice_object(student: User, invoice_id: str, total_cost: float) -> Invoice:
-    if LOCAL_STORE:
-        return Invoice.objects.create(invoice_id=invoice_id,
-                                      student=student,
-                                      total=total_cost,
-                                      location=f'invoicer/pdfs/{invoice_id}.pdf')
-    else:
-        return Invoice.objects.create(invoice_id=invoice_id,
-                                      student=student,
-                                      total=total_cost)
+    return Invoice.objects.create(invoice_id=invoice_id,
+                                  student=student,
+                                  total=total_cost)
