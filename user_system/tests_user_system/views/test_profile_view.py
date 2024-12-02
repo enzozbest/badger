@@ -133,4 +133,4 @@ class ProfileViewTest(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.student_user.refresh_from_db()
-        self.assertIsNone(self.student_user.hourly_rate)
+        self.assertIsNone(self.student_user.hourly_rate)  # Default hourly rate applies

@@ -5,14 +5,18 @@
     <title>Allocate Request</title>
 </head>
 <body>
-    <h1>Allocate Request #{{ lesson_request.id }}</h1>
-    <p>Student: {{ lesson_request.student.full_name }}</p>
-    <p>Requested Area: {{ lesson_request.knowledge_area }}</p>
-    <p>Venue Preference: {{ lesson_request.venue_preference }}</p>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Allocate</button>
-    </form>
+<h1>Allocate Request #{{ lesson_request.id }}</h1>
+<p>Student: {{ lesson_request.student.full_name }}</p>
+<p>Requested Area: {{ lesson_request.knowledge_area }}</p>
+<p>Venue Preference:
+    {% for venue in venue_preferences %}
+        {{ venue }},
+    {% endfor %}
+</p>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Allocate</button>
+</form>
 </body>
 </html>

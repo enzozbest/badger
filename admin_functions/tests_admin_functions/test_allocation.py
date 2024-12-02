@@ -80,7 +80,7 @@ class TestAllocation(TestCase):
         self.assertTemplateUsed("already_allocated_error.html")
 
     def test_allocating_unallocated_request_works(self):
-        self.client.login(username=self.admin.username, password='Password123')
+        self.client.force_login(self.admin)
         response = self.client.post(reverse("allocate_request", args={self.unallocated_request.id}), data={
             'tutor': self.tutor.id,
             'venue': str(self.online.id),

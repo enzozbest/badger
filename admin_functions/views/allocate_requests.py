@@ -25,10 +25,11 @@ class AllocateRequestView(LoginRequiredMixin, View):
             return render(http_request, 'already_allocated_error.html', status=409)
 
         form = AllocationForm(student=lesson_request.student, tutors=suitable_tutors, venues=venues)
-
         return render(http_request, "allocate_request.html", {
             "form": form,
             "lesson_request": lesson_request,
+            "venue_preferences": {"No Preference"} if len(venues) >= 2 else {venue for venue in venues if
+                                                                             venue != "No Preference"},
         })
 
     def post(self, request, request_id):
@@ -68,17 +69,19 @@ def _get_tuple(request_id: int) -> tuple:
     knowledge_area = lesson_request.knowledge_area
     knowledge_area_ids = KnowledgeArea.objects.filter(subject=knowledge_area).values_list('id', flat=True)
     venue_preference = lesson_request.venue_preference
+    max_hourly_rate = student.student_max_rate
 
     suitable_tutors = User.objects.filter(
         user_type="Tutor",
         knowledgearea__in=knowledge_area_ids,
-        availability__in=student.availability.all()
+        availability__in=student.availability.all(),
+        hourly_rate__lte=max_hourly_rate,
     ).distinct()
 
     venues = (
-        venue_preference.objects.all()
-        if venue_preference == "No Preference"
-        else Venue.objects.all()
+        Venue.objects.exclude(venue='No Preference').all()
+        if Venue.objects.get(venue='No Preference') in venue_preference.all()
+        else venue_preference.all()
     )
     return lesson_request, suitable_tutors, venues
 

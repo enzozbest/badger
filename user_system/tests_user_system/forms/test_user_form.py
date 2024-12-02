@@ -102,4 +102,4 @@ class UserFormTestCase(TestCase):
             user_type=User.ACCOUNT_TYPE_TUTOR,
         )
         form = UserForm(instance=new_tutor)
-        self.assertEqual(form.instance.hourly_rate, None)
+        self.assertEqual(form.instance.hourly_rate, 10.00)
