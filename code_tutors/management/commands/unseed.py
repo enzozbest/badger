@@ -25,7 +25,7 @@ class Command(BaseCommand):
         self.stdout.write('Deleting all invoices from S3...')
         credentials = _get_credentials()
         try:
-            _delete('invoices', get_bucket_name('invoicer'), credentials=credentials)
+            _delete('invoices/pdfs/*.pdf', get_bucket_name('invoicer'), credentials=credentials)
             self.stdout.write(self.style.SUCCESS('Invoices successfully deleted from S3!'))
         except Exception:
             self.stdout.write(self.style.ERROR('Invoices could not be deleted from S3!'))
