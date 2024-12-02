@@ -1,0 +1,18 @@
+<!-- sorting_table_head.html -->
+<thead>
+    <tr>
+        {% for field, label in valid_sorting_fields.items %}
+            <th>
+                <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if current_sort == field %}-{{ field }}{% else %}{{ field }}{% endif %}">
+                    {{ label }}
+                    {% if current_sort == field %}
+                        ▲
+                    {% elif current_sort == '-'|add:field %}
+                        ▼
+                    {% endif %}
+                </a>
+            </th>
+        {% endfor %}
+        <th>Actions</th>
+    </tr>
+</thead>

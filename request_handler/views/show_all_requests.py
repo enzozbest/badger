@@ -1,11 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView
-
+from admin_functions.helpers.mixins import SortingMixin
 from request_handler.helpers.request_filter import RequestFilter
 from request_handler.models import Request
 
 
-class AllRequestsView(LoginRequiredMixin, ListView):
+class AllRequestsView(LoginRequiredMixin, SortingMixin, ListView):
     """Class-based ListView to represent display a list of all relevant tutoring requests in the database
 
     This view displays a filterable, sortable, searchable list of all relevant requests present in the database.
@@ -15,8 +15,9 @@ class AllRequestsView(LoginRequiredMixin, ListView):
     template_name = 'view_requests.html'
     context_object_name = 'requests'
     paginate_by = 20
-    ordering = ['pk']
     filterset_class = RequestFilter
+    valid_sort_fields = ['id', 'student__first_name', 'student__last_name', 'knowledge_area', 'allocated']
+
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -28,8 +29,8 @@ class AllRequestsView(LoginRequiredMixin, ListView):
 
         self.filterset = RequestFilter(self.request.GET, queryset=relevant_requests)
         if self.filterset.is_valid():
-            return self.filterset.qs
-        return queryset
+            queryset = self.filterset.qs
+        return self.get_sorting_queryset(queryset)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

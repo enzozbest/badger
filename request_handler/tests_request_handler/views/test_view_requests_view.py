@@ -112,3 +112,53 @@ class viewRequestsTest(TestCase):
         response = self.client.get(reverse('view_requests'))
         expected_url = f"{reverse('log_in')}?next={reverse('view_requests')}"
         self.assertRedirects(response, expected_url, status_code=302, target_status_code=200)
+    
+    def test_sort_by_id_ascending(self):
+        request_1 = Request.objects.create(student=self.user, knowledge_area='C++', term='Easter')
+        request_2 = Request.objects.create(student=self.user, knowledge_area='Databases', term='Fall')
+
+        response = self.client.get(reverse('view_requests') + '?sort=id')
+
+        self.assertQuerysetEqual(
+            response.context['requests'],
+            ['<Request: 1>', '<Request: 2>'],
+            transform=lambda x: f'<Request: {x.id}>'
+        )
+
+
+    def test_sort_by_id_descending(self):
+        request_1 = Request.objects.create(student=self.user, knowledge_area='C++', term='Easter')
+        request_2 = Request.objects.create(student=self.user, knowledge_area='Databases', term='Fall')
+
+        response = self.client.get(reverse('view_requests') + '?sort=-id')
+
+        self.assertQuerysetEqual(
+            response.context['requests'],
+            ['<Request: 2>', '<Request: 1>'],
+            transform=lambda x: f'<Request: {x.id}>'
+        )
+
+
+    def test_sort_by_knowledge_area_ascending(self):
+        request_1 = Request.objects.create(student=self.user, knowledge_area='Databases', term='Fall')
+        request_2 = Request.objects.create(student=self.user, knowledge_area='C++', term='Spring')
+
+        response = self.client.get(reverse('view_requests') + '?sort=knowledge_area')
+
+        self.assertQuerysetEqual(
+            response.context['requests'],
+            ['<Request: 2>', '<Request: 1>'],
+            transform=lambda x: f'<Request: {x.id}>'
+        )
+
+    def test_sort_by_knowledge_area_descending(self):
+        request_1 = Request.objects.create(student=self.user, knowledge_area='Databases', term='Fall')
+        request_2 = Request.objects.create(student=self.user, knowledge_area='C++', term='Spring')
+
+        response = self.client.get(reverse('view_requests') + '?sort=-knowledge_area')
+
+        self.assertQuerysetEqual(
+            response.context['requests'],
+            ['<Request: 1>', '<Request: 2>'],
+            transform=lambda x: f'<Request: {x.id}>'
+        )

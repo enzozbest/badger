@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from admin_functions.helpers.mixins import SortingMixin
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, reverse
@@ -8,7 +9,7 @@ from admin_functions.helpers.filters import UserFilter
 from user_system.models import User
 
 
-class AllUsersView(LoginRequiredMixin, ListView):
+class AllUsersView(LoginRequiredMixin, SortingMixin, ListView):
     """Class-based ListView to display all users registered in the database.
 
     When entering the page, the user will see a paginated, sortable, filterable, searchable list of all users in the
@@ -23,19 +24,27 @@ class AllUsersView(LoginRequiredMixin, ListView):
     paginate_by = 20
     ordering = ['pk']
     filterset_class = UserFilter
+    valid_sort_fields = ['first_name', 'last_name', 'email', 'user_type']
+
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        self.filterset = self.filterset_class(self.request.GET, queryset=queryset)
-        if self.filterset.is_valid():
-            return self.filterset.qs
-        return queryset
+        if hasattr(self, 'filterset_class'):
+            self.filterset = self.filterset_class(self.request.GET, queryset=queryset)
+            if self.filterset.is_valid():
+                queryset = self.filterset.qs
+
+        return self.get_sorting_queryset(queryset)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['filter'] = self.filterset  # Pass the filter object to the template
-        context['count'] = context['users'].count()
-        context['total'] = self.filterset.qs.count()
+        context.update({
+            'filter': self.filterset,
+            'count': self.object_list.count(),
+            'total': self.filterset.qs.count() if hasattr(self, 'filterset') else self.get_queryset().count(),
+            'valid_sorting_fields': {field: field.replace('_', ' ').title() for field in self.valid_sort_fields},
+            'current_sort': self.request.GET.get('sort', self.default_sort_field),
+        })
         return context
 
     def get(self, request, *args, **kwargs):
