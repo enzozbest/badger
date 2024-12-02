@@ -3,7 +3,7 @@ from django.views import View
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
 from calendar_scheduler.models import Booking
-from datetime import date
+from datetime import date, datetime, timedelta
 
 
 def cancel_day(id,day):
@@ -40,7 +40,17 @@ class CancelLessonsView(LoginRequiredMixin,View):
         year = request.GET.get("year")
         recurring = request.GET.get("recurring")
         lesson = request.GET.get('lesson')
-        context = {"day":day, "month":month, "year":year, "recurring":recurring, "lesson":lesson}
+
+
+        #Check whether the day they are cancelling is at least two weeks away
+        day = date(int(year),int(month),int(day))
+        dayDatetime = datetime.combine(day, datetime.min.time())
+        today = datetime.now()
+        if (dayDatetime - today) >= timedelta(days=14):
+            close_date = False
+        else:
+            close_date = True
+        context = {"day":day, "month":month, "year":year, "recurring":recurring, "lesson":lesson, "close_date": close_date}
         if request.user.is_tutor:
             return render(request,'tutor_cancel_lessons.html',context)
         else:

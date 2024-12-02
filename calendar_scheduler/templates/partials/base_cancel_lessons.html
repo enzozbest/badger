@@ -1,14 +1,16 @@
 <body>
-    <p>Click below to cancel your individual lesson on {{day}}-{{month}}-{{year}}</p>
-    <form method="POST" action="{% block cancel_individual %}{% endblock %}">
-        {% csrf_token %}
-        <button type="submit">Cancel</button>
-        <input type="hidden" name="day" value="{{ day }}">
-        <input type="hidden" name="month" value="{{ month }}">
-        <input type="hidden" name="year" value="{{ year }}">
-        <input type="hidden" name="lesson" value="{{ lesson }}">
-        <input type="hidden" name="cancellation" value="day">
-    </form>
+    {% if close_date == False %}
+        <p>Click below to cancel your individual lesson on {{day}}-{{month}}-{{year}}</p>
+        <form method="POST" action="{% block cancel_individual %}{% endblock %}">
+            {% csrf_token %}
+            <button type="submit">Cancel</button>
+            <input type="hidden" name="day" value="{{ day }}">
+            <input type="hidden" name="month" value="{{ month }}">
+            <input type="hidden" name="year" value="{{ year }}">
+            <input type="hidden" name="lesson" value="{{ lesson }}">
+            <input type="hidden" name="cancellation" value="day">
+        </form>
+    {% endif %}
 
     <p>Click below to cancel all lessons for your term</p>
         <form method="POST" action="{% block cancel_term %}{% endblock %}">
