@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 from django.contrib.messages import constants as messages
 
@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'user_system',
     'code_tutors',
     'request_handler',
-    'admin_functions'
+    'admin_functions',
+    'invoicer'
 ]
 
 MIDDLEWARE = [
@@ -145,3 +146,12 @@ REDIRECT_URL_WHEN_LOGGED_IN = 'dashboard'
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
+
+#Invoicer Configuration
+LOGO_PATH = BASE_DIR/'static/logo.jpeg'
+INVOICE_OUTPUT_PATH = BASE_DIR/'invoicer/invoices/pdfs'
+
+#AWS Configurations
+AWS_ACCOUNT_ID = '058264317710'
+AWS_YAML_CONFIG_PATH = BASE_DIR/'code_tutors/aws/resources/config.yml'
+USE_AWS_S3 = True

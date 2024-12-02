@@ -157,8 +157,9 @@ class SignUpView(LoginProhibitedMixin, FormView):
 
 @login_required
 def AddKnowledgeAreas(request):
+    """Allow a logged-in tutor to add their knowledge areas to their profile."""
     if not request.user.is_tutor:
-        return redirect('profile') # Redirect if not a tutor
+        return redirect('profile')
 
     form = KnowledgeAreaForm(request.POST or None)
 
@@ -166,7 +167,7 @@ def AddKnowledgeAreas(request):
         subject = form.cleaned_data['subject']
 
         if KnowledgeArea.objects.filter(user=request.user, subject=subject).exists():
-            pass  # Can put an error message here maybe
+            pass
         else:
             knowledge_area = form.save(commit=False)
             knowledge_area.user = request.user
@@ -181,8 +182,7 @@ def AddKnowledgeAreas(request):
 
 @login_required
 def DeleteKnowledgeArea(request, area_id):
-    knowledge_area = get_object_or_404(KnowledgeArea, pk=area_id, user=request.user)
-    if knowledge_area.user != request.user:
-        raise Http404("You are not allowed to delete this knowledge area. ")
+    """Allow a logged-in tutor to delete a previously-added knowledge area."""
+    knowledge_area = get_object_or_404(KnowledgeArea, id=area_id, user=request.user)
     knowledge_area.delete()
     return redirect('add_knowledge_areas')
