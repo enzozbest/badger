@@ -13,28 +13,27 @@
 
     <!-- Filter Form -->
     <form method="get">
-        {{ filter.form.as_p }} <button type="submit">Go</button>
+        {{ filter.form.as_p }}
+        {% for key, value in request.GET.items %}
+            {% if key not in filter.form.fields.keys and key != 'page' %}
+                <input type="hidden" name="{{ key }}" value="{{ value }}">
+            {% endif %}
+        {% endfor %}
+        <button type="submit">Go</button>
     </form>
 
     <!-- Table -->
     <table>
-        <thead>
-            <tr>
-                <th>Email</th>
-                <th>First name</th>
-                <th>Last name</th>
-                <th>Account type</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
+        {% include "partials/sorting_table_head.html" with valid_sorting_fields=valid_sorting_fields current_sort=current_sort %}
         <tbody>
             {% for user in users %}
                 <tr>
-                    <td>{{ user.email }}</td>
                     <td>{{ user.first_name }}</td>
                     <td>{{ user.last_name }}</td>
-                    <td>{{ user.user_type}}</td>
-                    <td>{% if user.user_type != 'Admin' %}
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.user_type }}</td>
+                    <td>
+                        {% if user.user_type != 'Admin' %}
                             <a href="{% url 'make_admin' user.id %}">Make Administrator</a>
                         {% endif %}
                     </td>

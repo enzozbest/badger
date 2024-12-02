@@ -21,9 +21,42 @@
 <table>
     <thead>
     <tr>
-        <th>ID</th>
-        <th>Student</th>
-        <th>Requested Area</th>
+        <th>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' and key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if request.GET.sort == 'id' %}{% if request.GET.sort|slice:":1" == '-' %}id{% else %}-id{% endif %}{% else %}id{% endif %}">
+                ID
+                {% if request.GET.sort == 'id' or request.GET.sort == '-id' %}
+                    {% if request.GET.sort|slice:":1" != '-' %}
+                        <span>▲</span> 
+                    {% else %}
+                        <span>▼</span> 
+                    {% endif %}
+                {% endif %}
+            </a>
+        </th>
+        <th>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' and key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if request.GET.sort == 'student__first_name' %}{% if request.GET.sort|slice:":1" == '-' %}student__first_name{% else %}-student__first_name{% endif %}{% else %}student__first_name{% endif %}">
+                Student
+                {% if request.GET.sort == 'student__first_name' or request.GET.sort == '-student__first_name' %}
+                    {% if request.GET.sort|slice:":1" != '-' %}
+                        <span>▲</span>
+                    {% else %}
+                        <span>▼</span> 
+                    {% endif %}
+                {% endif %}
+            </a>
+        </th>
+        <th>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' and key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if request.GET.sort == 'knowledge_area' %}{% if request.GET.sort|slice:":1" == '-' %}knowledge_area{% else %}-knowledge_area{% endif %}{% else %}knowledge_area{% endif %}">
+                Requested Area
+                {% if request.GET.sort == 'knowledge_area' or request.GET.sort == '-knowledge_area' %}
+                    {% if request.GET.sort|slice:":1" != '-' %}
+                        <span>▲</span>
+                    {% else %}
+                        <span>▼</span>
+                    {% endif %}
+                {% endif %}
+            </a>
+        </th>
         <th>Venue Preference</th>
         <th>On time?</th>
         <th>Status</th>
