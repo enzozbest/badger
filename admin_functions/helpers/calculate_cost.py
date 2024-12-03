@@ -35,3 +35,5 @@ def calculate_num_lessons(frequency: str) -> int:
             return 30
         case "Fortnightly":
             return 7
+        case _:
+            return -1

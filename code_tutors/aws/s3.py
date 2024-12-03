@@ -35,10 +35,7 @@ def _delete(key: str, bucket: str = BUCKET, credentials: dict[str, str] = None) 
     """
     credentials = _get_credentials() if not credentials else credentials
     s3_client = get_client('s3', credentials=credentials) if credentials else None
-    try:
-        s3_client.delete_object(Bucket=bucket, Key=key)
-    except Exception as e:
-        print(f'Error deleting file: {e}')
+    s3_client.delete_object(Bucket=bucket, Key=key)
 
 
 def generate_access_url(key: str, bucket: str = BUCKET, expiration: int = 3600,
@@ -52,11 +49,8 @@ def generate_access_url(key: str, bucket: str = BUCKET, expiration: int = 3600,
     """
     credentials = _get_credentials() if not credentials else credentials
     s3_client = get_client('s3', credentials=credentials) if credentials else None
-    try:
-        return s3_client.generate_presigned_url('get_object', Params={'Bucket': bucket, 'Key': key},
-                                                ExpiresIn=expiration)
-    except Exception as e:
-        print(f'Error generating pre-signed URL: {e}')
+    return s3_client.generate_presigned_url('get_object', Params={'Bucket': bucket, 'Key': key},
+                                            ExpiresIn=expiration)
 
 
 def _get_credentials() -> dict[str, str]:

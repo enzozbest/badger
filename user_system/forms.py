@@ -43,14 +43,14 @@ class UserForm(forms.ModelForm):
             self.fields['hourly_rate'].widget.attrs['placeholder'] = 'Enter your hourly rate e.g., 22.50'
             self.fields['hourly_rate'].required = False
 
-            # Display maximum hourly rate only for students
-            if self.instance.user_type != User.ACCOUNT_TYPE_STUDENT:
-                self.fields.pop('student_max_rate', None)
-            else:
-                self.fields['student_max_rate'].label = 'Maximum Hourly Rate (in £)'
-                self.fields['student_max_rate'].widget.attrs['placeholder'] = ('Enter your the maximum hourly '
-                                                                               'rate you are willing to pay, e.g., 22.50')
-                self.fields['student_max_rate'].required = False
+        # Display set maximum hourly rate only for students
+        if self.instance.user_type != User.ACCOUNT_TYPE_STUDENT:
+            self.fields.pop('student_max_rate', None)
+        else:
+            self.fields['student_max_rate'].label = 'Maximum Hourly Rate (in £)'
+            self.fields['student_max_rate'].widget.attrs['placeholder'] = ('Enter your the maximum hourly '
+                                                                           'rate you are willing to pay, e.g., 22.50')
+            self.fields['student_max_rate'].required = False
 
     # Validates hourly rate to make sure it is 0 or positive
     def clean_hourly_rate(self):
@@ -60,7 +60,7 @@ class UserForm(forms.ModelForm):
         return hourly_rate
 
     # Validates the maximum hourly rate set by a student to make sure it is 0 or positive
-    def clean_student_max_hourly_rate(self):
+    def clean_student_max_rate(self):
         student_max_rate = self.cleaned_data.get('student_max_rate')
         if student_max_rate is not None and student_max_rate <= 0:
             raise forms.ValidationError('Student max hourly rate must be a positive number!')

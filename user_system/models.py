@@ -38,9 +38,9 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
     availability = models.ManyToManyField(Day, blank=False, default=None)
-    hourly_rate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, default=10.0,
+    hourly_rate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, default=0.00,
                                       help_text="Enter your hourly rate in GBP.")
-    student_max_rate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, default=10.0,
+    student_max_rate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, default=0.00,
                                            help_text="Enter the maximum hourly rate you are willing to pay, in GBP.")
     models.pk = email
 
@@ -58,7 +58,7 @@ class User(AbstractUser):
 
     @property
     def full_name(self):
-        return "%s %s" % (self.first_name, self.last_name)
+        return f'{self.first_name} {self.last_name}'
 
     def __str__(self):
         return (f'Username: {self.username} \n'
@@ -72,10 +72,6 @@ class User(AbstractUser):
         """Model options."""
 
         ordering = ['last_name', 'first_name']
-
-    def full_name(self):
-        """Return a string containing the user's full name."""
-        return f'{self.first_name} {self.last_name}'
 
     def gravatar(self, size=120):
         """Return a URL to the user's gravatar."""

@@ -5,7 +5,7 @@ from django.shortcuts import reverse
 from django.test import TestCase, override_settings
 
 from invoicer.helpers.generate_invoice_id import generate_invoice_id
-from invoicer.models import get_latest_id_number
+from invoicer.models import Invoice, get_latest_id_number
 from request_handler.fixtures.create_test_requests import create_test_requests
 from request_handler.models import Request
 from user_system.fixtures.create_test_users import create_test_users
@@ -22,7 +22,9 @@ class TestViewInvoices(TestCase):
         self.path = f'{settings.INVOICE_OUTPUT_PATH}/{self.invoice_id}.pdf'
 
     def tearDown(self):
-        os.remove(self.path)
+        if os.path.exists(self.path):
+            os.remove(self.path)
+        super().tearDown()
 
     @override_settings(USE_AWS_S3=False)
     def test_student_can_view_their_invoices_local(self):
@@ -54,6 +56,19 @@ class TestViewInvoices(TestCase):
         self.client.force_login(user)
         response = self.client.get(f'{reverse("get_invoice", kwargs={"invoice_id": self.invoice_id})}')
         self.assertEqual(response.status_code, 403)
+
+    @override_settings(USE_AWS_S3=False)
+    def test_saving_existing_invoice_id_does_not_change_it(self):
+        self.generate_invoice()
+        invoice = Invoice.objects.get(invoice_id=self.invoice_id)
+        invoice.save()
+        self.assertEqual(invoice.invoice_id, self.invoice_id)
+
+    @override_settings(USE_AWS_S3=False)
+    def test_creating_new_invoice_stores_correct_id(self):
+        invoice = Invoice.objects.create(student=self.student,
+                                         total=0.0)
+        self.assertEqual(invoice.invoice_id, self.invoice_id)
 
     def assert_correct_retrieval(self, response):
         self.assertEqual(response.status_code, 200)
