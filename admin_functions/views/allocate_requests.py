@@ -59,7 +59,7 @@ class AllocateRequestView(LoginRequiredMixin, View):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
         if not request.user.is_admin:
-            return render(request, 'permission_denied.html', status=401)
+            return render(request, 'permission_denied.html', status=403)
         return super().dispatch(request, *args, **kwargs)
 
 

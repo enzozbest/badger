@@ -16,10 +16,9 @@ class Invoice(models.Model):
     payment_status = models.BooleanField(default=False, blank=True, null=False)
 
     def save(self, *args, **kwargs):
-        if self.invoice_id:
-            pass
-
-        self.invoice_id = generate_invoice_id(self.student, get_latest_id_number(self.student))
+        if not self.invoice_id:
+            self.invoice_id = generate_invoice_id(self.student, get_latest_id_number(self.student))
+            
         super(Invoice, self).save(*args, **kwargs)
 
 

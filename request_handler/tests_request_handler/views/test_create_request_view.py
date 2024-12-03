@@ -1,4 +1,5 @@
 from datetime import datetime
+from unittest.mock import patch
 
 from django.test import TestCase
 from django.urls import reverse
@@ -93,3 +94,18 @@ class TestViews(TestCase):
         url = reverse('create_request')
         response = self.client.post(url, data, follow=True)
         self.assertRedirects(response, reverse('processing_late_request'), status_code=302, target_status_code=200)
+
+    @patch('request_handler.models.Request.save', side_effect=Exception("Database error"))
+    def test_post_handles_exception(self, mock_save):
+        self.client.force_login(self.student)
+        data = {
+            'knowledge_area': 'Python',
+            'term': 'May',
+            'frequency': 'Weekly',
+            'duration': '2',
+            'venue_preference': [self.online.id],
+        }
+        response = self.client.post(self.url, data)
+        self.assertContains(response, 'There was an error submitting this form! Database error')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'create_request.html')

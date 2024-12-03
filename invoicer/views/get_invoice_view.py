@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import FileResponse, HttpRequest, HttpResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.http import FileResponse, HttpRequest, HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 
 from code_tutors.aws import s3
 from invoicer.helpers.generate_invoice_id import generate_invoice_id
@@ -32,7 +32,7 @@ def get_invoice(http_request: HttpRequest, invoice_id: str) -> HttpResponse | Fi
     if settings.USE_AWS_S3:
         key = f'invoices/pdfs/{invoice.invoice_id}.pdf'
         url = s3.generate_access_url(key=key, expiration=60)
-        return redirect(url, permanent=True)
+        return HttpResponseRedirect(url, content=url)
     else:
         return FileResponse(open(
             f'{settings.INVOICE_OUTPUT_PATH}/{generate_invoice_id(invoice.student, get_latest_id_number(invoice.student))}.pdf',

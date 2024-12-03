@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
@@ -33,9 +33,16 @@ class EditRequestView(LoginRequiredMixin, View):
         form = RequestForm(instance=request_instance)
         return form, request_instance
 
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
+    def dispatch(self, wsgi_request, *args, **kwargs):
+        if not wsgi_request.user.is_authenticated:
             return self.handle_no_permission()
-        if request.user.is_tutor:
-            return render(request, 'permission_denied.html', status=403)
-        return super().dispatch(request, *args, **kwargs)
+
+        pk = kwargs.get('pk') or wsgi_request.POST.get('pk') or wsgi_request.GET.get('pk')
+        try:
+            _, instance = self.get_form_and_instance(pk)
+            if wsgi_request.user.is_tutor or (
+                    wsgi_request.user.is_student and wsgi_request.user.id != instance.student.id):
+                return render(wsgi_request, 'permission_denied.html', status=403)
+        except Http404:
+            pass
+        return super().dispatch(wsgi_request, *args, **kwargs)

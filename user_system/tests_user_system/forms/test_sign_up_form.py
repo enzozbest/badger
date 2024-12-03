@@ -1,10 +1,11 @@
 """Unit tests_user_system of the sign up form."""
-from django.contrib.auth.hashers import check_password
 from django import forms
+from django.contrib.auth.hashers import check_password
 from django.test import TestCase
-from django.core.management import call_command
+
 from user_system.forms import SignUpForm
 from user_system.models import User
+
 
 class SignUpFormTestCase(TestCase):
     """Unit tests_user_system of the sign up form."""
@@ -74,7 +75,7 @@ class SignUpFormTestCase(TestCase):
         before_count = User.objects.count()
         form.save()
         after_count = User.objects.count()
-        self.assertEqual(after_count, before_count+1)
+        self.assertEqual(after_count, before_count + 1)
         user = User.objects.get(username='@janedoe')
         self.assertEqual(user.first_name, 'Jane')
         self.assertEqual(user.last_name, 'Doe')
