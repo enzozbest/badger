@@ -41,10 +41,9 @@ class CancelLessonsView(LoginRequiredMixin,View):
         recurring = request.GET.get("recurring")
         lesson = request.GET.get('lesson')
 
-
         #Check whether the day they are cancelling is at least two weeks away
-        day = date(int(year),int(month),int(day))
-        dayDatetime = datetime.combine(day, datetime.min.time())
+        new_day = date(int(year),int(month),int(day))
+        dayDatetime = datetime.combine(new_day, datetime.min.time())
         today = datetime.now()
         if (dayDatetime - today) >= timedelta(days=14):
             close_date = False
