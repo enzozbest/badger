@@ -13,7 +13,6 @@ def cancel_term(id,month):
     months = []
     match month:
         case "9"|"10"|"11"|"12":
-            print("winter")
             months = [9,10,11,12]
         case "1"|"2"|"3"|"4":
             months = [1,2,3,4]

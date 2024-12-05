@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from user_system.models import User
-
+    
 class ViewAllUsersTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', email='test@test.com', password='Password123', user_type='Admin')
