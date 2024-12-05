@@ -4,6 +4,12 @@ from user_system.models import User
 from calendar_scheduler.models import Booking
 from datetime import datetime, timedelta, date
 
+""" Class to represent the cancelling of lessons
+
+This class is used as a view for the website. It creates multiple bookings and attempts to delete them in multiple ways
+and by multiple users, as the functionality works in the cancel_lessons view.
+"""
+
 class CancelLessonsViewTests(TestCase):
     def setUp(self):
         # Create users
@@ -168,15 +174,15 @@ class CancelLessonsViewTests(TestCase):
         recurring_lessons = Booking.objects.filter(lesson_identifier="4")
         self.assertEqual(len(recurring_lessons), 0)
 
-    # Test that an admin can not cancel a lesson from the tutor/student calendar.
+    # Test that an admin can cancel lessons from the tutor/student calendar.
     def test_permission_denied_for_non_student_or_tutor(self):
         admin = User.objects.create_user(username="@admin", password="Password123", email="admin@example.com")
         admin = User.objects.get(user_type=User.ACCOUNT_TYPE_ADMIN)
 
-        # Log in as admin (who shouldn't have access to this view)
+        # Log in as admin (who should have access to this view)
         self.client.login(username="@admin", password="Password123")
         response = self.client.get(reverse('tutor_cancel_lessons'),
                                    {'day': 3, 'month': 12, 'year': 2024, 'lesson': '1'})
 
-        self.assertTemplateUsed(response, 'permission_denied.html')
-        self.assertEqual(response.status_code, 401)
+        self.assertTemplateUsed(response, 'student_cancel_lessons.html')
+        self.assertEqual(response.status_code, 200)

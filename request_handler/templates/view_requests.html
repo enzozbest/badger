@@ -23,6 +23,8 @@
                 <th>ID</th>
                 <th>Student</th>
                 <th>Requested Area</th>
+                <th>Term</th>
+                <th>Recurring?</th>
                 <th>Venue Preference</th>
                 <th>On time?</th>
                 <th>Status</th>
@@ -40,6 +42,13 @@
                         </ol>
                     </td>
                     <td>{{ request.knowledge_area }}</td>
+                    <td>{{ request.term }}</td>
+                    <td>{% if request.is_recurring %}
+                            Yes
+                        {% else %}
+                            No
+                        {% endif %}
+                    </td>
                     <td>
                         <ul>
                             {% for venue in request.venue_preference.all %}

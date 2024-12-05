@@ -25,6 +25,7 @@
                 <th>Last name</th>
                 <th>Account type</th>
                 <th>Actions</th>
+                <th>Timetable</th>
             </tr>
         </thead>
         <tbody>
@@ -37,6 +38,13 @@
                     <td>{% if user.user_type != 'Admin' %}
                             <a href="{% url 'make_admin' user.id %}">Make Administrator</a>
                         {% endif %}
+                    </td>
+                    <td>
+                    {% if user.user_type == 'Tutor' %}
+                        <a href="{% url 'tutor_calendar' %}">View Tutor Calendar</a>
+                    {% elif user.user_type == 'Student' %}
+                        <a href="{% url 'student_calendar' %}">View Student Calendar</a>
+                    {% endif %}
                     </td>
                 </tr>
             {% empty %}

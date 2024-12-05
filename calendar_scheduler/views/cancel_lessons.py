@@ -5,7 +5,6 @@ from django.shortcuts import render, redirect
 from calendar_scheduler.models import Booking
 from datetime import date, datetime, timedelta
 
-
 def cancel_day(id,day):
     lesson = Booking.objects.get(lesson_identifier=id, date=day)
     lesson.delete()
@@ -33,8 +32,8 @@ def cancel_recurring(id):
 
 class CancelLessonsView(LoginRequiredMixin,View):
     def get(self, request: HttpRequest) -> HttpResponse:
-        if not(request.user.is_tutor or request.user.is_student):
-            return render(request, 'permission_denied.html', status=401)
+        #if not(request.user.is_tutor or request.user.is_student):
+        #    return render(request, 'permission_denied.html', status=401)
         day = request.GET.get("day")
         month = request.GET.get("month")
         year = request.GET.get("year")
@@ -62,10 +61,10 @@ class CancelLessonsView(LoginRequiredMixin,View):
         lesson_id = request.POST.get("lesson")
         cancellation = request.POST.get("cancellation")
 
-        #Delete lessons from the database, according to whether the user only wants to delete:
-        #The lesson for that specific day
-        #The lessons for that term
-        #All lessons if it's a recurring request
+        # Delete lessons from the database, according to whether the user only wants to delete:
+        # The lesson for that specific day
+        # The lessons for that term
+        # All lessons if it's a recurring request
         match cancellation:
             case "day":
                 day = date(int(year),int(month),int(day))

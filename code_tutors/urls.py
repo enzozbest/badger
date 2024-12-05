@@ -18,6 +18,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
+
+#from calendar_scheduler.views.calendar import AdminCalendarView
 from user_system import views as tutorial_views
 from request_handler.views import create_request as create_request_view, small_views as request_handler_views
 from request_handler.views import show_all_requests as view_requests_view
@@ -65,7 +67,8 @@ urlpatterns = [
     path('tutor/calendar/', calendar_view.TutorCalendarView.as_view(), name='tutor_calendar'),
     path('student/calendar/', calendar_view.StudentCalendarView.as_view(),name='student_calendar'),
     path('tutor/calendar/cancel/', cancel_lessons_view.CancelLessonsView.as_view(), name='tutor_cancel_lessons'),
-    path('student/calendar/cancel/', cancel_lessons_view.CancelLessonsView.as_view(),name='student_cancel_lessons')
+    path('student/calendar/cancel/', cancel_lessons_view.CancelLessonsView.as_view(),name='student_cancel_lessons'),
+    #path('admin/calendar/<int:user_id>/', AdminCalendarView.as_view(), name='admin_calendar'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

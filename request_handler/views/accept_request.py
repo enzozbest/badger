@@ -1,3 +1,4 @@
+import logging
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -6,12 +7,14 @@ from request_handler.models import Request
 from calendar_scheduler.models import Booking
 from django.db.models import Max
 
+logger = logging.getLogger(__name__)
+
 def get_first_weekday(year, month, day):
         """
         Get the first occurrence of a specific weekday in a given month.
 
         Weekday parameter is the day that we would like the first of as an Int
-        
+
         Returns a date object for the first occurrence of the specified weekday
         """
         # Start with the first day of the month
@@ -32,7 +35,7 @@ class AcceptRequestView(LoginRequiredMixin, View):
         current_year = today.year
         current_month = today.month
         first_term = lesson_request.term
-        
+
         match first_term:
             case "September":
                 booking_date = get_first_weekday(current_year,9,lesson_request.day)
@@ -53,15 +56,15 @@ class AcceptRequestView(LoginRequiredMixin, View):
                 sessions = 30
             case "Fortnightly":
                 sessions = 7
-        
-        #Retrieves the lesson_identifier of the last group of bookings
+
+        # Retrieves the lesson_identifier of the last group of bookings
         last_identifier = Booking.objects.aggregate(Max('lesson_identifier'))['lesson_identifier__max']
         if last_identifier == None:
             new_identifier = 1
         else:
             new_identifier = last_identifier + 1
-        
-        #Now add each of the sessions, starting with the booking_date
+
+        # Now add each of the sessions, starting with the booking_date
         for i in range(0,sessions):
             try:
                 # Create a new Booking object based on the allocated request
@@ -91,9 +94,9 @@ class AcceptRequestView(LoginRequiredMixin, View):
                         booking_date += timedelta(days=14)
 
             except Exception as e:
-                print(f"Error creating booking: {e}")
-            
+                logger.error(f"Error creating booking: {e}")
+                return redirect('view_requests')
+
         lesson_request.delete()
         return redirect('view_requests')
 
-    

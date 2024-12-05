@@ -38,13 +38,13 @@ class CalendarHelperTests(TestCase):
         self.assertEqual(week_days[0], today - timedelta(days=today.weekday()))  # Start of the week
 
 class CalendarViewTests(TestCase):
-    @classmethod
-    def setUpTestData(self):
+    def setUp(self):
         # Create users
         from user_system.fixtures import create_test_users
         create_test_users.create_test_user()
         self.tutor = User.objects.get(user_type=User.ACCOUNT_TYPE_TUTOR)
         self.student = User.objects.get(user_type=User.ACCOUNT_TYPE_STUDENT)
+        self.admin = User.objects.create_user(username="@admin", password="Password123", email="admin@example.com", user_type=User.ACCOUNT_TYPE_ADMIN)
 
         # Ensure the slug doesn't already exist
         self.calendar, created = Calendar.objects.get_or_create(
@@ -122,3 +122,29 @@ class CalendarViewTests(TestCase):
         Calendar.objects.filter(slug='tutor').delete()
         response = self.client.get(reverse('student_calendar'))
         self.assertEqual(response.status_code, 404)
+
+    # Test that the admin can see the calendar.
+    def test_admin_calendar_view_access(self):
+        self.client.login(username="@admin", password='Password123')
+        response = self.client.get(reverse('student_calendar'))  # Adjust the name to match your URL pattern
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'student_calendar.html')
+        self.assertContains(response, self.booking_student.lesson_identifier)  # Verify booking appears in the calendar
+
+    # Test if that calendar is not found for admin users.
+    def test_calendar_not_found_admin(self):
+        self.client.login(username="@admin", password='Password123')
+        Calendar.objects.filter(slug='tutor').delete()
+        response = self.client.get(reverse('student_calendar'))
+        self.assertEqual(response.status_code, 404)
+
+    # Test that the admin can see all lessons in the calendar. DONT WANT IT LIKE THIS ANYMORE, WANT INDIVIDUAL CALENDARS
+    def test_admin_calendar_view_all_events(self):
+        self.client.login(username=self.admin.username, password='Password123')
+        # Simulate viewing the calendar for today
+        response = self.client.get(reverse('tutor_calendar'), {'year': 2024, 'month': 12, 'day': date.today().day})
+        self.assertEqual(response.status_code, 200)
+        # Check if bookings are present in the response
+        self.assertContains(response, self.booking_tutor.lesson_identifier)
+        self.assertContains(response, self.booking_student.lesson_identifier)
+        self.assertTemplateUsed(response, 'tutor_calendar.html')
