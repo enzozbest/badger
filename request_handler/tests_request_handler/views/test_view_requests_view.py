@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.forms.models import model_to_dict
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
@@ -176,7 +178,8 @@ class viewRequestsTest(TestCase):
         self.assertQuerysetEqual(response.context['requests'],
                                  Request.objects.filter(student=User.objects.get(user_type='Student')).all())
 
-    def test_get_queryset_with_invalid_filterset(self):
+    @patch('request_handler.views.show_all_requests.RequestFilter.is_valid', return_value=False)
+    def test_get_queryset_with_invalid_filterset(self, mock_is_valid):
         factory = RequestFactory()
         request = factory.get(reverse('view_requests'), {'invalid_filter': 'value'})
         request.user = self.student
