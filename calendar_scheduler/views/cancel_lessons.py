@@ -31,32 +31,7 @@ def cancel_recurring(id):
     for i in lesson:
         i.delete()
 
-class CancelLessonsView(LoginRequiredMixin,View):
-    def get(self, request: HttpRequest) -> HttpResponse:
-        if not(request.user.is_tutor or request.user.is_student):
-            return render(request, 'permission_denied.html', status=401)
-        day = request.GET.get("day")
-        month = request.GET.get("month")
-        year = request.GET.get("year")
-        recurring = request.GET.get("recurring")
-        lesson = request.GET.get('lesson')
-
-
-        #Check whether the day they are cancelling is at least two weeks away
-        day = date(int(year),int(month),int(day))
-        dayDatetime = datetime.combine(day, datetime.min.time())
-        today = datetime.now()
-        if (dayDatetime - today) >= timedelta(days=14):
-            close_date = False
-        else:
-            close_date = True
-        context = {"day":day, "month":month, "year":year, "recurring":recurring, "lesson":lesson, "close_date": close_date}
-        if request.user.is_tutor:
-            return render(request,'tutor_cancel_lessons.html',context)
-        else:
-            return render(request,'student_cancel_lessons.html',context)
-    
-    def post(self, request: HttpRequest) -> HttpResponse:
+def student_tutor_cancel(request,):
         day = request.POST.get("day")
         month = request.POST.get("month")
         year = request.POST.get("year")
@@ -75,8 +50,62 @@ class CancelLessonsView(LoginRequiredMixin,View):
                 cancel_term(lesson_id,month)
             case "recurring":
                 cancel_recurring(lesson_id)
+            case "request":
+                #Set the cancellation_requested field to true
+                day = date(int(year),int(month),int(day))
+                lesson = Booking.objects.get(lesson_identifier=lesson_id, date=day)
+                lesson.cancellation_requested = True
+                lesson.save()
+        
+        return
 
-        if request.user.is_student:
-            return redirect('student_calendar')
+class CancelLessonsView(LoginRequiredMixin,View):
+    def get(self, request: HttpRequest) -> HttpResponse:
+        user_type = request.user.user_type
+        if user_type != 'Student' and user_type != "Tutor":
+            return render(request, 'permission_denied.html', status=401)
+        day = request.GET.get("day")
+        month = request.GET.get("month")
+        year = request.GET.get("year")
+        recurring = request.GET.get("recurring")
+        lesson = request.GET.get('lesson')
+
+
+        #Check whether the day they are cancelling is at least two weeks away
+        daytoCancel = date(int(year),int(month),int(day))
+        dayDatetime = datetime.combine(daytoCancel, datetime.min.time())
+        today = datetime.now()
+        if (dayDatetime - today) >= timedelta(days=14):
+            close_date = False
         else:
-            return redirect('tutor_calendar')
+            close_date = True
+        context = {"day":day, "month":month, "year":year, "recurring":recurring, "lesson":lesson, "close_date": close_date}
+        if request.user.is_tutor:
+            return render(request,'tutor_cancel_lessons.html',context)
+        elif request.user.is_student:
+            return render(request,'student_cancel_lessons.html',context)
+    
+    def post(self, request: HttpRequest) -> HttpResponse:
+        if request.user.is_student or request.user.is_tutor:
+            student_tutor_cancel(request)
+
+            if request.user.is_student:
+                return redirect('student_calendar')
+            else:
+                return redirect('tutor_calendar')
+        elif request.user.user_type == "Admin" and request.POST.get('cancellation')=="accept":
+            lesson_id = request.POST.get("lesson")
+            lesson = Booking.objects.get(id=lesson_id)
+            lesson.delete()
+            #Return to admin view cancellation requests
+            return redirect('view_cancellation_requests')
+        elif request.user.user_type == "Admin" and request.POST.get('cancellation')=="reject":
+            #Just delete the cancellation request, i.e. change the cancellation_requested field to false
+            lesson_id = request.POST.get("lesson")
+            lesson = Booking.objects.get(id=lesson_id)
+            lesson.cancellation_requested = False
+            lesson.save()
+
+            #Return to admin view cancellation requests
+            return redirect('view_cancellation_requests')
+    

@@ -27,6 +27,7 @@ from admin_functions.views import view_all_users as view_all_users_view
 from admin_functions.views import small_views as small_views_view
 from admin_functions.views import make_user_admin as make_user_admin_view
 from admin_functions.views import allocate_requests as allocate_requests_view
+from admin_functions.views import view_cancellation_requests as cancellation_request_view
 from invoicer.views.generate_invoice_view import generate_invoice_for_request
 from invoicer.views.get_invoice_view import get_invoice
 from invoicer.views.set_payment_status_view import set_payment_status
@@ -65,7 +66,9 @@ urlpatterns = [
     path('tutor/calendar/', calendar_view.TutorCalendarView.as_view(), name='tutor_calendar'),
     path('student/calendar/', calendar_view.StudentCalendarView.as_view(),name='student_calendar'),
     path('tutor/calendar/cancel/', cancel_lessons_view.CancelLessonsView.as_view(), name='tutor_cancel_lessons'),
-    path('student/calendar/cancel/', cancel_lessons_view.CancelLessonsView.as_view(),name='student_cancel_lessons')
+    path('student/calendar/cancel/', cancel_lessons_view.CancelLessonsView.as_view(),name='student_cancel_lessons'),
+    path('admins/cancel/',cancel_lessons_view.CancelLessonsView.as_view(),name='admin_cancel_lessons'),
+    path('admins/cancellation_requests/', cancellation_request_view.ViewCancellationRequests.as_view(),name='view_cancellation_requests')
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

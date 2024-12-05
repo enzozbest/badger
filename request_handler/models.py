@@ -79,3 +79,4 @@ class Request(models.Model):
         super().clean()
         if self.pk and not self.venue_preference.exists():
             raise ValidationError({"venue_preference": "No venue preference set!"})
+        

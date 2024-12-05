@@ -25,7 +25,9 @@ class Booking(models.Model):
     title = models.CharField(max_length=255,null=False, default="Tutor session")
     start = models.DateTimeField(null=False, blank=False, default=datetime.datetime(1900, 1, 1, 12, 0)) #Default is 12pm
     end = models.DateTimeField(null=False, blank=False, default=datetime.datetime(1900, 1, 1, 12, 0)) #Default is 12pm
+    cancellation_requested = models.BooleanField(blank=False,default=False)
 
 
     def __str__(self):
         return f"{self.student} -> {self.tutor} ({self.day}) {self.date}"
+    
