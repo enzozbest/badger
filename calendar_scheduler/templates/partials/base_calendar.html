@@ -38,6 +38,7 @@
                                                 <li>{{ i.duration }}</li>
                                                 <li>{{ i.venue }}</li>
                                                 <li>Recurring: {{ i.is_recurring }}</li>
+                                                <li>{{ i.cancellation_requested }}</li>
                                                 <!-- Form to submit lesson cancellation -->
                                                 <form method="GET" action="{% block calendar_action %}{% endblock %}">
                                                     {% csrf_token %}
