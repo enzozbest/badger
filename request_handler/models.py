@@ -39,6 +39,8 @@ class Request(models.Model):
     day = models.ForeignKey(Day, null=True, blank=True, on_delete=models.SET_NULL, related_name='allocated_day')
     venue = models.ForeignKey(Venue, null=True, blank=True, on_delete=models.SET_NULL, related_name='allocated_venue')
     invoice = models.ForeignKey(Invoice, null=True, blank=True, on_delete=models.SET_NULL, related_name='request_invoice')
+    rejected_request = models.BooleanField(default=False)
+    rejection_reason = models.TextField(blank=True, null=True)
 
     @property
     def student_email(self):

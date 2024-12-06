@@ -26,6 +26,8 @@
                 <th>Term</th>
                 <th>Recurring?</th>
                 <th>Venue Preference</th>
+                <th>Rejected?</th>
+                <th>Rejection Reason</th>
                 <th>On time?</th>
                 <th>Status</th>
                 <th>Action</th>
@@ -33,7 +35,7 @@
         </thead>
         <tbody>
             {% for request in requests %}
-                <tr>
+                <td>
                     <td>{{ request.id }}</td>
                     <td>
                         <ol>
@@ -58,6 +60,15 @@
                             {% endfor %}
                         </ul>
                     </td>
+                    <td>{{ request.rejected_request }}</td>
+                    <td>
+                    {% if request.rejected_request %}
+                    {{ request.rejection_reason }}
+                        {% else %}
+                        N/A
+                    {% endif %}
+                    </td>
+                    
                     <td>
                         {% if request.late %}
                         <li>Late request</li>
@@ -76,11 +87,20 @@
                         <ul>
                             {% if not request.allocated %}
                                 {% if user.user_type != 'Tutor' %}
+                                    {% if not request.rejected_request %}
                                     <li> <a href="{% url 'edit_request' request.id %}">Update</a> </li>
+                                    {% endif %}
                                     <li> <a href="{% url 'delete_request' request.id%}">Delete</a> </li>
                                 {% endif %}
                                 {% if user.user_type == 'Admin'%}
                                     <li> <a href="{% url 'allocate_request' request.id%}">Allocate</a> </li>
+                                    {% if not request.rejected_request %}
+                                    <li>
+                                        <form action="{% url 'reject_request' request.id %}" method="POST">
+                                        {% csrf_token %}
+                                        <button type="submit">Reject</button>
+                                        </form>
+                                    {% endif %}
                                 {% endif %}
                             {% else %}
 

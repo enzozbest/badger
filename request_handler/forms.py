@@ -55,3 +55,6 @@ class RequestForm(forms.ModelForm):
         fields = ['knowledge_area', 'term', 'frequency', 'duration', 'venue_preference', 'is_recurring']
 
 
+class RejectRequestForm(forms.Form):
+    reason = forms.CharField(widget=forms.Textarea, label='Reason for rejection:')
+
