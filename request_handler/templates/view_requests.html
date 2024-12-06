@@ -1,36 +1,85 @@
 {% extends 'base_content.html' %}
 {% load static %}
 {% block content %}
-<div class="container mt-5">
-    <h1 class="display-5 text-white">Tutoring Requests</h1>
-    <p class="text-white">Showing {{ count }} out of {{ total }} requests:</p>
-    <div class="mb-3">
-        <a href="{% url 'dashboard' %}" class="text-decoration-none text-success">Go to Dashboard</a>
+<div class="container">
+    <!-- Title and Button Row -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="display-5 text-white">Tutoring Requests</h1>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-success">Go to Dashboard</a>
     </div>
-    
+
+    <!-- Filter Form -->
     <form method="get" class="bg-dark text-white p-3 rounded mb-4">
-        {{ filter.form.as_p }}
-        <button type="submit" class="btn btn-outline-light btn-sm">Filter</button>
+        <p class="text-white">Showing {{ count }} out of {{ total }} requests:</p>
+        <div class="d-flex justify-content-start align-items-center mb-4">
+            <!-- Allocation Status Dropdown -->
+            <div class="me-2">
+                <select 
+                    name="allocated" 
+                    class="form-select form-select-sm">
+                    <option value="">All</option>
+                    <option value="true" {% if request.GET.allocated == "true" %}selected{% endif %}>Allocated</option>
+                    <option value="false" {% if request.GET.allocated == "false" %}selected{% endif %}>Unallocated</option>
+                </select>
+            </div>
+
+            <!-- Search Input -->
+            <div class="flex-grow-1 me-2">
+                <input 
+                    type="text" 
+                    name="search" 
+                    class="form-control form-control-sm" 
+                    placeholder="Search requests..." 
+                    value="{{ request.GET.search }}">
+            </div>
+
+            <!-- Filter Button -->
+            <div>
+                <button type="submit" class="btn btn-outline-light btn-sm">Filter</button>
+            </div>
+        </div>
     </form>
 
     {% if requests %}
         <div class="row row-cols-1 row-cols-md-4 g-4">
             {% for request in requests %}
-                <div class="col">
-                    <div class="card h-100 bg-dark text-white rounded-3 shadow-sm">
+                <div class="col" style="max-width: 18rem;"> <!-- Adjust the width here -->
+                    <div class="card h-100 bg-dark text-white rounded-3 shadow-sm border">
                         <div class="card-body">
-                            <p>
-                                <strong>Student:</strong> {{ request.student.first_name }} {{ request.student.last_name }}<br>
-                                <strong>Email:</strong> {{ request.student.email }}<br>
-                                <strong>Requested Area:</strong> {{ request.knowledge_area }}<br>
-                                <strong>Venue Preference:</strong>
-                                <ul class="list-unstyled">
+                            <!-- Requested Area -->
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-book fa-lg me-3"></i>
+                                <strong>{{ request.knowledge_area }}</strong>
+                            </div>
+
+                            <hr class="text-white my-2">
+
+                            <!-- Student Information -->
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-user fa-lg me-3"></i>
+                                <div>
+                                    <p class="mb-0">{{ request.student.first_name }} {{ request.student.last_name }}</p>
+                                    <small class="text-muted">{{ request.student.email | lower }}</small>
+                                </div>
+                            </div>
+
+
+                            <!-- Venue Preference -->
+                            <div class="d-flex align-items-start mb-3">
+                                <i class="fas fa-map-marker-alt fa-lg me-3" style="margin-top: 3px;"></i>
+                                <ul class="list-unstyled mb-0">
                                     {% for venue in request.venue_preference.all %}
                                         <li>{{ venue }}</li>
                                     {% empty %}
-                                        <li>No Venue Preference</li>
+                                        <li>No Preference</li>
                                     {% endfor %}
                                 </ul>
+                            </div>
+
+                            
+
+                            <!-- Status -->
+                            <p>
                                 <strong>Status:</strong> 
                                 {% if request.allocated %}
                                     Allocated to {{ request.tutor_name }}
@@ -40,12 +89,19 @@
                             </p>
                         </div>
                         <div class="card-footer">
-                            {% if user.user_type == 'Admin' %}
-                                <a href="{% url 'allocate_request' request.id %}" class="btn btn-warning btn-sm">Allocate</a>
-                            {% endif %}
-                            <a href="{% url 'edit_request' request.id %}" class="btn btn-info btn-sm">Update</a>
-                            <a href="{% url 'delete_request' request.id %}" class="btn btn-danger btn-sm">Delete</a>
+                            <div class="d-flex justify-content-center gap-2">
+                                {% if user.user_type == 'Admin' %}
+                                    <a href="{% url 'allocate_request' request.id %}" class="btn btn-outline-warning btn-sm">Allocate</a>
+                                {% endif %}
+                                <a href="{% url 'edit_request' request.id %}" class="btn btn-outline-info btn-sm">Update</a>
+                                <form method="post" action="{% url 'confirm_delete_request' request.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                                </form>
+                            </div>
                         </div>
+                        
+                        
                     </div>
                 </div>
             {% endfor %}

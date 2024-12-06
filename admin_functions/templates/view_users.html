@@ -1,20 +1,53 @@
 {% extends 'base_content.html' %}
 {% block content %}
 <div class="container mt-5">
-    <h1 class="display-5 text-white">
-        Registered Users 
-    </h1>
+    <!-- Title and Button Row -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="display-5 text-white">
+            Registered Users
+        </h1>
+        <a href="{% url 'admin_dash' %}" class="btn btn-outline-success">Go to the Administrator Dashboard</a>
+    </div>
 
     <!-- Filter Form -->
     <form method="get" class="bg-dark text-white p-3 rounded mb-4">
-        <p class="text-white">Showing {{ count }} out of {{ total }} users:</p>
-    
-        <div class="mb-3">
-            <a href="{% url 'admin_dash' %}" class="btn-outline-success">Go to the Administrator Dashboard</a>
+        <p class="text-white">Showing {{ count }} out of {{ total }} users</p>
+        <div class="d-flex justify-content-start align-items-center mb-4">
+            <!-- User Type Dropdown -->
+            <div class="me-2">
+                <select 
+                    name="{{ filter.form.user_type.name }}" 
+                    id="{{ filter.form.user_type.id_for_label }}" 
+                    class="form-select form-select-sm">
+                    {% for choice in filter.form.user_type.field.choices %}
+                        <option value="{{ choice.0 }}" {% if choice.0 == filter.form.user_type.value %}selected{% endif %}>
+                            {{ choice.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            
+            <!-- Search Input -->
+            <div class="flex-grow-1">
+                <label for="{{ filter.form.search.id_for_label }}" class="form-label d-none">
+                    {{ filter.form.search.label }}
+                </label>
+                <input 
+                    type="text" 
+                    name="{{ filter.form.search.name }}" 
+                    id="{{ filter.form.search.id_for_label }}" 
+                    class="form-control form-control-sm" 
+                    placeholder="Search users..." 
+                    value="{{ request.GET.search }}">
+            </div>
+        
+            <!-- Filter Button -->
+            <div class="ms-2">
+                <button type="submit" class="btn btn-outline-light btn-sm">Filter</button>
+            </div>
         </div>
-
-        {{ filter.form.as_p }}
-        <button type="submit" class="btn btn-outline-light btn-sm">Filter</button>
+        
     </form>
 
     <!-- Users Table -->
