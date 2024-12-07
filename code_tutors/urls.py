@@ -70,5 +70,5 @@ urlpatterns = [
     path('admins/cancellation_requests/', cancellation_request_view.ViewCancellationRequests.as_view(),name='view_cancellation_requests')
     #path('admin/calendar/<int:user_id>/', AdminCalendarView.as_view(), name='admin_calendar'),
 
-
+]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
