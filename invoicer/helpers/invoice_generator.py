@@ -43,15 +43,27 @@ def generate_invoice(request_obj: Request) -> None:
     pdf.setFont("Helvetica-Bold", 16)
     pdf.drawString(150, height - 60, "Invoice")
 
-    # Add recipient details
+     # Recipient Information Section
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(20, height - 170, "Recipient Information:")
     pdf.setFont("Helvetica", 12)
-    pdf.drawString(20, height - 120, f"Recipient: {request_obj.student.full_name}")
-    pdf.drawString(20, height - 140, f"Tutor: {request_obj.tutor.full_name}")
+    pdf.drawString(40, height - 190, f"Recipient: {request_obj.student.full_name}")
+    pdf.drawString(40, height - 210, f"Tutor: {request_obj.tutor.full_name}")
+    pdf.drawString(40, height - 230, f"Tutor Email: {request_obj.tutor.email}")
 
-    # Add lesson details
-    pdf.drawString(20, height - 180, f"Hourly Rate: £{request_obj.tutor.hourly_rate:.2f}")
-    pdf.drawString(20, height - 200, f"Lessons Booked: {calculate_num_lessons(request_obj.frequency)}")
-    pdf.drawString(20, height - 220, f"Total Cost: £{invoice.total:.2f}")
+    # Lesson Details Section
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(20, height - 260, "Lesson Details:")
+    pdf.setFont("Helvetica", 12)
+    pdf.drawString(40, height - 280, f"Hourly Rate: £{request_obj.tutor.hourly_rate:.2f}")
+    pdf.drawString(40, height - 300, f"Lessons Booked: {calculate_num_lessons(request_obj.frequency)}")
+    pdf.drawString(40, height - 320, f"Total Cost: £{invoice.total:.2f}")
+
+    # Footer Section
+    pdf.setFont("Helvetica", 10)
+    pdf.setFillColorRGB(0.5, 0.5, 0.5)  # Light gray for footer text
+    pdf.drawCentredString(width / 2, 50, "Thank you for using our service!")
+    pdf.setFillColorRGB(0, 0, 0)  # Reset to black for remaining content
 
     # # Add payment information
     # pdf.setFont("Helvetica-Bold", 12)
