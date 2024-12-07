@@ -3,15 +3,17 @@ from decimal import Decimal
 
 from django import forms
 from django.test import TestCase
+
+from user_system.fixtures.create_test_users import create_test_users
 from user_system.forms import UserForm
 from user_system.models import User
+
 
 class UserFormTestCase(TestCase):
     """Unit tests_user_system of the user form."""
 
     def setUp(self):
-        from user_system.fixtures import create_test_users
-        create_test_users.create_test_user()
+        create_test_users()
         self.form_input = {
             'first_name': 'Enzo',
             'last_name': 'Bestetti',
@@ -24,7 +26,7 @@ class UserFormTestCase(TestCase):
         self.student_user = User.objects.get(
             user_type=User.ACCOUNT_TYPE_STUDENT,
         )
-        self.client.login(username=self.tutor_user.username, password=self.tutor_user._password)
+        self.client.force_login(self.tutor_user)
 
     def test_form_has_necessary_fields(self):
         form = UserForm()
@@ -61,6 +63,11 @@ class UserFormTestCase(TestCase):
         form = UserForm(instance=self.tutor_user)
         self.assertIn('hourly_rate', form.fields)
         self.assertEqual(form.fields['hourly_rate'].widget.attrs['placeholder'], "Enter your hourly rate e.g., 22.50")
+
+    def test_hourly_rate_field_not_visible_to_students(self):
+        self.client.force_login(self.student_user)
+        form = UserForm(instance=self.student_user)
+        self.assertNotIn('hourly_rate', form.fields)
 
     def test_hourly_rate_is_saved_correctly(self):
         data = {
@@ -100,4 +107,64 @@ class UserFormTestCase(TestCase):
             user_type=User.ACCOUNT_TYPE_TUTOR,
         )
         form = UserForm(instance=new_tutor)
-        self.assertEqual(form.instance.hourly_rate, None)
+        self.assertEqual(form.instance.hourly_rate, 0.00)
+
+    def test_only_students_can_set_maximum_hourly_rate(self):
+        self.client.force_login(self.student_user)
+        form = UserForm(instance=self.student_user)
+        self.assertIn('student_max_rate', form.fields)
+
+    def test_tutors_cannot_see_student_max_rate_field(self):
+        self.client.force_login(self.tutor_user)
+        form = UserForm(instance=self.tutor_user)
+        self.assertNotIn('student_max_rate', form.fields)
+
+    def test_admins_cannot_see_hourly_rate_or_max_rate_fields(self):
+        admin = User.objects.get(user_type='Admin')
+        self.client.force_login(admin)
+        form = UserForm(instance=admin)
+        self.assertNotIn('student_max_rate', form.fields)
+        self.assertNotIn('hourly_rate', form.fields)
+
+    def test_max_student_rate_is_saved_correctly(self):
+        data = {
+            'first_name': self.student_user.first_name,
+            'last_name': self.student_user.last_name,
+            'username': self.student_user.username,
+            'email': self.student_user.email,
+            'user_type': self.student_user.user_type,
+            'student_max_rate': Decimal('20.00'),
+        }
+        self.client.force_login(self.student_user)
+        form = UserForm(data=data, instance=self.student_user)
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(self.student_user.student_max_rate, Decimal('20.00'))
+
+    def test_student_max_rate_invalid_value(self):
+        data = {
+            'first_name': self.student_user.first_name,
+            'last_name': self.student_user.last_name,
+            'username': self.student_user.username,
+            'email': self.student_user.email,
+            'user_type': self.student_user.user_type,
+            'student_max_rate': -50
+        }
+        self.client.force_login(self.student_user)
+        form = UserForm(data=data, instance=self.student_user)
+        self.assertFalse(form.is_valid())
+        self.assertIn('student_max_rate', form.errors)
+        self.assertEqual(form.errors['student_max_rate'][0], "Student max hourly rate must be a positive number!")
+
+    def test_email_must_be_unique(self):
+        data = {
+            'first_name': self.tutor_user.first_name,
+            'last_name': self.tutor_user.last_name,
+            'username': self.tutor_user.username,
+            'email': self.student_user.email,
+            'user_type': self.tutor_user.user_type,
+        }
+        self.client.force_login(self.tutor_user)
+        form = UserForm(instance=self.tutor_user, data=data)
+        self.assertFalse(form.is_valid())
+        self.assertRaises(ValueError, form.save)

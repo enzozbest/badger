@@ -140,3 +140,44 @@ h3.profile-title {
   background-color: transparent; /* Match dark theme */
   border-top: none;
 }
+
+/* Card Enhancements */
+.card.shadow-lg {
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.5); /* Enhanced shadow for better depth */
+  border-radius: 10px; /* Smooth rounded corners */
+}
+
+/* Card Header */
+.card-header.bg-gradient-primary {
+  background: linear-gradient(90deg, #1e90ff, #0056b3); /* Blue gradient for header */
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  font-size: 1.5rem; /* Slightly larger header text */
+  font-weight: bold;
+}
+
+/* Buttons */
+.btn-success {
+  background-color: #28a745; /* Consistent success green */
+  border: none;
+  font-weight: 500;
+  padding: 10px 20px;
+  transition: all 0.3s ease;
+}
+.btn-success:hover {
+  background-color: #218838; /* Darker green on hover */
+  transform: scale(1.05); /* Subtle hover effect */
+}
+
+.btn-outline-light {
+  border: 2px solid #fff;
+  color: #fff;
+  font-weight: 500;
+  padding: 10px 20px;
+  transition: all 0.3s ease;
+}
+.btn-outline-light:hover {
+  background-color: #fff;
+  color: #000;
+  transform: scale(1.05);
+}

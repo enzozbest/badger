@@ -1,25 +1,26 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404, HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpRequest, HttpResponse
-from request_handler.models import Request
+
 from request_handler.forms import RequestForm
+from request_handler.models import Request
+
 
 class EditRequestView(LoginRequiredMixin, View):
+    """ Class-based view to represent editing a tutoring request's details."""
+
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
-        if request.user.is_tutor:
-            return render(request, 'permission_denied.html', status=401)
         form, request_instance = self.get_form_and_instance(pk)
         return render(request, 'edit_request.html', {'form': form, 'request_instance': request_instance})
 
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
-        if request.user.is_tutor:
-            return render(request, 'permission_denied.html', status=401)
         form, request_instance = self.get_form_and_instance(pk)
         form = RequestForm(request.POST, instance=request_instance)
 
         if not request.POST.getlist('venue_preference'):
             form.add_error('venue_preference', "No venue preference set!")
+
         if form.is_valid():
             request_instance = form.save(commit=False)
             request_instance.save()
@@ -31,3 +32,17 @@ class EditRequestView(LoginRequiredMixin, View):
         request_instance = get_object_or_404(Request, pk=pk)
         form = RequestForm(instance=request_instance)
         return form, request_instance
+
+    def dispatch(self, wsgi_request, *args, **kwargs):
+        if not wsgi_request.user.is_authenticated:
+            return self.handle_no_permission()
+
+        pk = kwargs.get('pk') or wsgi_request.POST.get('pk') or wsgi_request.GET.get('pk')
+        try:
+            _, instance = self.get_form_and_instance(pk)
+            if wsgi_request.user.is_tutor or (
+                    wsgi_request.user.is_student and wsgi_request.user.id != instance.student.id):
+                return render(wsgi_request, 'permission_denied.html', status=403)
+        except Http404:
+            pass
+        return super().dispatch(wsgi_request, *args, **kwargs)

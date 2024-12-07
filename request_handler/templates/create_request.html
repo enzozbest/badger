@@ -1,45 +1,44 @@
 {% extends 'base_content.html' %}
 {% block content %}
-<div class="container vh-90 d-flex justify-content-center align-items-center">
-  <div class="row w-100">
-    <div class="col-sm-12 col-md-8 offset-md-2">
-      <div class="card p-4 shadow-sm bg-dark text-white rounded-3">
-        <h2 class="text-center">Create a New Lesson Request</h2>
-        <p class="text-muted text-center mb-4">Please fill out the form below to submit your tutoring request.</p>
-        <form action="{% url 'create_request' %}" method="post" class="mt-4">
-          {% csrf_token %}
-          <!-- Knowledge Area Field -->
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <div class="form-group">
-                {{ form.knowledge_area.label_tag }}
-                {{ form.knowledge_area }}
-                {% if form.knowledge_area.errors %}
-                  <div class="text-danger">{{ form.knowledge_area.errors }}</div>
-                {% endif %}
-              </div>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg bg-dark text-white rounded-3">
+                <div class="card-header bg-gradient-primary text-white text-center">
+                    <h2>Create a Tutoring Request</h2>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted text-center">Fill in the details below to create a Tutoring Request:</p>
+
+                    <form action="" method="POST" class="needs-validation">
+                        {% csrf_token %}
+
+                        {% for field in form %}
+                            <div class="form-group mb-4">
+                                <label for="{{ field.id_for_label }}" class="form-label text-light">
+                                    {{ field.label }}
+                                    {% if field.field.required %}
+                                        <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                                {% endif %}
+                                {% if field.errors %}
+                                    <div class="text-danger mt-2">{{ field.errors|striptags }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-success btn-lg px-4">Submit Request</button>
+                            <a href="{% url 'view_requests' %}" class="btn btn-outline-light btn-lg px-4 ms-3">Cancel</a>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <!-- Term Field -->
-            <div class="col-md-6">
-              <div class="form-group">
-                {{ form.term.label_tag }}
-                {{ form.term }}
-                {% if form.term.errors %}
-                  <div class="text-danger">{{ form.term.errors }}</div>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-          <!-- Include Additional Fields -->
-          {% include 'partials/_request_form_fields.html' %}
-          <!-- Submit and Cancel Buttons -->
-          <div class="text-center mt-4">
-            <button type="submit" class="btn btn-success w-100">Submit Request</button>
-            <a href="{% url 'dashboard' %}" class="btn btn-outline-light w-100 mt-2">Cancel</a>
-          </div>
-        </form>
-      </div>
+        </div>
     </div>
-  </div>
 </div>
 {% endblock %}

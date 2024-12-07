@@ -1,18 +1,23 @@
 {% extends 'base_content.html' %}
+{% load static %}
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm bg-dark text-white rounded-3">
-                <div class="card-header bg-success text-white text-center">
-                    <h2>Request Successfully Created!</h2>
-                </div>
-                <div class="card-body text-center">
-                    <p class="text-muted">Your lesson request has been successfully submitted.</p>
-                    
-                    <div class="mt-4">
-                        <a href="{% url 'dashboard' %}" class="btn btn-primary me-2">Back to Dashboard</a>
-                        <a href="{% url 'create_request' %}" class="btn btn-outline-light">Create Another Request</a>
+<div class="container py-5 d-flex justify-content-center align-items-center">
+    <div class="row w-100 justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card bg-dark text-white shadow-lg rounded-4 border">
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>
+                    </div>
+                    <h5 class="card-title display-6 mb-3">Request Successfully Created!</h5>
+                    <p class="card-text fs-5 text-muted mb-4">Your lesson request has been successfully submitted.</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg d-flex align-items-center justify-content-center">
+                            <i class="bi bi-house-door me-2"></i>Dashboard
+                        </a>
+                        <a href="{% url 'create_request' %}" class="btn btn-outline-light btn-lg d-flex align-items-center justify-content-center">
+                            <i class="bi bi-plus-circle me-2"></i>New Request
+                        </a>
                     </div>
                 </div>
             </div>
