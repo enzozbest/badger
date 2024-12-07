@@ -39,6 +39,7 @@ class Request(models.Model):
     late = models.BooleanField(default=False, blank=False)
     is_recurring = models.BooleanField(default=False)
     day = models.ForeignKey(Day, null=True, blank=True, on_delete=models.SET_NULL, related_name='allocated_day')
+    day2 = models.ForeignKey(Day, null=True, blank=True, on_delete=models.SET_NULL, related_name='allocated_day2')
     venue = models.ForeignKey(Venue, null=True, blank=True, on_delete=models.SET_NULL, related_name='allocated_venue')
     invoice = models.ForeignKey(Invoice, null=True, blank=True, on_delete=models.SET_NULL,
                                 related_name='request_invoice')

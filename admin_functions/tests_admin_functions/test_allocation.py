@@ -1,9 +1,10 @@
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.test import TestCase
 from django.urls import reverse
 
 from admin_functions.helpers import calculate_cost
+from admin_functions.views.allocate_requests import get_suitable_tutors, get_venue_preference
 from request_handler.fixtures.create_test_requests import create_test_requests
 from request_handler.models import Request, Venue
 from user_system.fixtures.create_test_users import create_test_users
@@ -21,6 +22,7 @@ class TestAllocation(TestCase):
         self.unallocated_request = Request.objects.get(allocated=False)
         self.online = Venue.objects.get(venue='Online')
         self.tuesday = Day.objects.get(day='Tuesday')
+        self.wednesday = Day.objects.get(day='Wednesday')
 
     def test_allocated_request_exists(self):
         self.assertIsNotNone(self.allocated_request)
@@ -92,7 +94,8 @@ class TestAllocation(TestCase):
     def test_invalid_allocation_reloads_form(self):
         self.client.login(username=self.admin.username, password='Password123')
         response = self.client.post(reverse("allocate_request", args={self.unallocated_request.id}), data={
-            'tutor': 'AAAAAAAAAAA'
+            'tutor': 'AAAAAAAAAAA',
+            'day1': '10'
         })
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed("allocate_request.html")
@@ -128,6 +131,7 @@ class TestAllocation(TestCase):
 
     def test_biweekly_allocation_cost(self):
         self.set_request_frequency("Biweekly")
+        self.unallocated_request.day2 = self.wednesday
         self.allocate()
         self.unallocated_request.refresh_from_db()
         tutor = get_object_or_404(User, id=self.tutor.id)
@@ -152,6 +156,79 @@ class TestAllocation(TestCase):
         cost = calculate_cost.calculate_cost(tutor, self.unallocated_request.id)
         self.assertTrue(cost <= 0)
 
+    def test_first_get_method_displays_correct_form(self):
+        self.client.force_login(self.admin)
+        self.unallocated_request.frequency = 'Biweekly'
+        response = self.client.get(reverse('allocate_request', args={self.unallocated_request.id}))
+        self.assertTemplateUsed('allocate_request.html')
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerysetEqual(response.context['form'].fields['tutor'].queryset, [])
+
+    def test_post_request_missing_day1(self):
+        self.client.force_login(self.admin)
+        self.unallocated_request.frequency = 'Weekly'
+        self.unallocated_request.save()
+        response = self.client.post(reverse("allocate_request", args={self.unallocated_request.id}),
+                                    data={'tutor': self.tutor.id,
+                                          'venue': self.online.id
+                                          })
+        self.assertContains(response, "Missing required day1", status_code=400)
+        self.assertEqual(response.status_code, 400)
+
+    def test_biweekly_request_missing_day2(self):
+        self.set_request_frequency('Biweekly')
+        self.client.force_login(self.admin)
+        response = self.client.post(reverse("allocate_request", args={self.unallocated_request.id}),
+                                    data={'tutor': self.tutor.id,
+                                          'venue': self.online.id,
+                                          'day1': self.tuesday.id,
+                                          })
+        self.assertContains(response, "Missing required day2", status_code=400)
+        self.assertEqual(response.status_code, 400)
+
+    def test_post_form_without_tutor(self):
+        self.client.force_login(self.admin)
+        response = self.client.post(reverse("allocate_request", args={self.unallocated_request.id}),
+                                    data={'day1': self.tuesday.id,
+                                          })
+        self.assertContains(response, "Missing required tutor", status_code=400)
+        self.assertEqual(response.status_code, 400)
+
+    def test_post_form_without_venue(self):
+        self.client.force_login(self.admin)
+        response = self.client.post(reverse("allocate_request", args={self.unallocated_request.id}),
+                                    data={'day1': self.tuesday.id,
+                                          'tutor': self.tutor.id,
+                                          })
+        self.assertContains(response, "Missing required venue", status_code=400)
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_method_with_valid_parameters_results_in_a_form_with_tutors(self):
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse("allocate_request", args={self.unallocated_request.id}), data={
+            'day1': self.tuesday.id,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed("allocate_request.html")
+        self.assertTrue(response.context['form'].fields['tutor'].queryset.count(), 1)
+
+    def test_get_venue_preferences_works_with_no_preference(self):
+        queryset = Venue.objects.all()
+        result = get_venue_preference(queryset)
+        self.assertQuerysetEqual(result.order_by('id'), Venue.objects.exclude(venue='No Preference').order_by('id'))
+
+    def test_get_suitable_tutors_without_day1(self):
+        result = get_suitable_tutors(self.unallocated_request.id, None, None)
+        self.assertQuerysetEqual(result, [])
+
+    def test_get_suitable_tutors_without_day2_biweekly(self):
+        self.set_request_frequency('Biweekly')
+        result = get_suitable_tutors(self.unallocated_request.id, self.tuesday.id, None)
+        self.assertQuerysetEqual(result, [])
+
+    def test_get_suitable_tutors_raises_404_if_invalid_request_id(self):
+        self.assertRaises(Http404, get_suitable_tutors, -99, self.tuesday.id, self.wednesday.id)
+
     def set_request_frequency(self, frequency: str = ''):
         self.unallocated_request.frequency = frequency
         self.unallocated_request.save()
@@ -166,5 +243,6 @@ class TestAllocation(TestCase):
         return self.client.post(reverse("allocate_request", args={self.unallocated_request.id}), data={
             'tutor': self.tutor.id,
             'venue': str(self.online.id),
-            'day': self.tuesday.id
+            'day1': self.tuesday.id,
+            'day2': self.wednesday.id
         })
