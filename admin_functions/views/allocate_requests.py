@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ValidationError
 from django.db.models import Q, QuerySet
+from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
@@ -32,12 +32,10 @@ class AllocateRequestView(LoginRequiredMixin, View):
         venue = http_request.GET.get('venue', None)
         venues = get_venue_preference(lesson_request.venue_preference)
 
-        try:
-            day1 = int(day1) if day1 else None
-            day2 = int(day2) if day2 else None
-            venue_id = int(venue) if venue else None
-        except ValueError:
-            day1, day2, venue_id = None, None, None
+        day1 = int(day1) if day1 else None
+        day2 = int(day2) if day2 else None
+        venue_id = int(venue) if venue else None
+
         form_data = {"day1": day1, "day2": day2, "venue": venue_id}
         if not day1 or (lesson_request.frequency == 'Biweekly' and not day2):
             form = AllocationForm(http_request.GET, initial=form_data, student=student, venues=venues)
@@ -73,11 +71,12 @@ class AllocateRequestView(LoginRequiredMixin, View):
         day2_data = day2 if day2 and day2 != 'None' else None
 
         if not day1_data:
-            raise ValidationError("Day1 is not present in the POST data!")
-        day1_id = int(day1_data)
-        if not day2_data and lesson_request.frequency == "Biweekly":
-            raise ValidationError("Day2 is not present in the POST data!")
+            return HttpResponseBadRequest("Missing required day1", status=400)
 
+        if lesson_request.frequency == "Biweekly" and not day2_data:
+            return HttpResponseBadRequest("Missing required day2", status=400)
+
+        day1_id = int(day1_data)
         day2_id = int(day2_data) if day2_data else None
         suitable_tutors = get_suitable_tutors(request_id, day1_id, day2_id)
         form = AllocationForm(request.POST, tutors=suitable_tutors, student=lesson_request.student, venues=venues)
@@ -89,35 +88,23 @@ class AllocateRequestView(LoginRequiredMixin, View):
             tutor = form.cleaned_data.get('tutor')
             venue = form.cleaned_data.get('venue')
 
-            if lesson_request.frequency == 'Biweekly' and not (day1 and day2):
-                form.add_error(None, "Both days must be selected for a biweekly lesson!")
-                raise ValueError("Missing required days for Biweekly frequency")
-
-            if not day1:
-                form.add_error('day1', "You must select a day for the allocation!")
-                raise ValueError("Missing day1")
-
             if not tutor:
                 form.add_error('tutor', "You must select a tutor!")
-                raise ValueError("Missing tutor")
+                return HttpResponseBadRequest("Missing required tutor")
 
             if not venue:
                 form.add_error('venue', "You must select a venue!")
-                raise ValueError("Missing venue")
+                return HttpResponseBadRequest("Missing required venue")
 
             day1 = Day.objects.get(id=day1_id) if day1_data else None
             day2 = Day.objects.get(id=day2_id) if day2_data else None
             _allocate(lesson_request, tutor, venue, day1, day2)
             _update_availabilities(lesson_request, day1, day2)
-
             return redirect("view_requests")
 
         venue_preferences = {"No Preference"} if len(venues) >= 2 else {
             venue.venue for venue in venues if venue.venue != "No Preference"
         }
-
-        print(form.errors)
-        print(request.POST)
 
         return render(request, "allocate_request.html", {
             "form": form,
@@ -149,7 +136,10 @@ def get_venue_preference(venue_preference: QuerySet) -> QuerySet:
 def get_suitable_tutors(request_id: int, day1_id: int, day2_id: int) -> QuerySet:
     lesson_request = get_object_or_404(Request, id=request_id)
 
-    if not day1_id or (lesson_request.frequency == 'Biweekly' and not day2_id):
+    if not day1_id:
+        return User.objects.none()
+
+    if lesson_request.frequency == 'Biweekly' and not day2_id:
         return User.objects.none()
 
     student = lesson_request.student
@@ -157,15 +147,14 @@ def get_suitable_tutors(request_id: int, day1_id: int, day2_id: int) -> QuerySet
     knowledge_area_ids = KnowledgeArea.objects.filter(subject=knowledge_area).values_list('id', flat=True)
     max_hourly_rate = student.student_max_rate
 
-    suitable_tutors = User.objects.none()
-    if day1_id and lesson_request.frequency == 'Biweekly' and day2_id:
+    if lesson_request.frequency == 'Biweekly':
         suitable_tutors = User.objects.filter(
             user_type="Tutor",
             knowledgearea__in=knowledge_area_ids,
             availability__in=Day.objects.filter(Q(id=day1_id) | Q(id=day2_id)),
             hourly_rate__lte=max_hourly_rate,
         ).distinct()
-    elif day1_id and lesson_request.frequency != 'Biweekly':
+    else:
         suitable_tutors = User.objects.filter(
             user_type="Tutor",
             knowledgearea__in=knowledge_area_ids,
@@ -178,8 +167,6 @@ def get_suitable_tutors(request_id: int, day1_id: int, day2_id: int) -> QuerySet
 
 def _allocate(lesson_request: Request, tutor: User, venue: Venue, day1: Day, day2: Day) -> None:
     if lesson_request.frequency == 'Biweekly':
-        if day1 is None or day2 is None:
-            raise AttributeError("Both days are needed for Biweekly allocation.")
         lesson_request.day2 = day2
 
     lesson_request.tutor = tutor

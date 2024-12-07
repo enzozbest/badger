@@ -18,7 +18,8 @@
     "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
     "user_type": "Tutor",
     "availability": [
-      "Tuesday"
+      "Tuesday",
+      "Wednesday"
     ],
     "hourly_rate": 25.00,
     "knowledge_areas": [
@@ -38,7 +39,8 @@
     "student_max_rate": 30.00,
     "availability": [
       "Tuesday",
-      "Thursday"
+      "Thursday",
+      "Wednesday"
     ]
   }
 ]
