@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ValidationError
 from django.db.models import Q, QuerySet
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
@@ -28,22 +29,22 @@ class AllocateRequestView(LoginRequiredMixin, View):
         student = lesson_request.student
         day1 = http_request.GET.get("day1", None)
         day2 = http_request.GET.get("day2", None)
+        venue = http_request.GET.get('venue', None)
         venues = get_venue_preference(lesson_request.venue_preference)
 
         try:
             day1 = int(day1) if day1 else None
             day2 = int(day2) if day2 else None
+            venue_id = int(venue) if venue else None
         except ValueError:
-            day1, day2 = None, None
-        form_data = {"day1": day1, "day2": day2}
+            day1, day2, venue_id = None, None, None
+        form_data = {"day1": day1, "day2": day2, "venue": venue_id}
         if not day1 or (lesson_request.frequency == 'Biweekly' and not day2):
-            form = AllocationForm(http_request.GET, initial=form_data, student=student, venues=venues,
-                                  frequency=lesson_request.frequency)
+            form = AllocationForm(http_request.GET, initial=form_data, student=student, venues=venues)
         else:
             suitable_tutors = get_suitable_tutors(request_id, day1, day2)
             form = AllocationForm(http_request.GET, initial=form_data, student=student, venues=venues,
-                                  tutors=suitable_tutors,
-                                  frequency=lesson_request.frequency)
+                                  tutors=suitable_tutors)
 
         venue_preferences = {"No Preference"} if len(venues) >= 2 else {
             venue.venue for venue in venues if venue.venue != "No Preference"
@@ -53,6 +54,7 @@ class AllocateRequestView(LoginRequiredMixin, View):
             "form": form,
             "day1": day1,
             "day2": day2,
+            "venue": venue,
             "lesson_request": lesson_request,
             "venue_preferences": venue_preferences,
         })
@@ -64,55 +66,58 @@ class AllocateRequestView(LoginRequiredMixin, View):
             return render(request, 'already_allocated_error.html', status=409)
 
         venues = get_venue_preference(lesson_request.venue_preference)
-        print(request.POST)
-        form = AllocationForm(request.POST, student=lesson_request.student, venues=venues,
-                              frequency=lesson_request.frequency)
+        day1 = request.POST.get("day1", None)
+        day2 = request.POST.get("day2", None)
+
+        day1_data = day1 if day1 and day1 != 'None' else None
+        day2_data = day2 if day2 and day2 != 'None' else None
+
+        if not day1_data:
+            raise ValidationError("Day1 is not present in the POST data!")
+        day1_id = int(day1_data)
+        if not day2_data and lesson_request.frequency == "Biweekly":
+            raise ValidationError("Day2 is not present in the POST data!")
+
+        day2_id = int(day2_data) if day2_data else None
+        suitable_tutors = get_suitable_tutors(request_id, day1_id, day2_id)
+        form = AllocationForm(request.POST, tutors=suitable_tutors, student=lesson_request.student, venues=venues)
+
+        if lesson_request.frequency != "Biweekly":
+            form.fields.pop('day2', None)
 
         if form.is_valid():
-            try:
-                day1 = form.cleaned_data.get('day1')
-                print(day1)
-                day2 = form.cleaned_data.get('day2') if lesson_request.frequency == 'Biweekly' else None
-                tutor = form.cleaned_data.get('tutor')
-                venue = form.cleaned_data.get('venue')
-                suitable_tutors = get_suitable_tutors(request_id, int(day1), int(day2))
-                form = AllocationForm(student=lesson_request.student, venues=venues,
-                                      tutors=suitable_tutors,
-                                      frequency=lesson_request.frequency)  # Set form with tutors in case of errors leading to the form being reloaded!
+            tutor = form.cleaned_data.get('tutor')
+            venue = form.cleaned_data.get('venue')
 
-                if lesson_request.frequency == 'Biweekly' and not (day1 and day2):
-                    form.add_error(None, "Both days must be selected for a biweekly lesson!")
-                    raise ValueError("Missing required days for Biweekly frequency")
+            if lesson_request.frequency == 'Biweekly' and not (day1 and day2):
+                form.add_error(None, "Both days must be selected for a biweekly lesson!")
+                raise ValueError("Missing required days for Biweekly frequency")
 
-                if not day1:
-                    form.add_error('day1', "You must select a day for the allocation!")
-                    raise ValueError("Missing day1")
+            if not day1:
+                form.add_error('day1', "You must select a day for the allocation!")
+                raise ValueError("Missing day1")
 
-                if not tutor:
-                    form.add_error('tutor', "You must select a tutor!")
-                    raise ValueError("Missing tutor")
+            if not tutor:
+                form.add_error('tutor', "You must select a tutor!")
+                raise ValueError("Missing tutor")
 
-                if not venue:
-                    form.add_error('venue', "You must select a venue!")
-                    raise ValueError("Missing venue")
+            if not venue:
+                form.add_error('venue', "You must select a venue!")
+                raise ValueError("Missing venue")
 
-                _allocate(lesson_request, tutor, Venue.objects.get(id=int(venue)), day1, day2)
-                _update_availabilities(lesson_request, day1, day2)
+            day1 = Day.objects.get(id=day1_id) if day1_data else None
+            day2 = Day.objects.get(id=day2_id) if day2_data else None
+            _allocate(lesson_request, tutor, venue, day1, day2)
+            _update_availabilities(lesson_request, day1, day2)
 
-                return redirect("view_requests")
+            return redirect("view_requests")
 
-            except ValueError as e:
-                print(f"Validation error in allocation: {e}")
-                form.add_error(None, str(e))
-            except Venue.DoesNotExist:
-                form.add_error('venue', "Selected venue does not exist.")
-            except Exception as e:
-                print(f"Unexpected error: {e}")
-                form.add_error(None, f"An unexpected error occurred: {e}")
-        print(form.errors)
         venue_preferences = {"No Preference"} if len(venues) >= 2 else {
             venue.venue for venue in venues if venue.venue != "No Preference"
         }
+
+        print(form.errors)
+        print(request.POST)
 
         return render(request, "allocate_request.html", {
             "form": form,
@@ -138,7 +143,6 @@ def get_venue_preference(venue_preference: QuerySet) -> QuerySet:
         venues = Venue.objects.exclude(venue='No Preference')
     else:
         venues = venue_preference.all()
-
     return venues
 
 

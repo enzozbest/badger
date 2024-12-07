@@ -29,12 +29,14 @@
 <form method="post" action="">
     {% csrf_token %}
     <p>
-        {% if day1 and lesson_request.frequency == 'Biweekly' and day2 or lesson_request.frequency != 'Biweekly' and day1 %}
+        {% if day1 and lesson_request.frequency == 'Biweekly' and day2 and venue or lesson_request.frequency != 'Biweekly' and day1 and venue %}
             Tutor:
             {{ form.tutor }}{% endif %}</p>
 
+    <input type="hidden" name="day1" value="{{ day1 }}">
+    <input type="hidden" name="day2" value="{{ day2 }}">
+    <input type="hidden" name="venue" value="{{ venue }}">
     <button type="submit">Allocate</button>
 </form>
-
 </body>
 </html>
