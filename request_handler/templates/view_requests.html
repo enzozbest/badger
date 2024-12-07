@@ -5,44 +5,78 @@
     <title>View Requests</title>
 </head>
 <body>
-    <div>
-        <a href="{% url 'dashboard' %}">Click here to go to the main dashboard</a>
-    </div>
+    
+<div>
+    <a href="{% url 'dashboard' %}">Click here to go to the main dashboard</a>
+</div>
 
-    <h1>Showing {{ count }} out of {{ total }} requests:</h1>
+<h1>Showing {{ count }} out of {{ total }} requests:</h1>
 
-    <!-- Filter Form -->
-    <form method="get">
-        {{ filter.form.as_p }} <button type="submit">Go</button>
-    </form>
+<!-- Filter Form -->
+<form method="get">
+    {{ filter.form.as_p }}
+    <button type="submit">Go</button>
+</form>
 
-    <!-- Table -->
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Student</th>
-                <th>Requested Area</th>
-                <th>Term</th>
-                <th>Recurring?</th>
-                <th>Venue Preference</th>
-                <th>On time?</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for request in requests %}
-                <tr>
-                    <td>{{ request.id }}</td>
-                    <td>
-                        <ol>
-                            <li>{{ request.student.first_name }} {{ request.student.last_name }}</li>
-                            <li>{{ request.student.email }}</li>
-                        </ol>
-                    </td>
-                    <td>{{ request.knowledge_area }}</td>
-                    <td>{{ request.term }}</td>
+<!-- Table -->
+<table>
+    <thead>
+    <tr>
+        <th>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' and key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if request.GET.sort == 'id' %}{% if request.GET.sort|slice:":1" == '-' %}id{% else %}-id{% endif %}{% else %}id{% endif %}">
+                ID
+                {% if request.GET.sort == 'id' or request.GET.sort == '-id' %}
+                    {% if request.GET.sort|slice:":1" != '-' %}
+                        <span>▲</span> 
+                    {% else %}
+                        <span>▼</span> 
+                    {% endif %}
+                {% endif %}
+            </a>
+        </th>
+        <th>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' and key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if request.GET.sort == 'student__first_name' %}{% if request.GET.sort|slice:":1" == '-' %}student__first_name{% else %}-student__first_name{% endif %}{% else %}student__first_name{% endif %}">
+                Student
+                {% if request.GET.sort == 'student__first_name' or request.GET.sort == '-student__first_name' %}
+                    {% if request.GET.sort|slice:":1" != '-' %}
+                        <span>▲</span>
+                    {% else %}
+                        <span>▼</span> 
+                    {% endif %}
+                {% endif %}
+            </a>
+        </th>
+        <th>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' and key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if request.GET.sort == 'knowledge_area' %}{% if request.GET.sort|slice:":1" == '-' %}knowledge_area{% else %}-knowledge_area{% endif %}{% else %}knowledge_area{% endif %}">
+                Requested Area
+                {% if request.GET.sort == 'knowledge_area' or request.GET.sort == '-knowledge_area' %}
+                    {% if request.GET.sort|slice:":1" != '-' %}
+                        <span>▲</span>
+                    {% else %}
+                        <span>▼</span>
+                    {% endif %}
+                {% endif %}
+            </a>
+        </th>
+        <th>Term</th>
+        <th>Venue Preference</th>
+        <th>On time?</th>
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for request in requests %}
+        <tr>
+            <td>{{ request.id }}</td>
+            <td>
+                <ol>
+                    <li>{{ request.student.first_name }} {{ request.student.last_name }}</li>
+                    <li>{{ request.student.email }}</li>
+                </ol>
+            </td>
+            <td>{{ request.knowledge_area }}</td>
+           <td>{{ request.term }}</td>
                     <td>{% if request.is_recurring %}
                             Yes
                         {% else %}
@@ -50,53 +84,64 @@
                         {% endif %}
                     </td>
                     <td>
-                        <ul>
-                            {% for venue in request.venue_preference.all %}
-                            <li>{{ venue }}</li>
-                            {% empty %}
-                            <li>No Venue Preference</li>
-                            {% endfor %}
-                        </ul>
-                    </td>
-                    <td>
-                        {% if request.late %}
-                        <li>Late request</li>
-                        {% else %}
-                        <li>On time</li>
+            <td>
+                <ul>
+                    {% for venue in request.venue_preference.all %}
+                        <li>{{ venue }}</li>
+                    {% empty %}
+                        <li>No Venue Preference</li>
+                    {% endfor %}
+                </ul>
+            </td>
+            <td>
+                {% if request.late %}
+                    <li>Late request</li>
+                {% else %}
+                    <li>On time</li>
+                {% endif %}
+            </td>
+            <td>
+                {% if request.allocated %}
+                    Allocated to {{ request.tutor_name }}
+                {% else %}
+                    Unallocated
+                {% endif %}
+            </td>
+            <td>
+                <ul>
+                    {% if not request.allocated %}
+                        {% if user.user_type != 'Tutor' %}
+                            <li><a href="{% url 'edit_request' request.id %}">Update</a></li>
+                            <li><a href="{% url 'delete_request' request.id %}">Delete</a></li>
                         {% endif %}
-                    </td>
-                    <td>
-                        {% if request.allocated %}
-                            Allocated to {{ request.tutor_name }}
-                        {% else %}
-                            Unallocated
+                        {% if user.user_type == 'Admin' %}
+                            <li><a href="{% url 'allocate_request' request.id %}">Allocate</a></li>
                         {% endif %}
-                    </td>
-                    <td>
-                        <ul>
-                            {% if not request.allocated %}
-                                {% if user.user_type != 'Tutor' %}
-                                    <li> <a href="{% url 'edit_request' request.id %}">Update</a> </li>
-                                    <li> <a href="{% url 'delete_request' request.id%}">Delete</a> </li>
-                                {% endif %}
-                                {% if user.user_type == 'Admin'%}
-                                    <li> <a href="{% url 'allocate_request' request.id%}">Allocate</a> </li>
-                                {% endif %}
-                            {% else %}
+                    {% else %}
 
-                                {% if request.invoice is None%}
-                                    {% if user.user_type == 'Admin' %}
-                                        <li> <a href="{% url 'generate_invoice' request.id%}">Generate Invoice</a> </li>
-                                    {% endif %}
+                        {% if request.invoice is None %}
+                            {% if user.user_type == 'Admin' %}
+                                <li><a href="{% url 'generate_invoice' request.id %}">Generate Invoice</a></li>
+                            {% endif %}
+                        {% else %}
+                            <li><a href="{% url 'get_invoice' request.invoice.invoice_id %}">View Invoice</a></li>
+                            {% if user.user_type == 'Admin' %}
+                                {% if not request.invoice.payment_status %}
+                                    <li>
+                                        <form action="{% url 'set_payment_status' request.invoice.invoice_id 1 %}"
+                                              method="post" style="display: inline;">
+                                            {% csrf_token %}
+                                            <button> Set as paid</button>
+                                        </form>
+                                    </li>
                                 {% else %}
-                                    <li> <a href="{% url 'get_invoice' request.invoice.invoice_id %}">View Invoice</a> </li>
-                                    {% if user.user_type == 'Admin' %}
-                                        {% if not request.invoice.payment_status %}
-                                            <li> <a href="{% url 'set_payment_status' request.invoice.invoice_id 1%}">Set as paid</a> </li>
-                                        {% else %}
-                                            <li> <a href="{% url 'set_payment_status' request.invoice.invoice_id 0%}">Set as unpaid</a> </li>
-                                        {% endif %}
-                                    {% endif %}
+                                    <li>
+                                        <form action="{% url 'set_payment_status' request.invoice.invoice_id 0 %}"
+                                              method="post" style="display: inline;">
+                                            {% csrf_token %}
+                                            <button> Set as unpaid</button>
+                                        </form>
+                                    </li>
                                 {% endif %}
                             {% endif %}
                         </ul>
@@ -124,17 +169,50 @@
 
     <!-- Pagination -->
    <div class="pagination">
+
     {% if is_paginated %}
         {% if page_obj.has_previous %}
-            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">First</a>
-            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Previous</a>
+            <a href="?
+
+
+
+
+
+
+
+                    {% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">First</a>
+            <a href="?
+
+
+
+
+
+
+
+                    {% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Previous</a>
         {% endif %}
 
         <span>Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
 
         {% if page_obj.has_next %}
-            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next</a>
-            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ paginator.num_pages }}">Last</a>
+            <a href="?
+
+
+
+
+
+
+
+                    {% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next</a>
+            <a href="?
+
+
+
+
+
+
+
+                    {% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ paginator.num_pages }}">Last</a>
         {% endif %}
     {% endif %}
 </div>

@@ -1,21 +1,22 @@
 """Tests of the home view."""
 from django.test import TestCase
 from django.urls import reverse
-from django.core.management import call_command
+
 from user_system.models import User
+
 
 class HomeViewTestCase(TestCase):
     """Tests of the home view."""
 
     def setUp(self):
         from user_system.fixtures import create_test_users
-        create_test_users.create_test_user()
+        create_test_users.create_test_users()
 
         self.url = reverse('home')
         self.user = User.objects.get(username='@johndoe')
 
     def test_home_url(self):
-        self.assertEqual(self.url,'/')
+        self.assertEqual(self.url, '/')
 
     def test_get_home(self):
         response = self.client.get(self.url)

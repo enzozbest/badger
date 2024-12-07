@@ -1,5 +1,7 @@
 from django.test import TestCase
+
 from code_tutors.aws.resources import yaml_loader
+
 
 class TestYamlLoader(TestCase):
     def setUp(self):

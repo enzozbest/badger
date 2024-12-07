@@ -11,11 +11,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 from pathlib import Path
+
 from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -27,7 +27,6 @@ SECRET_KEY = 'django-insecure-&$dln5wpgorppuw&(gintxm573v2ks+zq4o$(4*lapguixf^+2
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -78,7 +77,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'code_tutors.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
@@ -88,7 +86,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -108,7 +105,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -119,7 +115,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -149,11 +144,11 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
-#Invoicer Configuration
-LOGO_PATH = BASE_DIR/'static/logo.jpeg'
-INVOICE_OUTPUT_PATH = BASE_DIR/'invoicer/invoices/pdfs'
+# Invoicer Configuration
+LOGO_PATH = BASE_DIR / 'static/logo.jpeg'
+INVOICE_OUTPUT_PATH = BASE_DIR / 'invoicer/invoices/pdfs'
 
-#AWS Configurations
+# AWS Configurations
 AWS_ACCOUNT_ID = '058264317710'
-AWS_YAML_CONFIG_PATH = BASE_DIR/'code_tutors/aws/resources/config.yml'
+AWS_YAML_CONFIG_PATH = BASE_DIR / 'code_tutors/aws/resources/config.yml'
 USE_AWS_S3 = True

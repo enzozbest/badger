@@ -4,31 +4,34 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from invoicer.models import Invoice
-from user_system.models import User, Day
+from user_system.models import Day, User
 
-
-""" Class representing a venue for tutoring sessions.
-
-This Model is necessary for the ManyToMany relationships in Request to work, as they must be between model instances.
-Modes are represented in the database as a string (In person, Online, No preference) and an automatically assigned id (primary key).
-"""
 class Venue(models.Model):
+    """ Class representing a venue for tutoring sessions.
+
+    This Model is necessary for the ManyToMany relationships in Request to work, as they must be between model instances.
+    Modes are represented in the database as a string (In person, Online, No preference) and an automatically assigned id (primary key).
+    """
     venue = models.CharField(max_length=10)
+
     def __str__(self):
         return self.venue
 
-""" Class representing a request for lessons from a student.
 
-This Model represents a request made by a student for lessons. It contains all the necessary details for an admin to 
-contact the student and formalise arrangements. These details include: the student's user information, which knowledge areas
-they would like tutoring for, which days of the week they are available, their preferred mode of attendance, etc.
-"""
 class Request(models.Model):
+    """ Class representing a request for lessons from a student.
+
+    This Model represents a request made by a student for lessons. It contains all the necessary details for an admin to
+    contact the student and formalise arrangements. These details include: the student's user information, which knowledge areas
+    they would like tutoring for, which days of the week they are available, their preferred mode of attendance, etc.
+    """
+
     student = models.ForeignKey(User, default=None, null=True, on_delete=models.CASCADE, related_name='student')
     allocated = models.BooleanField(default=False, blank=True)
     allocated_string = 'No'
     tutor_name_string = '-'
-    tutor = models.ForeignKey(User, default=None, null=True, on_delete=models.SET_NULL, blank=True, related_name='tutor')
+    tutor = models.ForeignKey(User, default=None, null=True, on_delete=models.SET_NULL, blank=True,
+                              related_name='tutor')
     knowledge_area = models.CharField(max_length=255, blank=False)
     venue_preference = models.ManyToManyField(Venue, blank=False, related_name='student_venue_preference')
     term = models.CharField(max_length=255)
@@ -37,8 +40,10 @@ class Request(models.Model):
     late = models.BooleanField(default=False, blank=False)
     is_recurring = models.BooleanField(default=False)
     day = models.ForeignKey(Day, null=True, blank=True, on_delete=models.SET_NULL, related_name='allocated_day')
+    day2 = models.ForeignKey(Day, null=True, blank=True, on_delete=models.SET_NULL, related_name='allocated_day2')
     venue = models.ForeignKey(Venue, null=True, blank=True, on_delete=models.SET_NULL, related_name='allocated_venue')
-    invoice = models.ForeignKey(Invoice, null=True, blank=True, on_delete=models.SET_NULL, related_name='request_invoice')
+    invoice = models.ForeignKey(Invoice, null=True, blank=True, on_delete=models.SET_NULL,
+                                related_name='request_invoice')
 
     @property
     def student_email(self):

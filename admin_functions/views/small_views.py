@@ -1,15 +1,21 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 
 
+@login_required
 def admin_dash(request: HttpRequest) -> HttpResponse:
-    if not request.user.is_authenticated:
-        return redirect('log_in')
+    """ View function to display the Admin dashboard.
 
+    Only Admin users can see this page, so all other user types will receive a 403 Forbidden error if trying to access.
+    Because this is a read-only response, only GET requests are accepted.
+    :param request: the HTTP request object.
+    :return: an appropriately formatted HttpResponse.
+    """
     if request.user.user_type != 'Admin':
         return render(request, 'permission_denied.html', status=403)
 
     if request.method == 'POST':
-        return HttpResponseNotAllowed("This URL only accepts GET requests.", status=405, content=b'Not Allowed')
+        return HttpResponseNotAllowed("[GET]", status=405, content=b'Not Allowed')
 
     return render(request, 'admin_dashboard.html')

@@ -1,22 +1,23 @@
 """Tests of the log out view."""
 from django.test import TestCase
 from django.urls import reverse
-from django.core.management import call_command
+
 from user_system.models import User
 from user_system.tests_user_system.helpers import LogInTester
+
 
 class LogOutViewTestCase(TestCase, LogInTester):
     """Tests of the log out view."""
 
     def setUp(self):
         from user_system.fixtures import create_test_users
-        create_test_users.create_test_user()
+        create_test_users.create_test_users()
 
         self.url = reverse('log_out')
         self.user = User.objects.get(username='@johndoe')
 
     def test_log_out_url(self):
-        self.assertEqual(self.url,'/log_out/')
+        self.assertEqual(self.url, '/log_out/')
 
     def test_get_log_out(self):
         self.client.login(username=self.user.username, password='Password123')

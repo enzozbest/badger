@@ -1,9 +1,13 @@
-from django.test import TestCase
+from datetime import datetime
+from unittest.mock import patch
+
 from django.forms import ModelMultipleChoiceField
+from django.test import TestCase
+
 from request_handler.forms import RequestForm
 from request_handler.models import Venue
 from user_system.models import Day
-from datetime import datetime 
+
 
 class TestRequestForm(TestCase):
     def setUp(self):
@@ -115,7 +119,7 @@ class TestRequestForm(TestCase):
         form = RequestForm(data=invalid_input)
         self.assertFalse(form.is_valid())
         self.assertIn('duration', form.errors)
-    
+
     def test_form_handles_is_recurring_correctly(self):
         invalid_input = {
             'availability': [self.monday.id, self.wednesday.id],
@@ -135,7 +139,28 @@ class TestRequestForm(TestCase):
         self.assertTrue(form.is_valid())
         self.assertFalse(form.cleaned_data['is_recurring'])
 
-    def test_form_late_request_response(self):
+    def test_form_late_request_response_first_path(self):
+        form_input = self.generate_relevant_form_input(12)
+        form = RequestForm(data=form_input)
+        self.assertTrue(form.is_valid())
+        with patch('request_handler.forms.datetime') as mocked_datetime:
+            mock_today = datetime(2024, 12, 1)
+            mocked_datetime.today.return_value = mock_today
+            mocked_datetime.side_effect = lambda *args, **kwargs: datetime(*args, **kwargs)
+            self.assertTrue(form.is_late_request())
+
+    def test_form_late_request_response_second_path(self):
+        form_input = self.generate_relevant_form_input(7)
+        form = RequestForm(data=form_input)
+        self.assertTrue(form.is_valid())
+        with patch('request_handler.forms.datetime') as mocked_datetime:
+            mock_today = datetime(2024, 7, 1)
+            mocked_datetime.today.return_value = mock_today
+            mocked_datetime.side_effect = lambda *args, **kwargs: datetime(*args, **kwargs)
+            self.assertTrue(form.is_late_request())
+
+    # --- TEST HELPER ---#
+    def generate_relevant_form_input(self, month: int) -> dict:
         form_input = {
             'availability': [self.monday.id, self.wednesday.id],
             'term': '',
@@ -145,15 +170,12 @@ class TestRequestForm(TestCase):
             'venue_preference': [self.in_person.id, self.online.id],
             'is_recurring': False
         }
-        #Purposefully choosing a late term
-        if datetime.now().month >= 1 and datetime.now().month<5:
+        # Purposefully choosing a late term
+        if 1 <= month < 5:
             form_input['term'] = 'January'
-        elif datetime.now().month > 8 and datetime.now().month <= 12:
+        elif 8 < month <= 12:
             form_input['term'] = 'September'
-        elif datetime.now().month < 9 :
+        elif 5 <= month < 9:
             form_input['term'] = 'May'
 
-        form = RequestForm(data=form_input)
-
-        self.assertTrue(form.is_valid())
-        self.assertTrue(form.is_late_request())
+        return form_input
