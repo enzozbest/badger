@@ -9,14 +9,34 @@
 <h1>Allocate Request #{{ lesson_request.id }}</h1>
 <p>Student: {{ lesson_request.student.full_name }}</p>
 <p>Requested Area: {{ lesson_request.knowledge_area }}</p>
+<p> Frequency: {{ lesson_request.frequency }}</p>
 <p>Venue Preference:
     {% for venue in venue_preferences %}
         {{ venue }},
     {% endfor %}
 </p>
-<form method="post">
+
+
+<form method="get" action="" id="get-form">
+    <p> {% if lesson_request.frequency == 'Biweekly' %}First day {% else %}Day {% endif %}for
+        Allocation: {{ form.day1 }}</p>
+    <p> {% if lesson_request.frequency == 'Biweekly' and day1 %}Second Day for Allocation:
+        {{ form.day2 }}{% endif %} </p>
+    <p>
+        {% if day1 and lesson_request.frequency == 'Biweekly' and day2 or lesson_request.frequency != 'Biweekly' and day1 %}
+            Venue for allocation: {{ form.venue }} {% endif %}</p>
+</form>
+
+<form method="post" action="">
     {% csrf_token %}
-    {{ form.as_p }}
+    <p>
+        {% if day1 and lesson_request.frequency == 'Biweekly' and day2 and venue or lesson_request.frequency != 'Biweekly' and day1 and venue %}
+            Tutor:
+            {{ form.tutor }}{% endif %}</p>
+
+    <input type="hidden" name="day1" value="{{ day1 }}">
+    <input type="hidden" name="day2" value="{{ day2 }}">
+    <input type="hidden" name="venue" value="{{ venue }}">
     <button type="submit">Allocate</button>
 </form>
 </body>

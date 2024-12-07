@@ -3,7 +3,8 @@ from random import randint
 from django.core.management.base import BaseCommand
 from faker import Faker
 
-from admin_functions.views.allocate_requests import _allocate, _get_tuple, _update_availabilities
+from admin_functions.views.allocate_requests import _allocate, _update_availabilities, get_suitable_tutors, \
+    get_venue_preference
 from code_tutors.management.helpers import programming_langs_provider, term_provider, user_provider, venue_provider
 from request_handler.models import Request
 
@@ -70,16 +71,24 @@ class Command(BaseCommand):
             req_object.venue_preference.set(data['venue_preference'])
 
         if data['allocated']:
-            lesson_request, suitable_tutors, venues = _get_tuple(req_object.id)
-            day = None
+            venues = get_venue_preference(req_object.venue_preference)
+
             if req_object.student.availability.exists():
-                day = req_object.student.availability.all()[0]
+                day1 = req_object.student.availability.all()[0]
+                try:
+                    day2 = req_object.student.availability.all()[1] if req_object.frequency == 'Biweekly' else None
+                except IndexError:
+                    return
             else:
                 req_object.allocated = False
+                req_object.save()
+                return
+
+            suitable_tutors = get_suitable_tutors(req_object.id, day1.id, day2.id if day2 else None)
 
             if suitable_tutors.exists() and len(suitable_tutors.all()) > 0 and req_object.allocated:
-                _allocate(req_object, suitable_tutors.all()[0], venues[0], day)
-                _update_availabilities(req_object, day)
+                _allocate(req_object, suitable_tutors.all()[0], venues[0], day1, day2)
+                _update_availabilities(req_object, day1, day2)
             else:
                 req_object.allocated = False
             req_object.save()
