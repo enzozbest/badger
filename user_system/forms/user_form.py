@@ -67,7 +67,8 @@ class UserForm(forms.ModelForm):
         fields = ['first_name', 'last_name', 'username', 'email', 'user_type', 'hourly_rate', 'student_max_rate',
                   'availability']
 
-    # --HELPERS-- #
+    # --AUXILIARY METHODS-- #
+
     # Display a field in the form only if the user is of the required type.
     def _display_field(self, field_name, field_label, placeholder, user_type):
         if self.instance.user_type != user_type:
@@ -78,6 +79,7 @@ class UserForm(forms.ModelForm):
         self.fields[field_name].widget.attrs['placeholder'] = placeholder
         self.fields[field_name].required = False
 
+    # Display hourly_rate for tutors only and student_max_rate for students only.
     def _display_fields(self):
         self._display_field('hourly_rate', 'Hourly Rate (in £)', 'Enter your hourly rate e.g., 22.50',
                             User.ACCOUNT_TYPE_TUTOR)

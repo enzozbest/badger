@@ -1,8 +1,8 @@
-"""Tests of the sign up view."""
 from django.contrib.auth.hashers import check_password
 from django.test import TestCase
 from django.urls import reverse
 
+from user_system.fixtures.create_test_users import create_test_users
 from user_system.forms.signup_form import SignUpForm
 from user_system.models.user_model import User
 from user_system.tests_user_system.helpers import LogInTester
@@ -12,9 +12,7 @@ class SignUpViewTestCase(TestCase, LogInTester):
     """Tests of the sign up view."""
 
     def setUp(self):
-        from user_system.fixtures import create_test_users
-        create_test_users.create_test_users()
-
+        create_test_users()
         self.url = reverse('sign_up')
         self.form_input = {
             'first_name': 'Enzo',
@@ -39,7 +37,7 @@ class SignUpViewTestCase(TestCase, LogInTester):
         self.assertFalse(form.is_bound)
 
     def test_get_sign_up_redirects_when_logged_in(self):
-        self.client.login(username=self.user.username, password='Password123')
+        self.client.force_login(self.user)
         response = self.client.get(self.url, follow=True)
         redirect_url = reverse('dashboard')
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
@@ -75,7 +73,7 @@ class SignUpViewTestCase(TestCase, LogInTester):
         self.assertTrue(self._is_logged_in())
 
     def test_post_sign_up_redirects_when_logged_in(self):
-        self.client.login(username=self.user.username, password='Password123')
+        self.client.force_login(self.user)
         before_count = User.objects.count()
         response = self.client.post(self.url, self.form_input, follow=True)
         after_count = User.objects.count()

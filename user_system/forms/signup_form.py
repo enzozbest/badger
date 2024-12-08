@@ -4,10 +4,12 @@ from user_system.forms import NewPasswordMixin
 from user_system.models.day_model import Day
 from user_system.models.user_model import User
 
+USER_SIGNUP_CHOICES = [(User.ACCOUNT_TYPE_TUTOR, 'Tutor'), (User.ACCOUNT_TYPE_STUDENT, 'Student')]
+
 
 class SignUpForm(NewPasswordMixin, forms.ModelForm):
     """Form enabling unregistered users to sign up."""
-    USER_SIGNUP_CHOICES = [(User.ACCOUNT_TYPE_TUTOR, 'Tutor'), (User.ACCOUNT_TYPE_STUDENT, 'Student')]
+
     user_type = forms.ChoiceField(choices=USER_SIGNUP_CHOICES, label='Account Type')
     availability = forms.ModelMultipleChoiceField(
         label='Availability',
@@ -33,4 +35,5 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
             password=self.cleaned_data.get('new_password'),
             user_type=self.cleaned_data.get('user_type'),
         )
+        
         return user

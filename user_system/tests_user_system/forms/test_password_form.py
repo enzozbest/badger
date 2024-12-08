@@ -1,6 +1,7 @@
 from django.contrib.auth.hashers import check_password
 from django.test import TestCase
 
+from user_system.fixtures.create_test_users import create_test_users
 from user_system.forms.password_form import PasswordForm
 from user_system.models.user_model import User
 
@@ -8,8 +9,7 @@ from user_system.models.user_model import User
 class PasswordFormTestCase(TestCase):
 
     def setUp(self):
-        from user_system.fixtures import create_test_users
-        create_test_users.create_test_users()
+        create_test_users()
         self.user = User.objects.get(username='@johndoe')
         self.form_input = {
             'password': 'Password123',

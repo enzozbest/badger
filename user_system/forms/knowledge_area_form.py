@@ -4,6 +4,10 @@ from user_system.models.knowledge_area_model import KnowledgeArea
 
 
 def get_knowledge_areas():
+    """Function to get all knowledge areas available in our platform
+
+    :return: list of Knowledge Areas
+    """
     return [
         ('C++', 'C++'),
         ('Scala', 'Scala'),
