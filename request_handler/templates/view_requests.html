@@ -56,6 +56,11 @@
                         <div class="card-body">
                             <div class="p-3 bg-dark d-flex align-items-center">
 
+                                <!-- ID Display -->
+                                <div class="text-muted small position-absolute" style="right: 1rem; top: 1rem;">
+                                    #{{ request.id }}
+                                </div>
+
                                 <div class="position-absolute" style="right: 1rem; top: 3rem;">
                                     <img 
                                         src="{% static 'subjects/'|add:request.knowledge_area|add:'.png' %}" 
