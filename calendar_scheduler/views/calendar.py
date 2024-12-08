@@ -119,7 +119,6 @@ class TutorCalendarView(LoginRequiredMixin,View):
 
         elif request.user.is_admin and pk:
             user_for_calendar = get_object_or_404(User, pk=pk)
-            pk = user_for_calendar.pk
             if user_for_calendar.user_type == 'Tutor':
                 calendar = Calendar.objects.get(slug='tutor')
                 template = 'admin_tutor_calendar.html'
@@ -144,7 +143,6 @@ class StudentCalendarView(LoginRequiredMixin,View):
 
         elif request.user.is_admin and pk:
             user_for_calendar = get_object_or_404(User, pk=pk)
-            pk = user_for_calendar.pk
             if user_for_calendar.user_type == 'Student':
                 calendar = Calendar.objects.get(slug='student')
                 template = 'admin_student_calendar.html'

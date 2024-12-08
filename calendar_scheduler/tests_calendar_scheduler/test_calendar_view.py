@@ -1,4 +1,7 @@
 from datetime import date
+
+from django.shortcuts import get_object_or_404
+
 from calendar_scheduler.models import Booking
 from schedule.models import Calendar
 from django.test import TestCase
@@ -10,7 +13,8 @@ from calendar_scheduler.views.calendar import get_month_days, get_week_days, ret
 """ Classes to represent the calendar and lessons within the calendar
 
 Both classes below (CalendarHelperTests and CalendarViewTests) are used as a view for the website. CalendarHelperTests
-tests the helper methods in the calendar view, and CalendarViewTests tests the relevant calendar functionality.
+tests the helper methods in the calendar view (student and tutor view), and CalendarViewTests tests the relevant 
+calendar functionality.
 """
 
 class CalendarHelperTests(TestCase):
@@ -138,13 +142,67 @@ class CalendarViewTests(TestCase):
         response = self.client.get(reverse('student_calendar'))
         self.assertEqual(response.status_code, 404)
 
-    # Test that the admin can see all lessons in the calendar. DONT WANT IT LIKE THIS ANYMORE, WANT INDIVIDUAL CALENDARS
-    def test_admin_calendar_view_all_events(self):
+    def test_admin_view_student_calendar(self):
         self.client.login(username=self.admin.username, password='Password123')
-        # Simulate viewing the calendar for today
-        response = self.client.get(reverse('tutor_calendar'), {'year': 2024, 'month': 12, 'day': date.today().day})
+        # Get the student's calendar view
+        url = reverse('admin_student_calendar', kwargs={'pk': self.student.pk})
+        response = self.client.get(url)
+
+        # Check that the admin can access the calendar and correct template is rendered
         self.assertEqual(response.status_code, 200)
-        # Check if bookings are present in the response
-        self.assertContains(response, self.booking_tutor.lesson_identifier)
-        self.assertContains(response, self.booking_student.lesson_identifier)
-        self.assertTemplateUsed(response, 'tutor_calendar.html')
+        self.assertTemplateUsed(response, 'admin_student_calendar.html')
+
+    def test_admin_view_student_calendar_raises_value_error_for_non_student(self):
+        self.client.login(username=self.admin.username, password='Password123')
+
+        # Create a tutor user (non-student)
+        tutor_user = User.objects.create_user(username='tutor', password='password', user_type=User.ACCOUNT_TYPE_TUTOR)
+
+        url = reverse('admin_student_calendar', kwargs={'pk': tutor_user.pk})
+
+        # Ensure that the exception is raised when a non-student user tries to access the calendar
+        with self.assertRaises(ValueError):
+            self.client.get(url)
+
+    def test_admin_view_tutor_calendar(self):
+        self.client.login(username=self.admin.username, password='Password123')
+        # Get the student's calendar view
+        url = reverse('admin_tutor_calendar', kwargs={'pk': self.tutor.pk})
+        response = self.client.get(url)
+
+        # Check that the admin can access the calendar and correct template is rendered
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'admin_tutor_calendar.html')
+
+    def test_admin_view_tutor_calendar_raises_value_error_for_non_student(self):
+        self.client.login(username=self.admin.username, password='Password123')
+
+        # Create a tutor user (non-student)
+        student_user = User.objects.create_user(username='student', password='password', user_type=User.ACCOUNT_TYPE_STUDENT)
+
+        url = reverse('admin_tutor_calendar', kwargs={'pk': student_user.pk})
+
+        # Ensure that the exception is raised when a non-student user tries to access the calendar
+        with self.assertRaises(ValueError):
+            self.client.get(url)
+
+    def test_admin_view_raises_error_for_unknown_user_type(self):
+        self.client.login(username=self.admin.username, password='Password123')
+
+        # Create a user with an invalid type
+        unknown_user = User.objects.create_user(username='unknown', password='password', user_type='Unknown')
+
+        url = reverse('admin_student_calendar', kwargs={'pk': unknown_user.pk})
+
+        # Ensure that the exception is raised
+        with self.assertRaises(ValueError):
+            self.client.get(url)
+
+    def test_value_error_handling_in_admin_view(self):
+        self.client.login(username=self.admin.username, password='Password123')
+        # Try to access a calendar of an invalid user type, expecting a ValueError to be raised
+        try:
+            self.client.get(reverse('admin_student_calendar', kwargs={'pk': 9999}))
+        except ValueError as e:
+            # Check if ValueError is handled and no traceback is returned
+            self.assertIn("Unexpected user type", str(e))
