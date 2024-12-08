@@ -96,8 +96,6 @@ def retrieve_calendar_events(calendar, request, user_for_calendar=None):
                     newEvent = Booking.objects.filter(date=selected_date)
                     if newEvent.exists():
                         events.append(newEvent)
-
-
         except ValueError:
             break
     return {
@@ -113,6 +111,7 @@ def retrieve_calendar_events(calendar, request, user_for_calendar=None):
             "next_year": next_year,
         }
 
+'''A view to display the Tutor Calendar. '''
 class TutorCalendarView(LoginRequiredMixin,View):
     def get(self, request: HttpRequest, pk: int = None) -> HttpResponse:
         if request.user.is_student:
@@ -125,9 +124,7 @@ class TutorCalendarView(LoginRequiredMixin,View):
                 calendar = Calendar.objects.get(slug='tutor')
                 template = 'admin_tutor_calendar.html'
             else:
-                print("ERORORROROROROROR")
-                calender = Calendar.objects.get(slug='student')
-                template = 'admin_student_calendar.html'
+                raise ValueError("Unexpected user type. Only 'Tutor' is expected for this calendar.")
 
             data = retrieve_calendar_events(calendar, request, user_for_calendar)
             return render(request, template, data)
@@ -139,6 +136,7 @@ class TutorCalendarView(LoginRequiredMixin,View):
         except Calendar.DoesNotExist:
             return render(request, 'dashboard.html',status=404)
 
+'''A view to display the Student Calendar. '''
 class StudentCalendarView(LoginRequiredMixin,View):
     def get(self, request: HttpRequest, pk: int = None) -> HttpResponse:
         if request.user.is_tutor:
@@ -151,9 +149,7 @@ class StudentCalendarView(LoginRequiredMixin,View):
                 calendar = Calendar.objects.get(slug='student')
                 template = 'admin_student_calendar.html'
             else:
-                print("ERORRRORORORORORORORORO")
-                calender = Calendar.objects.get(slug='tutor')
-                template = 'admin_tutor_calendar.html'
+                raise ValueError("Unexpected user type. Only 'Student' is expected for this calendar.")
 
             data = retrieve_calendar_events(calendar, request, user_for_calendar)
             return render(request, template, data)

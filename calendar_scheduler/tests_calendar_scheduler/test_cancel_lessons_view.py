@@ -179,10 +179,10 @@ class CancelLessonsViewTests(TestCase):
         admin = User.objects.create_user(username="@admin", password="Password123", email="admin@example.com")
         admin = User.objects.get(user_type=User.ACCOUNT_TYPE_ADMIN)
 
-        # Log in as admin (who should have access to this view)
+        # Log in as admin (who should not have access to this view)
         self.client.login(username="@admin", password="Password123")
         response = self.client.get(reverse('tutor_cancel_lessons'),
                                    {'day': 3, 'month': 12, 'year': 2024, 'lesson': '1'})
 
-        self.assertTemplateUsed(response, 'student_cancel_lessons.html')
-        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'permission_denied.html')
+        self.assertEqual(response.status_code, 401)

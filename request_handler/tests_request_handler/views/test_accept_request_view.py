@@ -101,7 +101,7 @@ class AcceptRequestViewTestCase(TestCase):
         self.client.login(username="@other_user", password="Password123")
 
         response = self.client.post(reverse('accept_request', args=[self.lesson_request.id]))
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 404)
 
     # For some reason, this test is getting the first day from September 2025 (but putting the year as 2024)
     '''
