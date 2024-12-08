@@ -1,15 +1,18 @@
-from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
 from django.db import models
 from libgravatar import Gravatar
 
-""" Class representing a day of the week
 
-This Model is necessary for the ManyToMany relationships in Request to work, as they must be between model instances.
-Days are represented in the database as a string (their name) and an automatically assigned id (primary key).
-"""
 class Day(models.Model):
+    """ Class representing a day of the week
+
+    This Model is necessary for the ManyToMany relationships in Request to work, as they must be between model instances.
+    Days are represented in the database as a string (their name) and an automatically assigned id (primary key).
+    """
+
     day = models.CharField(max_length=10, unique=True)
+
     def __str__(self):
         return self.day
 
@@ -35,7 +38,10 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
     availability = models.ManyToManyField(Day, blank=False, default=None)
-    hourly_rate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, help_text="Enter your hourly rate in GBP.")
+    hourly_rate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, default=0.00,
+                                      help_text="Enter your hourly rate in GBP.")
+    student_max_rate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, default=0.00,
+                                           help_text="Enter the maximum hourly rate you are willing to pay, in GBP.")
     models.pk = email
 
     @property
@@ -52,7 +58,7 @@ class User(AbstractUser):
 
     @property
     def full_name(self):
-        return "%s %s" % (self.first_name, self.last_name)
+        return f'{self.first_name} {self.last_name}'
 
     def __str__(self):
         return (f'Username: {self.username} \n'
@@ -66,10 +72,6 @@ class User(AbstractUser):
         """Model options."""
 
         ordering = ['last_name', 'first_name']
-
-    def full_name(self):
-        """Return a string containing the user's full name."""
-        return f'{self.first_name} {self.last_name}'
 
     def gravatar(self, size=120):
         """Return a URL to the user's gravatar."""
@@ -89,4 +91,3 @@ class KnowledgeArea(models.Model):
 
     def __str__(self):
         return self.subject
-

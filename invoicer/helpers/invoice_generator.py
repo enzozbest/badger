@@ -1,24 +1,33 @@
 import os
+from io import BytesIO
 
+from django.conf import settings
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
-from invoicer.models import Invoice
-from request_handler.models import Request
-from django.conf import settings
+
 from admin_functions.helpers.calculate_cost import calculate_num_lessons
-from io import BytesIO
 from code_tutors.aws import s3
 from code_tutors.aws.resources import yaml_loader
+from invoicer.models import Invoice
+from request_handler.models import Request
 
-LOCAL_STORE = not settings.USE_AWS_S3
-LOGO_PATH = settings.LOGO_PATH
-OUTPUT_PATH = settings.INVOICE_OUTPUT_PATH
+_LOCAL_STORE = not settings.USE_AWS_S3
+_LOGO_PATH = settings.LOGO_PATH
+_OUTPUT_PATH = settings.INVOICE_OUTPUT_PATH
+
 
 def generate_invoice(request_obj: Request) -> None:
+    """Function that automatically generates a formatted PDF file for an invoice.
+
+    This function uses reportlab to generate the PDF. If _LOCAL_STORE is set, the PDF is stored in the local machine,
+    at invoicer/invoices/pdfs. Otherwise, the PDF is automatically uploaded to Amazon's S3 based on the configuration set
+    in the code_tutors.aws module.
+    :param request_obj: the tutoring request object for which an invoice is being generated.
+    """
     LOCAL_STORE = not settings.USE_AWS_S3
     invoice: Invoice = request_obj.invoice
-    buffer = BytesIO() #!!DO NOT REMOVE!!
-    path = f'{OUTPUT_PATH}/{invoice.invoice_id}.pdf'
+    buffer = BytesIO()  # !!DO NOT REMOVE!!
+    path = f'{_OUTPUT_PATH}/{invoice.invoice_id}.pdf'
 
     if not LOCAL_STORE:
         pdf = canvas.Canvas(buffer, pagesize=A4)
@@ -28,7 +37,7 @@ def generate_invoice(request_obj: Request) -> None:
         pdf = canvas.Canvas(buffer, pagesize=A4)
 
     width, height = A4
-    pdf.drawImage(LOGO_PATH, x=20, y=height-100, width=100, height=50, preserveAspectRatio=True, mask='auto')
+    pdf.drawImage(_LOGO_PATH, x=20, y=height - 100, width=100, height=50, preserveAspectRatio=True, mask='auto')
 
     # Add title
     pdf.setFont("Helvetica-Bold", 16)
@@ -58,9 +67,10 @@ def generate_invoice(request_obj: Request) -> None:
 
     if not LOCAL_STORE:
         buffer.seek(0)
-        s3.upload(obj=buffer, bucket=yaml_loader.get_bucket_name('invoicer'), key=f'invoices/pdfs/{invoice.invoice_id}.pdf')
+        s3.upload(obj=buffer, bucket=yaml_loader.get_bucket_name('invoicer'),
+                  key=f'invoices/pdfs/{invoice.invoice_id}.pdf')
     else:
         with open(path, "wb") as f:
             f.write(buffer.getvalue())
 
-    buffer.close() #!!DO NOT REMOVE!!
+    buffer.close()  # !!DO NOT REMOVE!!

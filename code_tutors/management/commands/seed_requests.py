@@ -1,13 +1,13 @@
-from faker import Faker
-from django.core.management.base import BaseCommand
-from request_handler.models import Request
 from random import randint
 
-from code_tutors.management.helpers import programming_langs_provider
-from code_tutors.management.helpers import term_provider
-from admin_functions.views.allocate_requests import get_tuple, allocate, update_availabilities
-from code_tutors.management.helpers import user_provider
-from code_tutors.management.helpers import venue_provider
+from django.core.management.base import BaseCommand
+from faker import Faker
+
+from admin_functions.views.allocate_requests import _allocate, _update_availabilities, get_suitable_tutors, \
+    get_venue_preference
+from code_tutors.management.helpers import programming_langs_provider, term_provider, user_provider, venue_provider
+from request_handler.models import Request
+
 
 class Command(BaseCommand):
     REQUEST_COUNT = 100
@@ -18,7 +18,7 @@ class Command(BaseCommand):
         self.faker.add_provider(term_provider.TermProvider)
         self.faker.add_provider(user_provider.UserProvider)
         self.faker.add_provider(venue_provider.VenueProvider)
-        self.frequencies = ['Weekly', 'Fortnightly', 'Biweekly', 'Monthly'] #There is currently no code to handle monthly
+        self.frequencies = ['Weekly', 'Fortnightly', 'Biweekly']
 
 
     def handle(self, *args, **options):
@@ -43,13 +43,14 @@ class Command(BaseCommand):
         tutor = None
         knowledge_area = self.faker.programming_langs()
         term = self.faker.term()
-        frequency = self.frequencies[randint(0, 3)]
+        frequency = self.frequencies[randint(0, 2)]
         duration = str(randint(1, 3)) + 'h'
         venue_preference = self.faker.venue()
         recurring = True if randint(0, 1) else False
-        self.try_create_request({'knowledge_area': knowledge_area, 'term':term, 'frequency':frequency, 'duration':duration,
-                                  'student':student, 'tutor':tutor, 'allocated':allocated,
-                                  'venue_preference':venue_preference, 'is_recurring':recurring})
+        self.try_create_request(
+            {'knowledge_area': knowledge_area, 'term': term, 'frequency': frequency, 'duration': duration,
+             'student': student, 'tutor': tutor, 'allocated': allocated,
+             'venue_preference': venue_preference, 'is_recurring': recurring})
 
     def try_create_request(self, data):
         try:
@@ -67,20 +68,28 @@ class Command(BaseCommand):
             frequency=data['frequency'],
             duration=data['duration'],
         )
-        if data['venue_preference']:
+        if data['venue_preference'] and isinstance(data['venue_preference'], list):
             req_object.venue_preference.set(data['venue_preference'])
 
         if data['allocated']:
-            lesson_request, suitable_tutors, venues = get_tuple(req_object.id)
-            day = None
+            venues = get_venue_preference(req_object.venue_preference)
+
             if req_object.student.availability.exists():
-                day = req_object.student.availability.all()[0]
+                day1 = req_object.student.availability.all()[0]
+                try:
+                    day2 = req_object.student.availability.all()[1] if req_object.frequency == 'Biweekly' else None
+                except IndexError:
+                    return
             else:
                 req_object.allocated = False
+                req_object.save()
+                return
 
-            if suitable_tutors.exists() and req_object.allocated:
-                allocate(req_object, suitable_tutors.all()[0], venues[0], day)
-                update_availabilities(req_object, day)
+            suitable_tutors = get_suitable_tutors(req_object.id, day1.id, day2.id if day2 else None)
+
+            if suitable_tutors.exists() and len(suitable_tutors.all()) > 0 and req_object.allocated:
+                _allocate(req_object, suitable_tutors.all()[0], venues[0], day1, day2)
+                _update_availabilities(req_object, day1, day2)
             else:
                 req_object.allocated = False
             req_object.save()

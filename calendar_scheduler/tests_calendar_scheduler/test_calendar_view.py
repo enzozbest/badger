@@ -8,7 +8,9 @@ from django.test import TestCase
 from user_system.models import User
 from django.urls import reverse
 from datetime import timedelta
-from calendar_scheduler.views.calendar import get_month_days, get_week_days, retrieve_calendar_events
+from calendar_scheduler.views.calendar import get_month_days, get_week_days
+from user_system.fixtures import create_test_users
+
 
 """ Classes to represent the calendar and lessons within the calendar
 
@@ -44,8 +46,7 @@ class CalendarHelperTests(TestCase):
 class CalendarViewTests(TestCase):
     def setUp(self):
         # Create users
-        from user_system.fixtures import create_test_users
-        create_test_users.create_test_user()
+        create_test_users.create_test_users()
         self.tutor = User.objects.get(user_type=User.ACCOUNT_TYPE_TUTOR)
         self.student = User.objects.get(user_type=User.ACCOUNT_TYPE_STUDENT)
         self.admin = User.objects.create_user(username="@admin", password="Password123", email="admin@example.com", user_type=User.ACCOUNT_TYPE_ADMIN)

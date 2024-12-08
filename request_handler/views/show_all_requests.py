@@ -1,15 +1,23 @@
-from request_handler.models import Request
-from request_handler.helpers.request_filter import AllocationFilter
-from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView
+from admin_functions.helpers.mixins import SortingMixin
+from request_handler.helpers.request_filter import RequestFilter
+from request_handler.models import Request
 
-class AllRequestsView(LoginRequiredMixin, ListView):
+
+class AllRequestsView(LoginRequiredMixin, SortingMixin, ListView):
+    """Class-based ListView to represent display a list of all relevant tutoring requests in the database
+
+    This view displays a filterable, sortable, searchable list of all relevant requests present in the database.
+    """
+    
     model = Request
     template_name = 'view_requests.html'
     context_object_name = 'requests'
     paginate_by = 20
-    ordering = ['pk']
-    filterset_class = AllocationFilter
+    filterset_class = RequestFilter
+    valid_sort_fields = ['id', 'student__first_name', 'student__last_name', 'knowledge_area', 'allocated']
+
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -19,10 +27,10 @@ class AllRequestsView(LoginRequiredMixin, ListView):
         if self.request.user.is_tutor:
             relevant_requests = queryset.filter(tutor=self.request.user)
 
-        self.filterset = AllocationFilter(self.request.GET, queryset=relevant_requests)
+        self.filterset = RequestFilter(self.request.GET, queryset=relevant_requests)
         if self.filterset.is_valid():
-            return self.filterset.qs
-        return queryset
+            queryset = self.filterset.qs
+        return self.get_sorting_queryset(queryset)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -31,8 +39,3 @@ class AllRequestsView(LoginRequiredMixin, ListView):
         context['total'] = self.filterset.qs.count()
         context['user'] = self.request.user
         return context
-
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return self.handle_no_permission()  # Redirects to login page
-        return super().dispatch(request, *args, **kwargs)

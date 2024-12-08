@@ -1,12 +1,11 @@
 from unittest.mock import patch
-
 from django.test import TestCase, Client
 from django.urls import reverse
-
 from calendar_scheduler.views.cancel_lessons import CancelLessonsView, cancel_day, cancel_term, cancel_recurring
 from user_system.models import User
 from calendar_scheduler.models import Booking
 from datetime import datetime, timedelta, date
+from user_system.fixtures import create_test_users
 
 """ Class to represent the cancelling of lessons
 

@@ -1,32 +1,46 @@
 [
   {
-      "first_name": "John",
-      "last_name": "Doe",
-      "username": "@johndoe",
-      "email": "johndoe@example.org",
-      "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
-      "user_type": "Admin",
-      "availability": []
-
+    "first_name": "John",
+    "last_name": "Doe",
+    "username": "@johndoe",
+    "email": "johndoe@example.org",
+    "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
+    "user_type": "Admin",
+    "hourly_rate": null,
+    "student_max_rate": null,
+    "availability": []
   },
   {
-      "first_name": "Jane",
-      "last_name": "Doe",
-      "username": "@janedoe",
-      "email": "janedoe@example.org",
-      "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
-      "user_type": "Tutor",
-      "availability": ["Tuesday"],
-      "hourly_rate": 25.00,
-      "knowledge_areas": ["Python", "Scala", "Java"]
+    "first_name": "Jane",
+    "last_name": "Doe",
+    "username": "@janedoe",
+    "email": "janedoe@example.org",
+    "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
+    "user_type": "Tutor",
+    "availability": [
+      "Tuesday",
+      "Wednesday"
+    ],
+    "hourly_rate": 25.00,
+    "knowledge_areas": [
+      "Python",
+      "Scala",
+      "Java"
+    ]
   },
   {
-      "first_name": "Charlie",
-      "last_name": "Johnson",
-      "username": "@charlie",
-      "email": "charliejohnson@example.org",
-      "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
-      "user_type": "Student",
-      "availability": ["Tuesday", "Thursday"]
+    "first_name": "Charlie",
+    "last_name": "Johnson",
+    "username": "@charlie",
+    "email": "charliejohnson@example.org",
+    "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
+    "user_type": "Student",
+    "hourly_rate": null,
+    "student_max_rate": 30.00,
+    "availability": [
+      "Tuesday",
+      "Thursday",
+      "Wednesday"
+    ]
   }
 ]

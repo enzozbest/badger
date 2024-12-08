@@ -1,8 +1,9 @@
 """Unit tests_user_system for the User model."""
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from django.core.management import call_command
+
 from user_system.models import User
+
 
 class UserModelTestCase(TestCase):
     """Unit tests_user_system for the User model."""
@@ -10,7 +11,7 @@ class UserModelTestCase(TestCase):
 
     def setUp(self):
         from user_system.fixtures import create_test_users
-        create_test_users.create_test_user()
+        create_test_users.create_test_users()
         self.user = User.objects.get(username='@johndoe')
 
     def test_valid_user(self):
@@ -53,7 +54,6 @@ class UserModelTestCase(TestCase):
         self.user.username = '@@johndoe'
         self._assert_user_is_invalid()
 
-
     def test_first_name_must_not_be_blank(self):
         self.user.first_name = ''
         self._assert_user_is_invalid()
@@ -71,7 +71,6 @@ class UserModelTestCase(TestCase):
         self.user.first_name = 'x' * 51
         self._assert_user_is_invalid()
 
-
     def test_last_name_must_not_be_blank(self):
         self.user.last_name = ''
         self._assert_user_is_invalid()
@@ -88,7 +87,6 @@ class UserModelTestCase(TestCase):
     def test_last_name_must_not_contain_more_than_50_characters(self):
         self.user.last_name = 'x' * 51
         self._assert_user_is_invalid()
-
 
     def test_email_must_not_be_blank(self):
         self.user.email = ''
@@ -119,11 +117,9 @@ class UserModelTestCase(TestCase):
         self.user.email = 'johndoe@@example.org'
         self._assert_user_is_invalid()
 
-
     def test_full_name_must_be_correct(self):
-        full_name = self.user.full_name()
+        full_name = self.user.full_name
         self.assertEqual(full_name, "John Doe")
-
 
     def test_default_gravatar(self):
         actual_gravatar_url = self.user.gravatar()
@@ -144,7 +140,6 @@ class UserModelTestCase(TestCase):
         gravatar_url = f"{UserModelTestCase.GRAVATAR_URL}?size={size}&default=mp"
         return gravatar_url
 
-
     def _assert_user_is_valid(self):
         try:
             self.user.full_clean()
@@ -158,8 +153,8 @@ class UserModelTestCase(TestCase):
     def test_string_method(self):
         s = str(self.user)
         self.assertEqual(s, (f'Username: @johndoe \n'
-                f'First Name: John \n'
-                f'Last Name: Doe \n'
-                f'User Type: Admin \n'
-                f'Email Address: johndoe@example.org'
-                ))
+                             f'First Name: John \n'
+                             f'Last Name: Doe \n'
+                             f'User Type: Admin \n'
+                             f'Email Address: johndoe@example.org'
+                             ))
