@@ -17,8 +17,7 @@ class CancelLessonsViewTests(TestCase):
     def setUp(self):
         # Create users
         self.client = Client()
-        from user_system.fixtures import create_test_users
-        create_test_users.create_test_user()
+        create_test_users.create_test_users()
         self.tutor = User.objects.get(user_type=User.ACCOUNT_TYPE_TUTOR)
         self.student = User.objects.get(user_type=User.ACCOUNT_TYPE_STUDENT)
 
@@ -264,7 +263,6 @@ class AdminCancelLessonsViewTest(TestCase):
 
     # Test that the admin can cancel a day lesson.
     def test_post_cancel_day(self):
-        # Perform a POST request to cancel a specific day
         response = self.client.post('/admins/calendar/cancel/', {
             'lesson': '1',
             'cancellation': 'day',
@@ -277,7 +275,6 @@ class AdminCancelLessonsViewTest(TestCase):
 
     # Test that the admin can cancel all the lessons in a term.
     def test_post_cancel_term(self):
-        # Perform a POST request to cancel a term
         response = self.client.post('/admins/calendar/cancel/', {
             'lesson': '1',
             'cancellation': 'term',
@@ -288,7 +285,6 @@ class AdminCancelLessonsViewTest(TestCase):
 
     # Test for an invalid cancellation type.
     def test_post_invalid_cancellation_type(self):
-        # Perform a POST request with an invalid cancellation type
         response = self.client.post('/admins/calendar/cancel/', {
             'lesson': '1',
             'cancellation': 'invalid',
@@ -297,7 +293,6 @@ class AdminCancelLessonsViewTest(TestCase):
 
     # Test that an admin can cancel recurring lessons.
     def test_post_cancel_recurring(self):
-        # Perform a POST request to cancel recurring lessons
         response = self.client.post('/admins/calendar/cancel/', {
             'lesson': '1',
             'cancellation': 'recurring',
