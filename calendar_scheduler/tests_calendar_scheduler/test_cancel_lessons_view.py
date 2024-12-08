@@ -1,5 +1,9 @@
-from django.test import TestCase
+from unittest.mock import patch
+
+from django.test import TestCase, Client
 from django.urls import reverse
+
+from calendar_scheduler.views.cancel_lessons import CancelLessonsView, cancel_day, cancel_term, cancel_recurring
 from user_system.models import User
 from calendar_scheduler.models import Booking
 from datetime import datetime, timedelta, date
@@ -13,6 +17,7 @@ and by multiple users, as the functionality works in the cancel_lessons view.
 class CancelLessonsViewTests(TestCase):
     def setUp(self):
         # Create users
+        self.client = Client()
         from user_system.fixtures import create_test_users
         create_test_users.create_test_user()
         self.tutor = User.objects.get(user_type=User.ACCOUNT_TYPE_TUTOR)
@@ -53,6 +58,12 @@ class CancelLessonsViewTests(TestCase):
             lesson_identifier="4",
             date=date(2025, 2, 3),
             is_recurring = True
+        )
+
+        self.booking = Booking.objects.create(
+            lesson_identifier="1",
+            date=date(2024, 12, 15),
+            cancellation_requested=False
         )
 
         self.client.login(username=self.tutor.username, password='Password123')
@@ -174,6 +185,20 @@ class CancelLessonsViewTests(TestCase):
         recurring_lessons = Booking.objects.filter(lesson_identifier="4")
         self.assertEqual(len(recurring_lessons), 0)
 
+    # Test that a request can be made for cancellation.
+    def test_post_request_cancellation(self):
+        self.client.login(username=self.student.username, password='Password123')
+        response = self.client.post(reverse('student_cancel_lessons'), {
+            'day': 15,
+            'month': 12,
+            'year': 2024,
+            'lesson': '1',
+            'cancellation': 'request',
+        })
+        self.assertEqual(response.status_code, 302)
+        self.booking.refresh_from_db()
+        self.assertTrue(self.booking.cancellation_requested)
+
     # Test that an admin can cancel lessons from the tutor/student calendar.
     def test_permission_denied_for_non_student_or_tutor(self):
         admin = User.objects.create_user(username="@admin", password="Password123", email="admin@example.com")
@@ -186,3 +211,140 @@ class CancelLessonsViewTests(TestCase):
 
         self.assertTemplateUsed(response, 'permission_denied.html')
         self.assertEqual(response.status_code, 401)
+
+    # Test that the cancel_day helper method works.
+    def test_cancel_day_success(self):
+        cancel_day('1', date(2024, 12, 15))
+        with self.assertRaises(Booking.DoesNotExist):
+            Booking.objects.get(lesson_identifier='1', date=date(2024, 12, 15))
+
+    def test_cancel_day_not_found(self):
+        response = cancel_day('1', date(2024, 12, 20))
+        self.assertEqual(response.status_code, 404)
+
+    # Test that the cancel_term helper method works.
+    def test_cancel_term(self):
+        cancel_term('1', '12')
+        self.assertFalse(Booking.objects.filter(lesson_identifier='1').exists())
+
+    # Test that the cancel recurring helper method works.
+    def test_cancel_recurring(self):
+        cancel_recurring('1')
+        self.assertFalse(Booking.objects.filter(lesson_identifier='1').exists())
+
+
+""" Class to represent the cancelling of lessons for admins
+
+This class is used as a view for the website. It creates multiple bookings and attempts to delete them in multiple ways
+through an admin (and as other forbidden users), as the functionality works in the cancel_lessons view.
+"""
+class AdminCancelLessonsViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.admin_user = User.objects.create_superuser(username='admin', password='password', user_type="Admin")
+        self.client.login(username='admin', password='password')
+
+        test_date = date.today() + timedelta(days=10)
+        self.booking_date = test_date
+        self.booking = Booking.objects.create(
+            lesson_identifier="1",
+            date=test_date,
+            cancellation_requested=False
+        )
+
+    # Test that the admin can see the cancellation page.
+    def test_get_admin_cancel_lessons(self):
+        # Perform a GET request as an admin
+        response = self.client.get('/admins/calendar/cancel/', {
+            'day': self.booking_date.day,
+            'month': self.booking_date.month,
+            'year': self.booking_date.year,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'admin_cancel_lessons.html')
+
+    # Test that the admin can cancel a day lesson.
+    def test_post_cancel_day(self):
+        # Perform a POST request to cancel a specific day
+        response = self.client.post('/admins/calendar/cancel/', {
+            'lesson': '1',
+            'cancellation': 'day',
+            'day': self.booking_date.day,
+            'month': self.booking_date.month,
+            'year': self.booking_date.year,
+        })
+        self.assertEqual(response.status_code, 302)  # Redirect to view_all_users
+        self.assertFalse(Booking.objects.filter(lesson_identifier="1", date=self.booking_date).exists())
+
+    # Test that the admin can cancel all the lessons in a term.
+    def test_post_cancel_term(self):
+        # Perform a POST request to cancel a term
+        response = self.client.post('/admins/calendar/cancel/', {
+            'lesson': '1',
+            'cancellation': 'term',
+            'month': self.booking_date.month,
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Booking.objects.filter(lesson_identifier="1").exists())
+
+    # Test for an invalid cancellation type.
+    def test_post_invalid_cancellation_type(self):
+        # Perform a POST request with an invalid cancellation type
+        response = self.client.post('/admins/calendar/cancel/', {
+            'lesson': '1',
+            'cancellation': 'invalid',
+        })
+        self.assertEqual(response.status_code, 400)
+
+    # Test that an admin can cancel recurring lessons.
+    def test_post_cancel_recurring(self):
+        # Perform a POST request to cancel recurring lessons
+        response = self.client.post('/admins/calendar/cancel/', {
+            'lesson': '1',
+            'cancellation': 'recurring',
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Booking.objects.filter(lesson_identifier="1").exists())
+
+    # Test when the close_date is false.
+    def test_close_date_false(self):
+        test_date_2 = date.today() + timedelta(days=20)
+        self.booking_2 = Booking.objects.create(
+            lesson_identifier="2",
+            date=test_date_2,
+            cancellation_requested=False
+        )
+        response = self.client.get('/admins/calendar/cancel/', {
+            'day': test_date_2.day,
+            'month': test_date_2.month,
+            'year': test_date_2.year,
+            'lesson': 2,  # Dummy lesson identifier
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'admin_cancel_lessons.html')
+
+    # Test the value error in the admin cancel lessons view.
+    def test_post_cancel_day_value_error(self):
+        invalid_date = date.today() + timedelta(days=10)
+        response = self.client.post('/admins/calendar/cancel/', {
+            'lesson': '999999',  # Non-existent lesson_id
+            'cancellation': 'day',
+            'day': invalid_date.day,
+            'month': invalid_date.month,
+            'year': invalid_date.year,
+        })
+        self.assertEqual(response.status_code, 500)
+        self.assertIn("No booking found for lesson_id", response.content.decode())
+
+    # Test the exception in the admin cancel lessons view.
+    def test_post_generic_exception(self):
+        with patch('calendar_scheduler.models.Booking.objects.get', side_effect=Exception("Unexpected error")):
+            response = self.client.post('/admins/calendar/cancel/', {
+                'lesson': '1',
+                'cancellation': 'day',
+                'day': self.booking_date.day+1,
+                'month': self.booking_date.month,
+                'year': self.booking_date.year,
+            })
+        self.assertEqual(response.status_code, 500)
+        self.assertIn("Error processing cancellation: No booking found for lesson_id: 1 on 2024-12-19", response.content.decode())

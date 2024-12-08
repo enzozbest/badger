@@ -163,7 +163,7 @@ class AdminCancelLessonsView(LoginRequiredMixin, View):
         except Exception as e:
             return HttpResponse(f"Error processing cancellation: {e}", status=500)
 
-        return redirect('view_all_users')
+        return redirect('view_all_users') # change this maybe
 
     # repetitive so will need refactoring
     def cancel_single_lesson_admin(self, lesson_id, cancel_one_day):
