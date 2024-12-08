@@ -3,16 +3,19 @@
 <div class="container mt-5">
   <div class="row justify-content-center">
     <div class="col-12 text-center">
-      <h1 class="display-5 text-white">Welcome to <span class="text-success">CodeConnect</span>, {{ user.username }}! <br> This is your <span class="text-success">dashboard</span></h1>
-      <p class="text-muted mt-2">Manage your tutoring requests or create new ones below.</p>
+      <h1 class="display-5 text-white">Welcome to <span class="text-success">CodeConnect</span>, {{ user.username }}!</h1>
+      <p class="text-muted mt-2">This is your <span class="text-success">dashboard</span>. Manage your tutoring requests or create new ones below.</p>
     </div>
   </div>
 
   <div class="row mt-4 justify-content-center">
     {% if user.user_type != 'Tutor' %}
-      <div class="col-md-6 mb-3">
-        <div class="card shadow-sm bg-dark text-white">
+      <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card shadow-lg bg-dark text-white h-100">
           <div class="card-body text-center">
+            <div class="mb-3">
+              <i class="bi bi-pencil-square text-primary" style="font-size: 2rem;"></i>
+            </div>
             <h5 class="card-title">Create a New Lesson Request</h5>
             <p class="card-text">Need help with a specific subject? Start by creating a new lesson request.</p>
             <a href="{% url 'create_request' %}" class="btn btn-primary">Create Request</a>
@@ -21,9 +24,12 @@
       </div>
     {% endif %}
 
-    <div class="col-md-6 mb-3">
-      <div class="card shadow-sm bg-dark text-white">
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div class="card shadow-lg bg-dark text-white h-100">
         <div class="card-body text-center">
+          <div class="mb-3">
+            <i class="bi bi-book text-secondary" style="font-size: 2rem;"></i>
+          </div>
           <h5 class="card-title">View Your Lesson Requests</h5>
           <p class="card-text">Review and manage your existing lesson requests here.</p>
           <a href="{% url 'view_requests' %}" class="btn btn-secondary">View Requests</a>
@@ -31,12 +37,28 @@
       </div>
     </div>
 
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div class="card shadow-lg bg-dark text-white h-100">
+        <div class="card-body text-center">
+          <div class="mb-3">
+            <i class="bi bi-calendar text-success" style="font-size: 2rem;"></i>
+          </div>
+          <h5 class="card-title">View Your Calendar</h5>
+          <p class="card-text">Stay organized by reviewing your calendar of lessons.</p>
+          <a href="{% url 'view_requests' %}" class="btn btn-success">View Calendar</a>
+        </div>
+      </div>
+    </div>
+
     {% if user.user_type == 'Admin' %}
-      <div class="col-md-6 mb-3">
-        <div class="card shadow-sm bg-dark text-white">
+      <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card shadow-lg bg-dark text-white h-100">
           <div class="card-body text-center">
-            <h5 class="card-title">{{ user.username }} you are an Administrator</h5>
-            <p class="card-text">View the users and manage lessons here.</p>
+            <div class="mb-3">
+              <i class="bi bi-person-circle text-warning" style="font-size: 2rem;"></i>
+            </div>
+            <h5 class="card-title">Administrator Dashboard</h5>
+            <p class="card-text">Manage users and lessons here.</p>
             <a href="{% url 'admin_dash' %}" class="btn btn-warning">Go to Admin Dashboard</a>
           </div>
         </div>
