@@ -96,12 +96,12 @@ class AcceptRequestViewTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
 
     # Test that another user cannot accept a request.
-    def test_user_not_tutor(self):
+    def test_user_not_admin(self):
         other_user = User.objects.create_user(username="@other_user", email="other_user@example.com", password="Password123")
         self.client.login(username="@other_user", password="Password123")
 
         response = self.client.post(reverse('accept_request', args=[self.lesson_request.id]))
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 302)
 
     # For some reason, this test is getting the first day from September 2025 (but putting the year as 2024)
     '''

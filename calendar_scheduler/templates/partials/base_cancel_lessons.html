@@ -4,6 +4,7 @@
         <form method="POST" action="{% block cancel_individual %}{% endblock %}">
             {% csrf_token %}
             <button type="submit">Cancel</button>
+            <input type="hidden" name="booking" value="{{ booking.id }}">
             <input type="hidden" name="day" value="{{ day }}">
             <input type="hidden" name="month" value="{{ month }}">
             <input type="hidden" name="year" value="{{ year }}">
@@ -11,6 +12,7 @@
             <input type="hidden" name="cancellation" value="day">
         </form>
     {% else %}
+        {% if user.user_type != "Admin" %}
         <p> Your lesson on {{day}}-{{month}}-{{year}} is less than 2 weeks away.</p>
         <p> You may only request an individual lesson cancellation that can either be accepted or refused.</p>
         <form method="POST" action="{% block request_cancellation %}{% endblock %}">
@@ -22,6 +24,7 @@
             <input type="hidden" name="lesson" value="{{ lesson }}">
             <input type="hidden" name="cancellation" value="request">
         </form>
+        {% endif %}
     {% endif %}
 
     <p>Click below to cancel all lessons for your term</p>

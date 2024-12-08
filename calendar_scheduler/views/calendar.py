@@ -1,5 +1,5 @@
 from calendar import Calendar
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from calendar_scheduler.models import Booking
 from schedule.models import Calendar
 from datetime import datetime,date,timedelta
@@ -48,7 +48,7 @@ The day is associated with the day attribute of the request parameter
 
 The calendar parameter is a Calendar object from django-scheduler/schedule
 '''
-def retrieve_calendar_events(calendar, request):
+def retrieve_calendar_events(calendar, request, user_for_calendar=None):
     # Get today's date for the default display
     today = datetime.today()
     year = int(request.GET.get("year", today.year))
@@ -83,9 +83,20 @@ def retrieve_calendar_events(calendar, request):
                 if(newEvent.exists()): # Only append events where the queryset isn't empty
                     events.append(newEvent)
             elif request.user.user_type == 'Admin':
-                newEvent = Booking.objects.filter(date=selected_date)
-                if (newEvent.exists()):
-                    events.append(newEvent)
+                if user_for_calendar:
+                    # Admin is viewing a specific user's calendar
+                    if user_for_calendar.user_type == 'Student':
+                        newEvent = Booking.objects.filter(student=user_for_calendar, date=selected_date)
+                    elif user_for_calendar.user_type == 'Tutor':
+                        newEvent = Booking.objects.filter(tutor=user_for_calendar, date=selected_date)
+                    if newEvent.exists():
+                        events.append(newEvent)
+                else:
+                    # If no specific user is selected, admin sees all events
+                    newEvent = Booking.objects.filter(date=selected_date)
+                    if newEvent.exists():
+                        events.append(newEvent)
+
 
         except ValueError:
             break
@@ -103,9 +114,24 @@ def retrieve_calendar_events(calendar, request):
         }
 
 class TutorCalendarView(LoginRequiredMixin,View):
-    def get(self, request: HttpRequest) -> HttpResponse:
+    def get(self, request: HttpRequest, pk: int = None) -> HttpResponse:
         if request.user.is_student:
             return render(request, 'permission_denied.html', status=401)
+
+        elif request.user.is_admin and pk:
+            user_for_calendar = get_object_or_404(User, pk=pk)
+            pk = user_for_calendar.pk
+            if user_for_calendar.user_type == 'Tutor':
+                calendar = Calendar.objects.get(slug='tutor')
+                template = 'admin_tutor_calendar.html'
+            else:
+                print("ERORORROROROROROR")
+                calender = Calendar.objects.get(slug='student')
+                template = 'admin_student_calendar.html'
+
+            data = retrieve_calendar_events(calendar, request, user_for_calendar)
+            return render(request, template, data)
+
         try:
             calendar = Calendar.objects.get(slug='tutor')
             data = retrieve_calendar_events(calendar,request)
@@ -114,35 +140,27 @@ class TutorCalendarView(LoginRequiredMixin,View):
             return render(request, 'dashboard.html',status=404)
 
 class StudentCalendarView(LoginRequiredMixin,View):
-    def get(self, request: HttpRequest) -> HttpResponse:
+    def get(self, request: HttpRequest, pk: int = None) -> HttpResponse:
         if request.user.is_tutor:
             return render(request, 'permission_denied.html', status=401)
+
+        elif request.user.is_admin and pk:
+            user_for_calendar = get_object_or_404(User, pk=pk)
+            pk = user_for_calendar.pk
+            if user_for_calendar.user_type == 'Student':
+                calendar = Calendar.objects.get(slug='student')
+                template = 'admin_student_calendar.html'
+            else:
+                print("ERORRRORORORORORORORORO")
+                calender = Calendar.objects.get(slug='tutor')
+                template = 'admin_tutor_calendar.html'
+
+            data = retrieve_calendar_events(calendar, request, user_for_calendar)
+            return render(request, template, data)
+
         try:
             calendar = Calendar.objects.get(slug='tutor')
             data = retrieve_calendar_events(calendar, request)
             return render(request,'student_calendar.html', data)
         except Calendar.DoesNotExist:
             return render(request, 'dashboard.html',status=404)
-'''
-class AdminCalendarView(LoginRequiredMixin, View):
-    def get(self, request: HttpRequest) -> HttpResponse:
-        if not request.user.is_admin:
-            return render(request, 'permission_denied.html', status=401)
-        # Fetch the user whose calendar we want to display
-        target_user = get_object_or_404(User)
-
-        # Determine whether the user is a student or tutor
-        if target_user.user_type == 'Student':
-            calendar = Calendar.objects.get(slug='student')
-        elif target_user.user_type == 'Tutor':
-            calendar = Calendar.objects.get(slug='tutor')
-        else:
-            return render(request, 'dashboard.html', {"error": "Invalid user type."}, status=400)
-
-        # Fetch the calendar events for the specific user
-        try:
-            data = retrieve_calendar_events(calendar, request, user=target_user)  # Pass the target user
-            # return render(request, 'admin_calendar.html', data)
-        except Calendar.DoesNotExist:
-            return render(request, 'dashboard.html', {"error": "Calendar does not exist."}, status=404)
-'''

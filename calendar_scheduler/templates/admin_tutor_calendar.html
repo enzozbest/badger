@@ -1,0 +1,9 @@
+{% extends "partials/base_calendar.html" %}
+
+{% block title %}
+Tutor Calendar
+{% endblock %}
+
+{% block calendar_action %}
+{% url 'admin_cancel_lessons' %}
+{% endblock %}
