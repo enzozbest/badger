@@ -37,44 +37,49 @@ def generate_invoice(request_obj: Request) -> None:
         pdf = canvas.Canvas(buffer, pagesize=A4)
 
     width, height = A4
-    pdf.drawImage(_LOGO_PATH, x=20, y=height - 100, width=100, height=50, preserveAspectRatio=True, mask='auto')
-
-    # Add title
+    
+    # Header with Logo
     pdf.setFont("Helvetica-Bold", 16)
-    pdf.drawString(150, height - 60, "Invoice")
-
-     # Recipient Information Section
-    pdf.setFont("Helvetica-Bold", 14)
-    pdf.drawString(20, height - 170, "Recipient Information:")
-    pdf.setFont("Helvetica", 12)
-    pdf.drawString(40, height - 190, f"Recipient: {request_obj.student.full_name}")
-    pdf.drawString(40, height - 210, f"Tutor: {request_obj.tutor.full_name}")
-    pdf.drawString(40, height - 230, f"Tutor Email: {request_obj.tutor.email}")
-
-    # Lesson Details Section
-    pdf.setFont("Helvetica-Bold", 14)
-    pdf.drawString(20, height - 260, "Lesson Details:")
-    pdf.setFont("Helvetica", 12)
-    pdf.drawString(40, height - 280, f"Hourly Rate: £{request_obj.tutor.hourly_rate:.2f}")
-    pdf.drawString(40, height - 300, f"Lessons Booked: {calculate_num_lessons(request_obj.frequency)}")
-    pdf.drawString(40, height - 320, f"Total Cost: £{invoice.total:.2f}")
-
-    # Footer Section
+    pdf.drawString(20, height - 60, "Code Connect Tutors")
+    pdf.setFont("Helvetica-Bold", 16)
+    pdf.drawString(width - 200, height - 60, "Transfer Confirmation")
     pdf.setFont("Helvetica", 10)
-    pdf.setFillColorRGB(0.5, 0.5, 0.5)  # Light gray for footer text
-    pdf.drawCentredString(width / 2, 50, "Thank you for using our service!")
-    pdf.setFillColorRGB(0, 0, 0)  # Reset to black for remaining content
 
-    # # Add payment information
-    # pdf.setFont("Helvetica-Bold", 12)
-    # pdf.drawString(20, height - 260, "Payment Information:")
-    # pdf.setFont("Helvetica", 12)
-    # pdf.drawString(20, height - 280, f"Bank Name: {bank_details['bank_name']}")
-    # pdf.drawString(20, height - 300, f"Account Number: {bank_details['account_number']}")
-    # pdf.drawString(20, height - 320, f"Sort Code: {bank_details['sort_code']}")
-    # pdf.drawString(20, height - 340, f"Reference: {bank_details['reference']}")
+    pdf.setLineWidth(1)
+    pdf.line(20 + 28, height - 90, width - 28, height - 90)
+    
+    content_start = height - 150
 
-    # Finalize the PDF !!DO NOT REMOVE!!
+    pdf.setFont("Helvetica-Bold", 12)
+    pdf.drawString(20, content_start, "Recipient details")
+    pdf.setFont("Helvetica", 10)
+    pdf.drawString(40, content_start - 20, f"Tutor Name: {request_obj.tutor.full_name}")
+    pdf.drawString(40, content_start - 40, f"Tutor Email: {request_obj.tutor.email}")
+    
+    # Student Details
+    content_start -= 80
+    pdf.setFont("Helvetica-Bold", 12)
+    pdf.drawString(20, content_start, "Payer details")
+    pdf.setFont("Helvetica", 10)
+    pdf.drawString(40, content_start - 20, f"Student Name: {request_obj.student.full_name}")
+    
+    # Transfer Overview
+    content_start -= 80
+    pdf.setFont("Helvetica-Bold", 12)
+    pdf.drawString(20, content_start, "Transfer details")
+    pdf.setFont("Helvetica", 10)
+    pdf.drawString(40, content_start - 20, f"Hourly Rate: £{request_obj.tutor.hourly_rate:.2f}")
+    pdf.drawString(40, content_start - 40, f"Lessons Booked: {calculate_num_lessons(request_obj.frequency)}")
+    pdf.drawString(40, content_start - 60, f"Total Cost: £{invoice.total:.2f}")
+    pdf.drawString(40, content_start - 80, "Status: Completed")
+    
+    # Footer
+    pdf.setFont("Helvetica", 8)
+    pdf.setFillColorRGB(0.5, 0.5, 0.5)  # Light gray
+    pdf.drawCentredString(width / 2, 50, "Thank you for using Code Connect Tutors!")
+    pdf.drawCentredString(width / 2, 40, "For support, contact support@codeconnect.com")
+    pdf.setFillColorRGB(0, 0, 0)  # Reset color
+
     pdf.save()
 
     if not LOCAL_STORE:
