@@ -9,23 +9,23 @@ from django.db.models import Max
 
 logger = logging.getLogger(__name__)
 
-def get_first_weekday(year, month, day):
-        """
-        Get the first occurrence of a specific weekday in a given month.
+def get_first_weekday(year, month, target_day):
+    """
+    Get the first occurrence of a specific weekday in a given month.
 
-        Weekday parameter is the day that we would like the first of as an Int
+    Weekday parameter is the day that we would like the first of as an Int
 
-        Returns a date object for the first occurrence of the specified weekday
-        """
-        # Start with the first day of the month
-        first_day = date(year, month, 1)
-        # Calculate the difference to the target weekday
-        daysList = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
-        days_to_weekday = (daysList.index(day.day) - first_day.day + 7) % 7
-        # Add the difference to the first day
-        first_weekday = first_day + timedelta(days=days_to_weekday + 1)
-        lesson_time = time(12,0)
-        return datetime.combine(first_weekday,lesson_time)
+    Returns a date object for the first occurrence of the specified weekday
+    """
+    # Start with the first day of the month
+    first_day = date(year, month, 1)
+    first_day_weekday = first_day.weekday() 
+    weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    day = weekdays.index(target_day.day)
+    days_to_target = (day - first_day_weekday + 7) % 7
+    target = first_day + timedelta(days=days_to_target)
+    lesson_time = time(12,0)
+    return datetime.combine(target,lesson_time)
 
 class AcceptRequestView(LoginRequiredMixin, View):
     def post(self, request, request_id):
@@ -88,8 +88,17 @@ class AcceptRequestView(LoginRequiredMixin, View):
                     case "Weekly":
                         booking_date += timedelta(days=7)
                     case "Biweekly":
-                        booking_date += timedelta(days=3)
-                        #Is this fine, since we didn't discuss 2 day availability
+                        weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+                        day1 = weekdays.index(str(lesson_request.day))
+                        day2 = weekdays.index(str(lesson_request.day2))
+                        if booking_date.weekday() == day1:
+                            #Find the difference from day1 to day2
+                            dayDiff = (day2-day1 + 7) % 7
+                            booking_date += timedelta(days=dayDiff)
+                        else:
+                            #Find the difference from day2 to day1
+                            dayDiff = (day1 - booking_date.weekday() + 7) % 7
+                            booking_date += timedelta(days=dayDiff)
                     case "Fortnightly":
                         booking_date += timedelta(days=14)
 
