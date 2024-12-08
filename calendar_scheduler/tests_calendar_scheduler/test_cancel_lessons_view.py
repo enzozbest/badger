@@ -14,7 +14,7 @@ and by multiple users, as the functionality works in the cancel_lessons view.
 class CancelLessonsViewTests(TestCase):
     def setUp(self):
         # Create users
-        create_test_users.create_test_user()
+        create_test_users.create_test_users()
         self.tutor = User.objects.get(user_type=User.ACCOUNT_TYPE_TUTOR)
         self.student = User.objects.get(user_type=User.ACCOUNT_TYPE_STUDENT)
 

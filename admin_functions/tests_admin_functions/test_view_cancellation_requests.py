@@ -9,7 +9,7 @@ from user_system.fixtures import create_test_users
 
 class ViewCancellationRequestsTestCase(TestCase):
     def setUp(self):
-        create_test_users.create_test_user()
+        create_test_users.create_test_users()
         self.student = User.objects.get(user_type=User.ACCOUNT_TYPE_STUDENT)
         self.admin = User.objects.get(user_type=User.ACCOUNT_TYPE_ADMIN)
         self.tutor = User.objects.get(user_type=User.ACCOUNT_TYPE_TUTOR)
