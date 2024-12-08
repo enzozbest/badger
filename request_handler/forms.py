@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import django.forms as forms
 
-from user_system.forms import get_knowledge_areas
+from user_system.forms.knowledge_area_form import get_knowledge_areas
 from .models import Request, Venue
 
 
@@ -12,7 +12,7 @@ class RequestForm(forms.ModelForm):
     This class is used as the form displayed to a student user when they wish to make a request for tutoring. They can fill
     in all the fields and a Request instance containing that information will be created and stored in the database.
     """
-    
+
     venue_preference = forms.ModelMultipleChoiceField(
         queryset=Venue.objects.all(),
         widget=forms.CheckboxSelectMultiple,

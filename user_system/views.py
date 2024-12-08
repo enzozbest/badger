@@ -4,15 +4,19 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
-from django.shortcuts import redirect, render, get_object_or_404
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views import View
 from django.views.generic.edit import FormView, UpdateView
-from django.urls import reverse
-from user_system.forms import LogInForm, PasswordForm, UserForm, SignUpForm
-from django.http import HttpRequest, HttpResponse, Http404
+
+from user_system.forms.knowledge_area_form import KnowledgeAreaForm
+from user_system.forms.login_form import LogInForm
+from user_system.forms.password_form import PasswordForm
+from user_system.forms.signup_form import SignUpForm
+from user_system.forms.user_form import UserForm
 from user_system.helpers import login_prohibited
 from .models import KnowledgeArea, User
-from .forms import KnowledgeAreaForm
 
 
 @login_required
@@ -26,6 +30,7 @@ def dashboard(request: HttpRequest) -> HttpResponse:
 def home(request: HttpRequest) -> HttpResponse:
     """Display the application's start/home screen."""
     return render(request, 'home.html')
+
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
@@ -140,6 +145,7 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
+
 class SignUpView(LoginProhibitedMixin, FormView):
     """Display the sign up screen and handle sign ups."""
 
@@ -154,6 +160,7 @@ class SignUpView(LoginProhibitedMixin, FormView):
 
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
 
 @login_required
 def AddKnowledgeAreas(request):
@@ -178,7 +185,9 @@ def AddKnowledgeAreas(request):
     knowledge_areas = KnowledgeArea.objects.filter(user=request.user)  # Only retrieve knowledge areas of this tutor
     existing_subjects = [area.subject for area in knowledge_areas]
 
-    return render(request, 'add_knowledge_areas.html', {'form': form, 'knowledge_areas': knowledge_areas, 'existing_subjects': existing_subjects})
+    return render(request, 'add_knowledge_areas.html',
+                  {'form': form, 'knowledge_areas': knowledge_areas, 'existing_subjects': existing_subjects})
+
 
 @login_required
 def DeleteKnowledgeArea(request, area_id):

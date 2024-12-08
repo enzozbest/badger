@@ -2,7 +2,7 @@
 from django import forms
 from django.test import TestCase
 
-from user_system.forms import LogInForm
+from user_system.forms.login_form import LogInForm
 from user_system.models import User
 
 
