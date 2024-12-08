@@ -2,7 +2,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from user_system.models import User
+from user_system.models.user_model import User
 
 
 class UserModelTestCase(TestCase):

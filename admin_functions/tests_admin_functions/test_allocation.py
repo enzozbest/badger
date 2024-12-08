@@ -8,7 +8,8 @@ from admin_functions.views.allocate_requests import get_suitable_tutors, get_ven
 from request_handler.fixtures.create_test_requests import create_test_requests
 from request_handler.models import Request, Venue
 from user_system.fixtures.create_test_users import create_test_users
-from user_system.models import Day, User
+from user_system.models.day_model import Day
+from user_system.models.user_model import User
 
 
 class TestAllocation(TestCase):

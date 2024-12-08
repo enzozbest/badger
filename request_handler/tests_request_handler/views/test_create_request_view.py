@@ -6,7 +6,8 @@ from django.urls import reverse
 
 from request_handler.models import Venue
 from user_system.fixtures.create_test_users import create_test_users
-from user_system.models import Day, User
+from user_system.models.user_model import User
+from user_system.models.day_model import Day
 
 INVALID_REQUEST_ID = 999
 

@@ -3,7 +3,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, render
 from django.views import View
 
-from user_system.models import User
+from user_system.models.user_model import User
 
 """ These classes allow admins to make selected users also admins and confirms their choice
 

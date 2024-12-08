@@ -1,6 +1,6 @@
 from django import forms
 
-from user_system.models import KnowledgeArea
+from user_system.models.knowledge_area_model import KnowledgeArea
 
 
 def get_knowledge_areas():

@@ -4,7 +4,7 @@ from django.urls import reverse
 
 from request_handler.models import Request, Venue
 from user_system.fixtures.create_test_users import create_test_users
-from user_system.models import User
+from user_system.models.user_model import User
 
 INVALID_REQUEST_ID = 999999999
 
@@ -28,7 +28,7 @@ class DeleteRequestViewTest(TestCase):
         self.url = reverse('delete_request', kwargs={'pk': self.request_instance.pk})
 
     def test_delete_request_url(self):
-        self.assertEqual(self.url, f'/request/{self.request_instance.pk}/delete/')
+        self.assertEqual(self.url, f'/requests/delete/{self.request_instance.pk}/')
 
     def test_get_bad_request(self):
         self.client.force_login(self.student)

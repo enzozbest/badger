@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from user_system.forms.password_form import PasswordForm
-from user_system.models import User
+from user_system.models.user_model import User
 from user_system.tests_user_system.helpers import reverse_with_next
 
 

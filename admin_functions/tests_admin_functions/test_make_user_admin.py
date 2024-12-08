@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from user_system.models import User
+from user_system.models.user_model import User
 
 
 class MakeUserAdminTestCase(TestCase):

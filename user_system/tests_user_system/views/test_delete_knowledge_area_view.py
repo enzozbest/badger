@@ -2,7 +2,8 @@ from django.http import Http404
 from django.test import TestCase
 from django.urls import reverse
 
-from user_system.models import KnowledgeArea, User
+from user_system.models.knowledge_area_model import KnowledgeArea
+from user_system.models.user_model import User
 
 
 class DeleteKnowledgeAreaTest(TestCase):

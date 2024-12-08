@@ -1,7 +1,8 @@
 from django import forms
 
 from user_system.forms import NewPasswordMixin
-from user_system.models import Day, User
+from user_system.models.day_model import Day
+from user_system.models.user_model import User
 
 
 class SignUpForm(NewPasswordMixin, forms.ModelForm):

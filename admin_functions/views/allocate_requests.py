@@ -6,7 +6,8 @@ from django.views import View
 
 from admin_functions.forms import AllocationForm
 from request_handler.models import Request, User, Venue
-from user_system.models import Day, KnowledgeArea
+from user_system.models.day_model import Day
+from user_system.models.knowledge_area_model import KnowledgeArea
 
 
 class AllocateRequestView(LoginRequiredMixin, View):

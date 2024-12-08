@@ -1,5 +1,6 @@
 from faker.providers import BaseProvider
-from user_system.models import User
+from user_system.models.user_model import User
+
 
 class UserProvider(BaseProvider):
     def student(self):

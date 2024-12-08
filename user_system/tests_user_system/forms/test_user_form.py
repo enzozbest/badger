@@ -6,7 +6,7 @@ from django.test import TestCase
 
 from user_system.fixtures.create_test_users import create_test_users
 from user_system.forms.user_form import UserForm
-from user_system.models import User
+from user_system.models.user_model import User
 
 
 class UserFormTestCase(TestCase):

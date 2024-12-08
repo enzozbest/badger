@@ -4,7 +4,7 @@ from django.urls import reverse
 from admin_functions.helpers.filters import UserFilter
 from admin_functions.views.view_all_users import AllUsersView
 from user_system.fixtures.create_test_users import create_test_users
-from user_system.models import User
+from user_system.models.user_model import User
 
 
 class ViewAllUsersTestCase(TestCase):

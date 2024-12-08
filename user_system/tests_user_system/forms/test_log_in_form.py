@@ -3,7 +3,7 @@ from django import forms
 from django.test import TestCase
 
 from user_system.forms.login_form import LogInForm
-from user_system.models import User
+from user_system.models.user_model import User
 
 
 class LogInFormTestCase(TestCase):

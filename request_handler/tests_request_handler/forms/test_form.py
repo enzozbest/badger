@@ -6,7 +6,7 @@ from django.test import TestCase
 
 from request_handler.forms import RequestForm
 from request_handler.models import Venue
-from user_system.models import Day
+from user_system.models.day_model import Day
 
 
 class TestRequestForm(TestCase):
