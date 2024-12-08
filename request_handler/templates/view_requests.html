@@ -7,7 +7,6 @@
         <a href="{% url 'dashboard' %}" class="btn btn-outline-success">Go to Dashboard</a>
     </div>
 
-
     <form method="get" class="bg-dark text-white p-3 rounded mb-4">
         <p class="text-white">Showing {{ count }} out of {{ total }} requests:</p>
         <div class="d-flex flex-wrap justify-content-start align-items-center mb-4">
@@ -48,19 +47,15 @@
     </form>
 
     {% if requests %}
-
         <div class="row row-cols-1 row-cols-md-4 g-4">
             {% for request in requests %}
                 <div class="col">
                     <div class="card h-100 bg-dark text-white rounded-3 shadow-sm border">
                         <div class="card-body">
                             <div class="p-3 bg-dark d-flex align-items-center">
-
-                                <!-- ID Display -->
                                 <div class="text-muted small position-absolute" style="right: 1rem; top: 1rem;">
                                     #{{ request.id }}
                                 </div>
-
                                 <div class="position-absolute" style="right: 1rem; top: 3rem;">
                                     <img 
                                         src="{% static 'subjects/'|add:request.knowledge_area|add:'.png' %}" 
@@ -137,18 +132,14 @@
                                         <button type="submit" class="btn btn-outline-primary btn-sm">Generate Invoice</button>
                                     </form>
                                 {% endif %}
-
                             </div>
                         </div>
-                        
-                        
                     </div>
                 </div>
             {% endfor %}
         </div>
 
         {% include 'partials/_pagination.html' %}
-
     {% else %}
         <p class="text-muted text-center">No tutoring requests found.</p>
     {% endif %}
