@@ -143,9 +143,9 @@ class CalendarViewTests(TestCase):
         response = self.client.get(reverse('student_calendar'))
         self.assertEqual(response.status_code, 404)
 
+    # Test that an admin can view a specific student's calendar.
     def test_admin_view_student_calendar(self):
         self.client.login(username=self.admin.username, password='Password123')
-        # Get the student's calendar view
         url = reverse('admin_student_calendar', kwargs={'pk': self.student.pk})
         response = self.client.get(url)
 
@@ -153,55 +153,51 @@ class CalendarViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'admin_student_calendar.html')
 
+    # Test that the student view does not allow admins to see a tutor's calendar.
     def test_admin_view_student_calendar_raises_value_error_for_non_student(self):
         self.client.login(username=self.admin.username, password='Password123')
-
-        # Create a tutor user (non-student)
         tutor_user = User.objects.create_user(username='tutor', password='password', user_type=User.ACCOUNT_TYPE_TUTOR)
 
         url = reverse('admin_student_calendar', kwargs={'pk': tutor_user.pk})
 
-        # Ensure that the exception is raised when a non-student user tries to access the calendar
         with self.assertRaises(ValueError):
             self.client.get(url)
 
+    # Test that an admin can view a specific student's calendar.
     def test_admin_view_tutor_calendar(self):
         self.client.login(username=self.admin.username, password='Password123')
-        # Get the student's calendar view
+
         url = reverse('admin_tutor_calendar', kwargs={'pk': self.tutor.pk})
         response = self.client.get(url)
 
-        # Check that the admin can access the calendar and correct template is rendered
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'admin_tutor_calendar.html')
 
-    def test_admin_view_tutor_calendar_raises_value_error_for_non_student(self):
+    # Test that the tutor view does not allow admins to see a student's calendar.
+    def test_admin_view_tutor_calendar_raises_value_error_for_non_tutor(self):
         self.client.login(username=self.admin.username, password='Password123')
 
         # Create a tutor user (non-student)
         student_user = User.objects.create_user(username='student', password='password', user_type=User.ACCOUNT_TYPE_STUDENT)
-
         url = reverse('admin_tutor_calendar', kwargs={'pk': student_user.pk})
 
-        # Ensure that the exception is raised when a non-student user tries to access the calendar
         with self.assertRaises(ValueError):
             self.client.get(url)
 
+    # Test that the ValueError is raised properly.
     def test_admin_view_raises_error_for_unknown_user_type(self):
         self.client.login(username=self.admin.username, password='Password123')
 
-        # Create a user with an invalid type
         unknown_user = User.objects.create_user(username='unknown', password='password', user_type='Unknown')
-
         url = reverse('admin_student_calendar', kwargs={'pk': unknown_user.pk})
 
         # Ensure that the exception is raised
         with self.assertRaises(ValueError):
             self.client.get(url)
 
+    # Test that the exception works appropriately in the calendar view.
     def test_value_error_handling_in_admin_view(self):
         self.client.login(username=self.admin.username, password='Password123')
-        # Try to access a calendar of an invalid user type, expecting a ValueError to be raised
         try:
             self.client.get(reverse('admin_student_calendar', kwargs={'pk': 9999}))
         except ValueError as e:
