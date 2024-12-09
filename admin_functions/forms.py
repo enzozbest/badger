@@ -1,7 +1,8 @@
 import django.forms as forms
 
 from request_handler.models import Venue
-from user_system.models import Day, User
+from user_system.models.day_model import Day
+from user_system.models.user_model import User
 
 
 class AllocationForm(forms.Form):

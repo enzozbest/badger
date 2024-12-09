@@ -1,18 +1,23 @@
-from django.test import TestCase, Client
-from django.urls import reverse
-from user_system.models import User
-from request_handler.models import Request
-from request_handler.forms import RejectRequestForm
 from django.http import HttpResponseForbidden
+from django.test import TestCase
+from django.urls import reverse
+
+from request_handler.forms import RejectRequestForm
+from request_handler.models import Request
+from user_system.models.user_model import User
+
 
 class RejectRequestViewTests(TestCase):
     def setUp(self):
-        self.admin_user = User.objects.create_user(username='@admin', password='Password123', email="admin@example.com", user_type='Admin')
-        self.regular_user = User.objects.create_user(username='@student', password='Password123', email="student@example.com", user_type='Student')
-        self.request = Request.objects.create(student=self.regular_user, knowledge_area='Scala', term='2024', is_recurring=False, late=False)
+        self.admin_user = User.objects.create_user(username='@admin', password='Password123', email="admin@example.com",
+                                                   user_type='Admin')
+        self.regular_user = User.objects.create_user(username='@student', password='Password123',
+                                                     email="student@example.com", user_type='Student')
+        self.request = Request.objects.create(student=self.regular_user, knowledge_area='Scala', term='2024',
+                                              is_recurring=False, late=False)
         self.reject_url = reverse('reject_request', args=[self.request.id])
 
-    #Test that non-admin users cannot access the reject request view.
+    # Test that non-admin users cannot access the reject request view.
     def test_reject_request_for_non_admin_user(self):
         self.client.login(username='@student', password='Password123')
         response = self.client.get(self.reject_url)

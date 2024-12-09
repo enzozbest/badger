@@ -4,7 +4,9 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from invoicer.models import Invoice
-from user_system.models import User, Day
+
+from user_system.models.day_model import Day
+from user_system.models.user_model import User
 
 class Venue(models.Model):
     """ Class representing a venue for tutoring sessions.

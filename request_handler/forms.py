@@ -1,9 +1,11 @@
 from datetime import datetime, timedelta
 
 import django.forms as forms
-from user_system.forms import get_knowledge_areas
+
+from user_system.forms.knowledge_area_form import get_knowledge_areas
+
 from .models import Request, Venue
-from user_system.models import Day
+from user_system.models.day_model import Day
 
 class RequestForm(forms.ModelForm):
     """ Class representing a form to create a tutoring Request instance.

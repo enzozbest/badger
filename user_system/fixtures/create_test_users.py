@@ -1,6 +1,8 @@
 import json
 
-from user_system.models import Day, KnowledgeArea, User
+from user_system.models.day_model import Day
+from user_system.models.knowledge_area_model import KnowledgeArea
+from user_system.models.user_model import User
 
 
 def create_test_users() -> None:

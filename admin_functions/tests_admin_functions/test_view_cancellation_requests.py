@@ -1,10 +1,11 @@
+from datetime import date
+
 from django.test import TestCase
 from django.urls import reverse
-from user_system.models import User
-from calendar_scheduler.models import Booking
-from datetime import datetime, timedelta, date
-from user_system.fixtures import create_test_users
 
+from calendar_scheduler.models import Booking
+from user_system.fixtures import create_test_users
+from user_system.models.user_model import User
 
 
 class ViewCancellationRequestsTestCase(TestCase):
@@ -14,7 +15,7 @@ class ViewCancellationRequestsTestCase(TestCase):
         self.admin = User.objects.get(user_type=User.ACCOUNT_TYPE_ADMIN)
         self.tutor = User.objects.get(user_type=User.ACCOUNT_TYPE_TUTOR)
 
-        self.booking_sep = Booking.objects.create( # September term booking
+        self.booking_sep = Booking.objects.create(  # September term booking
             student=self.student,
             tutor=self.tutor,
             start="2024-12-03 10:00:00",
@@ -28,7 +29,7 @@ class ViewCancellationRequestsTestCase(TestCase):
         self.client.login(username=self.admin.username, password='Password123')
         response = self.client.post(reverse('view_cancellation_requests'))
         self.assertEqual(response.status_code, 405)
-    
+
     def test_unauthenticated_user_cannot_view_requests(self):
         response = self.client.get(reverse('view_cancellation_requests'), follow=True)
         self.assertRedirects(response, reverse('log_in'), status_code=302, target_status_code=200)
@@ -39,20 +40,15 @@ class ViewCancellationRequestsTestCase(TestCase):
         response = self.client.post(reverse('view_cancellation_requests'))
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response.content, b'Not Allowed')
-    
+
     def test_non_admin_not_allowed(self):
-        self.client.login(username=self.student.username,password='Password123')
+        self.client.login(username=self.student.username, password='Password123')
         response = self.client.get(reverse('view_cancellation_requests'))
         self.assertEqual(response.status_code, 403)
         self.assertTemplateUsed(response, 'permission_denied.html')
-    
+
     def test_cancellation_requests_in_view(self):
-        self.client.login(username=self.admin.username,password='Password123')
+        self.client.login(username=self.admin.username, password='Password123')
         response = self.client.get(reverse('view_cancellation_requests'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'view_cancellation_requests.html')
-
-
-
-
-    

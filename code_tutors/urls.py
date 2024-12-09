@@ -18,60 +18,31 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
+from django.urls.conf import include
 
-from user_system import views as tutorial_views
-from request_handler.views import accept_request as accept_request_view, create_request as create_request_view, delete_request as delete_request_view, \
-    edit_request as edit_request_view, show_all_requests as view_requests_view, small_views as request_handler_views
-from admin_functions.views import allocate_requests as allocate_requests_view, make_user_admin as make_user_admin_view, \
-    small_views as small_views_view, view_all_users as view_all_users_view, view_cancellation_requests as cancellation_request_view
-from calendar_scheduler.views import calendar as calendar_view, cancel_lessons as cancel_lessons_view
-from invoicer.views.generate_invoice_view import generate_invoice_for_request
-from invoicer.views.get_invoice_view import get_invoice
-from invoicer.views.set_payment_status_view import set_payment_status
-from request_handler.views import reject_request as reject_request_view
-
+from admin_functions.views.view_cancellation_requests import ViewCancellationRequests
+from calendar_scheduler.views.calendar import StudentCalendarView, TutorCalendarView
+from calendar_scheduler.views.cancel_lessons import AdminCancelLessonsView, CancelLessonsView
+from request_handler.views.accept_request import AcceptRequestView
+from request_handler.views.reject_request import reject_request
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', tutorial_views.home, name='home'),
-    path('dashboard/', tutorial_views.dashboard, name='dashboard'),
-    path('log_in/', tutorial_views.LogInView.as_view(), name='log_in'),
-    path('log_out/', tutorial_views.log_out, name='log_out'),
-    path('password/', tutorial_views.PasswordView.as_view(), name='password'),
-    path('profile/', tutorial_views.ProfileUpdateView.as_view(), name='profile'),
-    path('sign_up/', tutorial_views.SignUpView.as_view(), name='sign_up'),
-    path('create_request/', create_request_view.CreateRequestView.as_view(), name="create_request"),
-    path('request_success/', request_handler_views.request_success, name="request_success"),
-    path('view_requests/', view_requests_view.AllRequestsView.as_view(), name='view_requests'),
-    path('edit_request/<int:pk>/', edit_request_view.EditRequestView.as_view(), name='edit_request'),
-    path('request/<int:pk>/delete/', delete_request_view.DeleteRequestView.as_view(), name='delete_request'),
-    path('delete_request/<int:pk>/confirm/', delete_request_view.ConfirmDeleteRequestView.as_view(),
-         name='confirm_delete_request'),
-    path('permission_denied/', request_handler_views.permission_denied, name='permission_denied'),
-    path('processing_late_request/', request_handler_views.processing_late_request, name='processing_late_request'),
-    path('admins/dashboard', small_views_view.admin_dash, name="admin_dash"),
-    path('admins/view_all_users', view_all_users_view.AllUsersView.as_view(), name='view_all_users'),
-    path('admins/make_admin/<int:pk>', make_user_admin_view.MakeUserAdmin.as_view(), name="make_admin"),
-    path('admins/make_admin/<int:pk>/confirm', make_user_admin_view.ConfirmMakeUserAdmin.as_view(),
-         name="confirm_make_admin"),
-    path('add-knowledge-areas/', tutorial_views.AddKnowledgeAreas, name='add_knowledge_areas'),
-    path('delete-knowledge-area/<int:area_id>/', tutorial_views.DeleteKnowledgeArea, name='delete_knowledge_area'),
-    path("admins/allocate_request/<int:request_id>/", allocate_requests_view.AllocateRequestView.as_view(),
-         name="allocate_request"),
-    path("admins/generate_invoice/<int:tutoring_request_id>/", generate_invoice_for_request, name="generate_invoice"),
-    path("get_invoice/<str:invoice_id>", get_invoice, name='get_invoice'),
-    path("set_payment_status/<str:invoice_id>/<int:payment_status>", set_payment_status,name="set_payment_status"),
-    path('accept_request/<int:request_id>/', accept_request_view.AcceptRequestView.as_view(), name="accept_request"),
-    path('tutor/calendar/', calendar_view.TutorCalendarView.as_view(), name='tutor_calendar'),
-    path('student/calendar/', calendar_view.StudentCalendarView.as_view(),name='student_calendar'),
-    path('admin-tutor/calendar/<int:pk>/', calendar_view.TutorCalendarView.as_view(), name='admin_tutor_calendar'),
-    path('admin-student/calendar/<int:pk>/', calendar_view.StudentCalendarView.as_view(),name='admin_student_calendar'),
-    path('tutor/calendar/cancel/', cancel_lessons_view.CancelLessonsView.as_view(), name='tutor_cancel_lessons'),
-    path('student/calendar/cancel/', cancel_lessons_view.CancelLessonsView.as_view(),name='student_cancel_lessons'),
-    path('admins/calendar/cancel/',cancel_lessons_view.AdminCancelLessonsView.as_view(),name='admin_calendar_cancel_lessons'),
-    path('admins/cancel/', cancel_lessons_view.CancelLessonsView.as_view(),name='admin_cancel_lessons'),
-    path('admins/cancellation_requests/', cancellation_request_view.ViewCancellationRequests.as_view(),name='view_cancellation_requests'),
-    path('reject_request/<int:request_id>/', reject_request_view.reject_request, name='reject_request'),
+    path('', include('user_system.urls')),
+    path('requests/', include('request_handler.urls')),
+    path('admins/', include('admin_functions.urls')),
+    path('invoices/', include('invoicer.urls')),
+    path('accept_request/<int:request_id>/', AcceptRequestView.as_view(), name="accept_request"),
+    path('tutor/calendar/', TutorCalendarView.as_view(), name='tutor_calendar'),
+    path('student/calendar/', StudentCalendarView.as_view(), name='student_calendar'),
+    path('admin-tutor/calendar/<int:pk>/', TutorCalendarView.as_view(), name='admin_tutor_calendar'),
+    path('admin-student/calendar/<int:pk>/', StudentCalendarView.as_view(), name='admin_student_calendar'),
+    path('tutor/calendar/cancel/', CancelLessonsView.as_view(), name='tutor_cancel_lessons'),
+    path('student/calendar/cancel/', CancelLessonsView.as_view(), name='student_cancel_lessons'),
+    path('admins/calendar/cancel/', AdminCancelLessonsView.as_view(), name='admin_calendar_cancel_lessons'),
+    path('admins/cancel/', CancelLessonsView.as_view(), name='admin_cancel_lessons'),
+    path('admins/cancellation_requests/', ViewCancellationRequests.as_view(), name='view_cancellation_requests'),
+    path('reject_request/<int:request_id>/', reject_request, name='reject_request'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

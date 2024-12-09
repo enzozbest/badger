@@ -4,7 +4,7 @@ from django.urls import reverse
 from request_handler.forms import RequestForm
 from request_handler.models import Request, Venue
 from user_system.fixtures.create_test_users import create_test_users
-from user_system.models import User
+from user_system.models.user_model import User
 
 INVALID_REQUEST_ID = 999
 

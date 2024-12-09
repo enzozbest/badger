@@ -3,8 +3,8 @@ from django import forms
 from django.contrib.auth.hashers import check_password
 from django.test import TestCase
 
-from user_system.forms import SignUpForm
-from user_system.models import User
+from user_system.forms.signup_form import SignUpForm
+from user_system.models.user_model import User
 
 
 class SignUpFormTestCase(TestCase):
