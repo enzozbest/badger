@@ -170,8 +170,7 @@ h3.profile-title {
 }
 
 .btn-outline-light {
-  border:#fff;
-  color: #fff;
+  
   font-weight: 500;
   padding: 10px 20px;
   transition: all 0.3s ease;
@@ -188,3 +187,103 @@ h3.profile-title {
   margin: 1rem 0; /* Adjust spacing as needed */
 }
 
+.calendar .event h6, .calendar .event p {
+  text-shadow: none; /* Remove text shadow */
+}
+
+.calendar {
+  background-color: #222222; /* Slightly lighter dark grey for calendar */
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+.calendar .table {
+  table-layout: fixed;
+  border-collapse: collapse;
+  width: 100%;
+}
+.calendar .table th, .calendar .table td {
+  border: 1px solid #4d4d4d; /* Subtle border color */
+  padding: 10px;
+  vertical-align: top;
+}
+.calendar .table th {
+  background-color: #444;
+  color: #ddd; /* Light grey text for headers */
+}
+.calendar .table td {
+  background-color: #3a3a3a; /* Match calendar background */
+  color: #ffffff; /* White text */
+  height: 150px;
+}
+.calendar .table td:hover {
+  background-color: #3b3b3b; /* Slightly lighter grey on hover */
+  cursor: pointer;
+}
+.calendar .event {
+  background-color: #17a2b8; /* Teal for events */
+  border-radius: 5px;
+  padding: 8px;
+  margin-top: 8px;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+.calendar .event p {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+
+
+.btn {
+  border-radius: 20px;
+}
+.btn-danger {
+  background-color: #c0392b; /* Deep red for cancel button */
+  border-color: #c0392b;
+}
+.btn-danger:hover {
+  background-color: #e74c3c; /* Lighter red on hover */
+}
+.text-danger {
+  color: #e74c3c !important; /* Highlight weekends */
+}
+
+/* View Users Table Enhancements */
+.table-users {
+  background-color: #1f1f1f; /* Dark grey for user table */
+  color: #fff;
+}
+.table-users th {
+  background-color: #333;
+  color: #ddd; /* Lighter text */
+  font-weight: bold;
+}
+.table-users td {
+  background-color: #262626;
+  color: #fff;
+}
+.table-users tr:hover {
+  background-color: #444;
+}
+
+.table-users .btn {
+  width: 160px; /* Fixed width for buttons */
+  font-size: 0.9rem;
+  padding: 5px 10px;
+}
+
+.table-users .btn-info {
+  background-color: #17a2b8;
+  border: none;
+}
+.table-users .btn-info:hover {
+  background-color: #138496;
+}
+.table-users .btn-primary {
+  background-color: #007bff;
+  border: none;
+}
+.table-users .btn-primary:hover {
+  background-color: #0056b3;
+}
