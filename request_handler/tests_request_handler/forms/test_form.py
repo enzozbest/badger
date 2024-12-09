@@ -8,7 +8,6 @@ from request_handler.forms import RequestForm
 from request_handler.models import Venue
 from user_system.models.day_model import Day
 
-
 class TestRequestForm(TestCase):
     def setUp(self):
         self.monday, _ = Day.objects.get_or_create(day='Monday')

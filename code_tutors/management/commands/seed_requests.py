@@ -20,6 +20,7 @@ class Command(BaseCommand):
         self.faker.add_provider(venue_provider.VenueProvider)
         self.frequencies = ['Weekly', 'Fortnightly', 'Biweekly']
 
+
     def handle(self, *args, **options):
         self.__init__()
         self.create_requests()
@@ -55,7 +56,7 @@ class Command(BaseCommand):
         try:
             self.create_request(data)
         except Exception as e:
-            print(e)
+            pass
 
     def create_request(self, data):
         req_object = Request.objects.create(
@@ -78,12 +79,15 @@ class Command(BaseCommand):
                 try:
                     day2 = req_object.student.availability.all()[1] if req_object.frequency == 'Biweekly' else None
                 except IndexError:
-                    return
+                    req_object.allocated = False
+                    req_object.save()
+                    raise Exception("Skipping this user, no availability for Biweekly allocation!")
             else:
                 req_object.allocated = False
                 req_object.save()
                 return
 
+            req_object.refresh_from_db()
             suitable_tutors = get_suitable_tutors(req_object.id, day1.id, day2.id if day2 else None)
 
             if suitable_tutors.exists() and len(suitable_tutors.all()) > 0 and req_object.allocated:
@@ -91,6 +95,7 @@ class Command(BaseCommand):
                 _update_availabilities(req_object, day1, day2)
             else:
                 req_object.allocated = False
+
             req_object.save()
 
         req_object.save()

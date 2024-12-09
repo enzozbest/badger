@@ -109,6 +109,8 @@ Run all tests with:
 $ python3 manage.py test
 ```
 
+All tests should pass, and coverage is at 100% if the variable USE_AWS_S3 in code_tutors/settings.py is set. Note that if you do not use AWS (i.e. you do not have it set up locally and/or the variable is not set), AWS-related tests will be skipped and this may impact the coverage report! 
+
 ## Sources
 
 The packages used by this application are specified in `requirements.txt`

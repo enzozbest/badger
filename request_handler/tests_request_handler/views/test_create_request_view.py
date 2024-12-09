@@ -11,7 +11,6 @@ from user_system.models.day_model import Day
 
 INVALID_REQUEST_ID = 999
 
-
 class TestViews(TestCase):
     def setUp(self):
         create_test_users()
@@ -85,11 +84,12 @@ class TestViews(TestCase):
             'venue_preference': [self.online.id]
         }
         # Purposefully choosing a late term
-        if datetime.now().month >= 1 and datetime.now().month < 5:
+        today_date = datetime.now()
+        if today_date.month >= 1 and today_date.month < 5:
             data['term'] = 'January'
-        elif datetime.now().month > 8 and datetime.now().month <= 12:
+        elif today_date.month > 8 and today_date.month <= 12:
             data['term'] = 'September'
-        elif datetime.now().month < 9:
+        elif today_date.now().month < 9:
             data['term'] = 'May'
 
         url = reverse('create_request')

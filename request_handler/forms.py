@@ -3,8 +3,9 @@ from datetime import datetime, timedelta
 import django.forms as forms
 
 from user_system.forms.knowledge_area_form import get_knowledge_areas
-from .models import Request, Venue
 
+from .models import Request, Venue
+from user_system.models.day_model import Day
 
 class RequestForm(forms.ModelForm):
     """ Class representing a form to create a tutoring Request instance.
@@ -48,9 +49,12 @@ class RequestForm(forms.ModelForm):
                      (term == "January" and todayDate > term_two - timedelta(weeks=2)) or
                      (term == "May" and todayDate > term_three - timedelta(weeks=2))):
             late = True
-
         return late
 
     class Meta:
         model = Request
         fields = ['knowledge_area', 'term', 'frequency', 'duration', 'venue_preference', 'is_recurring']
+
+class RejectRequestForm(forms.Form):
+    reason = forms.CharField(widget=forms.Textarea, label='Reason for rejection:')
+
