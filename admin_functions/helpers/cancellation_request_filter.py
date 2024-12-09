@@ -13,27 +13,35 @@ class CancellationRequestFilter(django_filters.FilterSet):
     def filter_search(self, queryset, name, value):
         search_filter = Q(student__first_name__icontains=value) | \
                         Q(tutor__first_name__icontains=value)
-        try:
-            search_date = datetime.strptime(value, "%b. %d, %Y").date() 
-            search_filter |= Q(date=search_date)
-        except ValueError:
+
+        if value:
+            value_cleaned = value.replace('.', '').strip()
+
             try:
-                search_date = datetime.strptime(value, "%b %d, %Y").date()
-                search_filter |= Q(date=search_date)
+                if len(value_cleaned) == 3:
+                    search_month = datetime.strptime(value_cleaned, "%b").month
+                    search_filter |= Q(date__month=search_month)
+                else:
+                    search_date = datetime.strptime(value_cleaned, "%b %d")
+                    search_filter |= Q(date__month=search_date.month, date__day__icontains=search_date.day)
             except ValueError:
                 try:
-                    search_date = datetime.strptime(value, "%b %d").date()
-                    current_year = datetime.now().year
-                    search_date = search_date.replace(year=current_year)
-                    search_filter |= Q(date=search_date)
+                    search_day = int(value_cleaned)
+                    search_filter |= Q(date__day__icontains=search_day)
                 except ValueError:
                     pass
 
-        try:
-            search_filter |= Q(id=int(value))
-        except ValueError:
-            pass
-        
+            try:
+                search_year = int(value_cleaned)
+                search_filter |= Q(date__year=search_year)
+            except ValueError:
+                pass
+
+            try:
+                search_filter |= Q(id__icontains=int(value_cleaned))
+            except ValueError:
+                pass
+
         return queryset.filter(search_filter)
 
     class Meta:

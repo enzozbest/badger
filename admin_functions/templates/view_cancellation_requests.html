@@ -4,6 +4,7 @@
     <!-- Filter Form -->
     <form method="get">
         {{ filter.form.as_p }}
+        <p><i>Search by ID, Student Name, Tutor Name, Date (e.g., Dec / Dec 13 / 13)</i></p>
         {% for key, value in request.GET.items %}
             {% if key not in filter.form.fields.keys and key != 'page' %}
                 <input type="hidden" name="{{ key }}" value="{{ value }}">
