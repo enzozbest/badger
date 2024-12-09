@@ -47,7 +47,6 @@
                                                 <li>{{ i.cancellation_requested }}</li>
                                                 <!-- Form to submit lesson cancellation -->
                                                 <form method="GET" action="{% block calendar_action %}{% endblock %}">
-                                                    {% csrf_token %}
                                                     <button type="submit">Cancel</button>
                                                     <input type="hidden" name="day" value="{{ day }}">
                                                     <input type="hidden" name="month" value="{{ month }}">
