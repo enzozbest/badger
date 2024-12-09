@@ -167,17 +167,18 @@ def get_suitable_tutors(request_id: int, day1_id: int, day2_id: int) -> QuerySet
 
 def _allocate(lesson_request: Request, tutor: User, venue: Venue, day1: Day, day2: Day) -> None:
     weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-    if lesson_request.frequency == 'Biweekly' and weekdays.index(day1.day) < weekdays.index(day2.day):
+    if lesson_request.frequency == 'Biweekly':# and weekdays.index(day1.day) < weekdays.index(day2.day):
         #Ensure day1 is before day2
-        lesson_request.day = day1
+        #lesson_request.day = day1
         lesson_request.day2 = day2
-    elif lesson_request.frequency == 'Biweekly' and weekdays.index(day1.day) > weekdays.index(day2.day):
-        lesson_request.day = day2
-        lesson_request.day2 = day1
-    else:
-        lesson_request.day = day1
+    #elif lesson_request.frequency == 'Biweekly' and weekdays.index(day1.day) > weekdays.index(day2.day):
+    #    lesson_request.day = day2
+    #    lesson_request.day2 = day1
+    #else:
+    #    lesson_request.day = day1
 
     lesson_request.tutor = tutor
+    lesson_request.day = day1
     lesson_request.venue = venue
     lesson_request.allocated = True
     lesson_request.save()

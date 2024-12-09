@@ -63,6 +63,7 @@
         <th>Rejected?</th>
         <th>Rejection Reason</th>
         <th>On time?</th>
+        <th>Paid?</th>
         <th>Status</th>
         <th>Action</th>
     </tr>
@@ -107,6 +108,13 @@
                     <li>Late request</li>
                 {% else %}
                     <li>On time</li>
+                {% endif %}
+            </td>
+            <td>
+                {% if request.paid_status %}
+                    Successfully paid
+                {% else %}
+                    Payment pending
                 {% endif %}
             </td>
             <td>
