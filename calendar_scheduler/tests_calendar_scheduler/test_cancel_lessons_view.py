@@ -74,7 +74,7 @@ class CancelLessonsViewTests(TestCase):
         self.assertTemplateUsed(response, 'tutor_cancel_lessons.html')
 
         # Test if the date is more than 2 weeks away
-        future_date = (datetime(2025, 12, 3) + timedelta(days=20)).date()  # More than 2 weeks ahead
+        future_date = (datetime(2035, 12, 3) + timedelta(days=20)).date()  # More than 2 weeks ahead
         response = self.client.get(reverse('tutor_cancel_lessons'),
                                    {'day': future_date.day, 'month': future_date.month, 'year': future_date.year,
                                     'lesson': '1'})
@@ -87,7 +87,7 @@ class CancelLessonsViewTests(TestCase):
                             #f'Click below to cancel your individual lesson on {new_date}')  # When close_date is False
 
         # Test if the date is within 2 weeks
-        close_date = (datetime(2024, 12, 3) + timedelta(days=5)).date()  # Within 2 weeks
+        close_date = (datetime(2024, 11, 5) + timedelta(days=5)).date()  # Within 2 weeks
         response = self.client.get(reverse('tutor_cancel_lessons'),
                                    {'day': close_date.day, 'month': close_date.month, 'year': close_date.year,
                                     'lesson': '1'})
