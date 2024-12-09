@@ -1,0 +1,42 @@
+<body>
+    <h1>Cancellation requests</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Student</th>
+                <th>Tutor</th>
+                <th>Lesson date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in lessons.all %}
+            <tr>
+                <td>{{ i.id }}</td>
+                <td>{{ i.student.first_name }}  {{ i.student.last_name }}</td>
+                <td>{{ i.tutor.first_name }}  {{ i.tutor.last_name }}</td>
+                <td>{{ i.date }}</td>
+                <td>
+                    <ul>
+                        <form method="POST" action="{% url 'admin_cancel_lessons' %}">
+                            {% csrf_token %}
+                            <button type="submit">Accept</button>
+                            <input type="hidden" name="date" value="{{ i.date }}">
+                            <input type="hidden" name="lesson" value="{{ i.id }}">
+                            <input type="hidden" name="cancellation" value="accept">
+                        </form>
+                        <form method="POST" action="{% url 'admin_cancel_lessons' %}">
+                            {% csrf_token %}
+                            <button type="submit">Reject</button>
+                            <input type="hidden" name="date" value="{{ i.date }}">
+                            <input type="hidden" name="lesson" value="{{ i.id }}">
+                            <input type="hidden" name="cancellation" value="reject">
+                        </form>
+                    </ul>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>

@@ -24,6 +24,7 @@
 
     <!-- Table -->
     <table>
+
         {% include "partials/sorting_table_head.html" with valid_sorting_fields=valid_sorting_fields current_sort=current_sort %}
         <tbody>
             {% for user in users %}
@@ -36,6 +37,13 @@
                         {% if user.user_type != 'Admin' %}
                             <a href="{% url 'make_admin' user.id %}">Make Administrator</a>
                         {% endif %}
+                    </td>
+                    <td>
+                    {% if user.user_type == 'Tutor' %}
+                        <a href="{% url 'admin_tutor_calendar' user.id %}">View Tutor Calendar</a>
+                    {% elif user.user_type == 'Student' %}
+                        <a href="{% url 'admin_student_calendar' user.id %}">View Student Calendar</a>
+                    {% endif %}
                     </td>
                 </tr>
             {% empty %}

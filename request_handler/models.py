@@ -1,9 +1,12 @@
+from email.policy import default
+
 from django.core.exceptions import ValidationError
 from django.db import models
 
 from invoicer.models import Invoice
-from user_system.models import Day, User
 
+from user_system.models.day_model import Day
+from user_system.models.user_model import User
 
 class Venue(models.Model):
     """ Class representing a venue for tutoring sessions.
@@ -29,8 +32,7 @@ class Request(models.Model):
     allocated = models.BooleanField(default=False, blank=True)
     allocated_string = 'No'
     tutor_name_string = '-'
-    tutor = models.ForeignKey(User, default=None, null=True, on_delete=models.SET_NULL, blank=True,
-                              related_name='tutor')
+    tutor = models.ForeignKey(User, default=None, null=True, on_delete=models.SET_NULL, blank=True, related_name='tutor')
     knowledge_area = models.CharField(max_length=255, blank=False)
     venue_preference = models.ManyToManyField(Venue, blank=False, related_name='student_venue_preference')
     term = models.CharField(max_length=255)
@@ -43,6 +45,8 @@ class Request(models.Model):
     venue = models.ForeignKey(Venue, null=True, blank=True, on_delete=models.SET_NULL, related_name='allocated_venue')
     invoice = models.ForeignKey(Invoice, null=True, blank=True, on_delete=models.SET_NULL,
                                 related_name='request_invoice')
+    rejected_request = models.BooleanField(default=False, null=True)
+    rejection_reason = models.TextField(blank=True, null=True)
 
     @property
     def student_email(self):
@@ -83,3 +87,4 @@ class Request(models.Model):
         super().clean()
         if self.pk and not self.venue_preference.exists():
             raise ValidationError({"venue_preference": "No venue preference set!"})
+        

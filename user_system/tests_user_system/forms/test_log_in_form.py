@@ -2,16 +2,16 @@
 from django import forms
 from django.test import TestCase
 
-from user_system.forms import LogInForm
-from user_system.models import User
+from user_system.fixtures.create_test_users import create_test_users
+from user_system.forms.login_form import LogInForm
+from user_system.models.user_model import User
 
 
 class LogInFormTestCase(TestCase):
     """Unit tests_user_system of the log in form."""
 
     def setUp(self):
-        from user_system.fixtures import create_test_users
-        create_test_users.create_test_users()
+        create_test_users()
         self.form_input = {'username': '@janedoe', 'password': 'Password123'}
 
     def test_form_contains_required_fields(self):

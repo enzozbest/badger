@@ -8,7 +8,7 @@ from request_handler.fixtures.create_test_requests import create_test_requests
 from request_handler.models import Request, Venue
 from request_handler.views.show_all_requests import AllRequestsView
 from user_system.fixtures.create_test_users import create_test_users
-from user_system.models import User
+from user_system.models.user_model import User
 
 INVALID_REQUEST_ID = 999
 

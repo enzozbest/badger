@@ -1,10 +1,10 @@
-"""Tests of the log in view."""
 from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
 
-from user_system.forms import LogInForm
-from user_system.models import User
+from user_system.fixtures.create_test_users import create_test_users
+from user_system.forms.login_form import LogInForm
+from user_system.models.user_model import User
 from user_system.tests_user_system.helpers import LogInTester, MenuTesterMixin, reverse_with_next
 
 
@@ -12,9 +12,7 @@ class LogInViewTestCase(TestCase, LogInTester, MenuTesterMixin):
     """Tests of the log in view."""
 
     def setUp(self):
-        from user_system.fixtures import create_test_users
-        create_test_users.create_test_users()
-
+        create_test_users()
         self.url = reverse('log_in')
         self.user = User.objects.get(username='@johndoe')
 

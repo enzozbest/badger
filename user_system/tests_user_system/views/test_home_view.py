@@ -1,17 +1,15 @@
-"""Tests of the home view."""
 from django.test import TestCase
 from django.urls import reverse
 
-from user_system.models import User
+from user_system.fixtures.create_test_users import create_test_users
+from user_system.models.user_model import User
 
 
 class HomeViewTestCase(TestCase):
     """Tests of the home view."""
 
     def setUp(self):
-        from user_system.fixtures import create_test_users
-        create_test_users.create_test_users()
-
+        create_test_users()
         self.url = reverse('home')
         self.user = User.objects.get(username='@johndoe')
 

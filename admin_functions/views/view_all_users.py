@@ -6,7 +6,7 @@ from django.views.generic import ListView
 
 from admin_functions.helpers.filters import UserFilter
 from admin_functions.helpers.mixins import SortingMixin
-from user_system.models import User
+from user_system.models.user_model import User
 
 
 class AllUsersView(LoginRequiredMixin, SortingMixin, ListView):
