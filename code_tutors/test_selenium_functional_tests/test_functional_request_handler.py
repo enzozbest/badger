@@ -31,10 +31,13 @@ class TestFunctionalRequestHandler(StaticLiveServerTestCase):
 
     def test_student_can_create_a_request(self):
         log_in_via_form(self.driver, self.live_server_url, self.student.username, 'Password123')
-        self.create_request_via_form()
+        self.create_request_via_form(self.student)
 
     def test_tutor_cannot_create_a_request(self):
-        pass
+        log_in_via_form(self.driver, self.live_server_url, self.tutor.username, 'Password123')
+        url = f"{self.live_server_url}{reverse('create_request')}"
+        self.driver.get(url)
+        self.assertIn("Permission Denied", self.driver.page_source)
 
     def test_student_can_edit_a_request(self):
         log_in_via_form(self.driver, self.live_server_url, self.student.username, 'Password123')
@@ -54,6 +57,14 @@ class TestFunctionalRequestHandler(StaticLiveServerTestCase):
         request.refresh_from_db()
         self.assertEqual(request.knowledge_area, 'Python')
 
+    def test_tutor_cannot_edit_a_request(self):
+        log_in_via_form(self.driver, self.live_server_url, self.tutor.username, 'Password123')
+        create_test_requests()
+        request = Request.objects.all().first()
+        url = f"{self.live_server_url}{reverse('edit_request', kwargs={'pk': request.id})}"
+        self.driver.get(url)
+        self.assertIn("Permission Denied", self.driver.page_source)
+
     def test_student_can_delete_a_request(self):
         log_in_via_form(self.driver, self.live_server_url, self.student.username, 'Password123')
         create_test_requests()
@@ -68,13 +79,57 @@ class TestFunctionalRequestHandler(StaticLiveServerTestCase):
         self.assertEqual(self.driver.current_url, f"{self.live_server_url}{reverse('view_requests')}")
         self.assertFalse(Request.objects.filter(id=request.id).exists())
 
-    def create_request_via_form(self):
+    def test_tutor_cannot_delete_a_request(self):
+        log_in_via_form(self.driver, self.live_server_url, self.tutor.username, 'Password123')
+        create_test_requests()
+        request = Request.objects.all().first()
+        url = f"{self.live_server_url}{reverse('delete_request', kwargs={'pk': request.id})}"
+        self.driver.get(url)
+        self.assertIn("Permission Denied", self.driver.page_source)
+
+    def test_admin_can_create_a_request(self):
+        log_in_via_form(self.driver, self.live_server_url, self.admin.username, 'Password123')
+        self.create_request_via_form(self.admin)
+
+    def test_admin_can_edit_a_request(self):
+        log_in_via_form(self.driver, self.live_server_url, self.admin.username, 'Password123')
+        create_test_requests()
+        request = Request.objects.all().first()
+        self.driver.get(f'{self.live_server_url}{reverse("edit_request", kwargs={"pk": request.id})}')
+        wait(self.driver)
+
+        new_knowledge_area = Select(wait_for_element(self.driver, By.ID, "id_knowledge_area"))
+        new_knowledge_area.select_by_visible_text("Python")
+        submit_button = wait_for_clickable(self.driver, wait_for_element(self.driver, By.ID, "id_submit_button"))
+        submit_button.click()
+
+        wait(self.driver)
+        self.assertEqual(self.driver.current_url, f"{self.live_server_url}{reverse('view_requests')}")
+        self.assertTrue(Request.objects.filter(id=request.id).exists())
+        request.refresh_from_db()
+        self.assertEqual(request.knowledge_area, 'Python')
+
+    def test_admin_can_delete_a_request(self):
+        log_in_via_form(self.driver, self.live_server_url, self.admin.username, 'Password123')
+        create_test_requests()
+        request = Request.objects.all().first()
+        self.driver.get(f"{self.live_server_url}{reverse('confirm_delete_request', kwargs={'pk': request.id})}")
+        wait(self.driver)
+
+        submit_button = wait_for_clickable(self.driver, wait_for_element(self.driver, By.ID, "id_submit_button"))
+        submit_button.click()
+
+        wait(self.driver)
+        self.assertEqual(self.driver.current_url, f"{self.live_server_url}{reverse('view_requests')}")
+        self.assertFalse(Request.objects.filter(id=request.id).exists())
+
+    def create_request_via_form(self, user: User):
         self.driver.get(f'{self.live_server_url}{reverse("create_request")}')
         wait(self.driver)
         self.populate_create_request_fields(self.get_create_request_fields())
         wait(self.driver)
         self.assertEqual(self.driver.current_url, f"{self.live_server_url}{reverse('request_success')}")
-        self.assertTrue(Request.objects.filter(student=self.student).exists())
+        self.assertTrue(Request.objects.filter(student=user).exists())
 
     def get_create_request_fields(self) -> tuple:
         knowledge_area_input = Select(wait_for_element(self.driver, By.ID, "id_knowledge_area"))
