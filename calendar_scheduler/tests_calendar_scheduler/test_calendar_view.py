@@ -11,7 +11,6 @@ from datetime import timedelta
 from calendar_scheduler.views.calendar import get_month_days, get_week_days
 from user_system.fixtures import create_test_users
 
-
 """ Classes to represent the calendar and lessons within the calendar
 
 Both classes below (CalendarHelperTests and CalendarViewTests) are used as a view for the website. CalendarHelperTests

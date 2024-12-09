@@ -6,7 +6,6 @@ from user_system.models import User, Day
 from request_handler.models import Request, Venue
 from calendar_scheduler.models import Booking
 from datetime import datetime, timedelta
-from django.utils import timezone
 
 class AcceptRequestViewTestCase(TestCase):
     def setUp(self):
