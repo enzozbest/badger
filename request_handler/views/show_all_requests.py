@@ -3,6 +3,8 @@ from django.views.generic import ListView
 from admin_functions.helpers.mixins import SortingMixin
 from request_handler.helpers.request_filter import RequestFilter
 from request_handler.models import Request
+from django.db.models import Q, Value, Case, When
+from django.db.models.fields import CharField
 
 
 class AllRequestsView(LoginRequiredMixin, SortingMixin, ListView):
@@ -27,7 +29,16 @@ class AllRequestsView(LoginRequiredMixin, SortingMixin, ListView):
         if self.request.user.is_tutor:
             relevant_requests = queryset.filter(tutor=self.request.user)
 
-        self.filterset = RequestFilter(self.request.GET, queryset=relevant_requests)
+        annotated_queryset = relevant_requests.annotate(
+            paid_status=Case(
+                When(invoice__payment_status=True, then=Value("Yes")),
+                When(invoice__payment_status=False, then=Value("No")),
+                defualt=Value("No Invoice"),
+                output_field=CharField()
+            )
+        )
+
+        self.filterset = RequestFilter(self.request.GET, queryset=annotated_queryset)
         if self.filterset.is_valid():
             queryset = self.filterset.qs
         return self.get_sorting_queryset(queryset)

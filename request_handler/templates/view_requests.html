@@ -57,8 +57,13 @@
                 {% endif %}
             </a>
         </th>
+        <th>Term</th>
+        <th>Recurring?</th>
         <th>Venue Preference</th>
+        <th>Rejected?</th>
+        <th>Rejection Reason</th>
         <th>On time?</th>
+        <th>Paid?</th>
         <th>Status</th>
         <th>Action</th>
     </tr>
@@ -74,6 +79,13 @@
                 </ol>
             </td>
             <td>{{ request.knowledge_area }}</td>
+            <td>{{ request.term }}</td>
+            <td>{% if request.is_recurring %}
+                    Yes
+                {% else %}
+                    No
+                {% endif %}
+            </td>
             <td>
                 <ul>
                     {% for venue in request.venue_preference.all %}
@@ -83,11 +95,26 @@
                     {% endfor %}
                 </ul>
             </td>
+            <td>{{ request.rejected_request }}</td>
+            <td>
+                {% if request.rejected_request %}
+                    {{ request.rejection_reason }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </td>
             <td>
                 {% if request.late %}
                     <li>Late request</li>
                 {% else %}
                     <li>On time</li>
+                {% endif %}
+            </td>
+            <td>
+                {% if request.paid_status %}
+                    Successfully paid
+                {% else %}
+                    Payment pending
                 {% endif %}
             </td>
             <td>
@@ -101,11 +128,20 @@
                 <ul>
                     {% if not request.allocated %}
                         {% if user.user_type != 'Tutor' %}
-                            <li><a href="{% url 'edit_request' request.id %}">Update</a></li>
-                            <li><a href="{% url 'delete_request' request.id %}">Delete</a></li>
+                            {% if not request.rejected_request %}
+                                <li> <a href="{% url 'edit_request' request.id %}">Update</a> </li>
+                            {% endif %}
+                                <li> <a href="{% url 'delete_request' request.id%}">Delete</a> </li>
                         {% endif %}
                         {% if user.user_type == 'Admin' %}
                             <li><a href="{% url 'allocate_request' request.id %}">Allocate</a></li>
+                            {% if not request.rejected_request %}
+                                <li>
+                                <form action="{% url 'reject_request' request.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit">Reject</button>
+                                </form>
+                            {% endif %}
                         {% endif %}
                     {% else %}
 
@@ -138,6 +174,18 @@
                     {% endif %}
                 </ul>
             </td>
+            <td>
+                <ul>
+                    {% if user.is_tutor and request.allocated and request.tutor == user %}
+                        <li>
+                            <form method="post" action="{% url 'accept_request' request.id %}">
+                                {% csrf_token %}
+                                <button type="submit">Accept Request</button>
+                            </form>
+                        </li>
+                    {% endif %}
+                </ul>
+            </td>
         </tr>
     {% empty %}
         <tr>
@@ -151,47 +199,13 @@
 <div class="pagination">
     {% if is_paginated %}
         {% if page_obj.has_previous %}
-            <a href="?
-
-
-
-
-
-
-
-                    {% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">First</a>
-            <a href="?
-
-
-
-
-
-
-
-                    {% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Previous</a>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">First</a>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Previous</a>
         {% endif %}
-
         <span>Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
-
         {% if page_obj.has_next %}
-            <a href="?
-
-
-
-
-
-
-
-                    {% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next</a>
-            <a href="?
-
-
-
-
-
-
-
-                    {% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ paginator.num_pages }}">Last</a>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next</a>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ paginator.num_pages }}">Last</a>
         {% endif %}
     {% endif %}
 </div>

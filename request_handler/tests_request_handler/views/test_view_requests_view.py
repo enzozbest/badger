@@ -1,19 +1,25 @@
-from django.test import TestCase
-from django.urls import reverse
-from user_system.models import User, Day
-from request_handler.models import Request, Venue
+from unittest.mock import patch
+
 from django.forms.models import model_to_dict
+from django.test import RequestFactory, TestCase
+from django.urls import reverse
+
+from request_handler.fixtures.create_test_requests import create_test_requests
+from request_handler.models import Request, Venue
+from request_handler.views.show_all_requests import AllRequestsView
+from user_system.fixtures.create_test_users import create_test_users
+from user_system.models import User
 
 INVALID_REQUEST_ID = 999
 
 
 class viewRequestsTest(TestCase):
     def setUp(self):
-        # Set up test user
-        self.user = User.objects.create_user(username='@charlie', password='Password123', user_type='Student')
+        create_test_users()
+        self.student = User.objects.get(user_type='Student')
         self.mode_preference = Venue.objects.create(venue="Online")
 
-        self.client.login(username='@charlie', password='Password123')
+        self.client.force_login(self.student)
 
     # Tests that an unauthenticated user is redirected when attempting to view their lesson requests
     def test_redirect_if_not_logged_in_view_requests(self):
@@ -26,7 +32,7 @@ class viewRequestsTest(TestCase):
     def test_view_requests_populated(self):
         # Request instance belonging to test user
         self.request_instance = Request.objects.create(
-            student=self.user,
+            student=self.student,
             knowledge_area='C++',
             term='Easter',
             frequency='Weekly',
@@ -46,11 +52,10 @@ class viewRequestsTest(TestCase):
         })
 
     def test_tutor_view_request(self):
-        tutor = User.objects.create_user(username='@testtutor', email='test@example.org', password='Password123', user_type='Tutor')
-        self.client.login(username='@testtutor', password='Password123')
-
+        tutor = User.objects.get(user_type='Tutor')
+        self.client.force_login(tutor)
         self.request_instance = Request.objects.create(
-            student=self.user,
+            student=self.student,
             knowledge_area='C++',
             term='Easter',
             frequency='Weekly',
@@ -72,20 +77,19 @@ class viewRequestsTest(TestCase):
         })
 
     def test_admin_view_request(self):
-        admin = User.objects.create_user(username='@admin', email="admin@example.org", password='Password123', user_type='Admin')
-        self.client.login(username='@admin', password='Password123')
+        admin = User.objects.get(user_type='Admin')
+        self.client.force_login(admin)
         student_request = Request.objects.create(
-            student=self.user,
+            student=self.student,
             knowledge_area='C++',
             term='Easter',
             frequency='Weekly',
             duration='1h',
             allocated=False
         )
-        tutor = User.objects.create_user(username='@testtutor', email='test@example.org', password='Password123',
-                                         user_type='Tutor')
+        tutor = User.objects.get(user_type='Tutor')
         tutor_request = Request.objects.create(
-            student=self.user,
+            student=self.student,
             knowledge_area='C++',
             term='Easter',
             frequency='Weekly',
@@ -95,11 +99,11 @@ class viewRequestsTest(TestCase):
         )
 
         response = self.client.get(reverse('view_requests'))
-        self.assertTrue(response.context, {model_to_dict(student_request).items().__hash__, model_to_dict(tutor_request).items().__hash__})
+        self.assertTrue(response.context, {model_to_dict(student_request).items().__hash__,
+                                           model_to_dict(tutor_request).items().__hash__})
 
     # Tests that a logged in user who requests to view their requests (while having none) does not receive an error
     def test_view_requests_empty(self):
-        self.client.login(username='@charlie', password='Password123')
         response = self.client.get(reverse('view_requests'))
         self.assertEqual(list(response.context['requests']), [])
 
@@ -112,10 +116,10 @@ class viewRequestsTest(TestCase):
         response = self.client.get(reverse('view_requests'))
         expected_url = f"{reverse('log_in')}?next={reverse('view_requests')}"
         self.assertRedirects(response, expected_url, status_code=302, target_status_code=200)
-    
+
     def test_sort_by_id_ascending(self):
-        request_1 = Request.objects.create(student=self.user, knowledge_area='C++', term='Easter')
-        request_2 = Request.objects.create(student=self.user, knowledge_area='Databases', term='Fall')
+        request_1 = Request.objects.create(student=self.student, knowledge_area='C++', term='Easter')
+        request_2 = Request.objects.create(student=self.student, knowledge_area='Databases', term='Fall')
 
         response = self.client.get(reverse('view_requests') + '?sort=id')
 
@@ -125,10 +129,9 @@ class viewRequestsTest(TestCase):
             transform=lambda x: f'<Request: {x.id}>'
         )
 
-
     def test_sort_by_id_descending(self):
-        request_1 = Request.objects.create(student=self.user, knowledge_area='C++', term='Easter')
-        request_2 = Request.objects.create(student=self.user, knowledge_area='Databases', term='Fall')
+        request_1 = Request.objects.create(student=self.student, knowledge_area='C++', term='Easter')
+        request_2 = Request.objects.create(student=self.student, knowledge_area='Databases', term='Fall')
 
         response = self.client.get(reverse('view_requests') + '?sort=-id')
 
@@ -138,10 +141,9 @@ class viewRequestsTest(TestCase):
             transform=lambda x: f'<Request: {x.id}>'
         )
 
-
     def test_sort_by_knowledge_area_ascending(self):
-        request_1 = Request.objects.create(student=self.user, knowledge_area='Databases', term='Fall')
-        request_2 = Request.objects.create(student=self.user, knowledge_area='C++', term='Spring')
+        request_1 = Request.objects.create(student=self.student, knowledge_area='Databases', term='Fall')
+        request_2 = Request.objects.create(student=self.student, knowledge_area='C++', term='Spring')
 
         response = self.client.get(reverse('view_requests') + '?sort=knowledge_area')
 
@@ -152,8 +154,8 @@ class viewRequestsTest(TestCase):
         )
 
     def test_sort_by_knowledge_area_descending(self):
-        request_1 = Request.objects.create(student=self.user, knowledge_area='Databases', term='Fall')
-        request_2 = Request.objects.create(student=self.user, knowledge_area='C++', term='Spring')
+        request_1 = Request.objects.create(student=self.student, knowledge_area='Databases', term='Fall')
+        request_2 = Request.objects.create(student=self.student, knowledge_area='C++', term='Spring')
 
         response = self.client.get(reverse('view_requests') + '?sort=-knowledge_area')
 
@@ -162,3 +164,27 @@ class viewRequestsTest(TestCase):
             ['<Request: 1>', '<Request: 2>'],
             transform=lambda x: f'<Request: {x.id}>'
         )
+
+    def test_filter_by_allocation_status(self):
+        create_test_requests()
+        response = self.client.get(f'{reverse("view_requests")}?allocated=true')
+        self.assertIsNotNone(response.context['requests'])
+        self.assertQuerysetEqual(response.context['requests'], Request.objects.filter(allocated=True).all())
+
+    def test_filter_by_search(self):
+        create_test_requests()
+        response = self.client.get(f'{reverse("view_requests")}?search=Charlie')
+        self.assertIsNotNone(response.context['requests'])
+        self.assertQuerysetEqual(response.context['requests'],
+                                 Request.objects.filter(student=User.objects.get(user_type='Student')).all())
+
+    @patch('request_handler.views.show_all_requests.RequestFilter.is_valid', return_value=False)
+    def test_get_queryset_with_invalid_filterset(self, mock_is_valid):
+        factory = RequestFactory()
+        request = factory.get(reverse('view_requests'), {'invalid_filter': 'value'})
+        request.user = self.student
+        view = AllRequestsView()
+        view.request = request
+        view.setup(request)
+        queryset = view.get_queryset()
+        self.assertQuerysetEqual(queryset, Request.objects.all())
