@@ -2,7 +2,8 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from user_system.models import User
+from user_system.fixtures.create_test_users import create_test_users
+from user_system.models.user_model import User
 
 
 class UserModelTestCase(TestCase):
@@ -10,8 +11,7 @@ class UserModelTestCase(TestCase):
     GRAVATAR_URL = "https://www.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986"
 
     def setUp(self):
-        from user_system.fixtures import create_test_users
-        create_test_users.create_test_users()
+        create_test_users()
         self.user = User.objects.get(username='@johndoe')
 
     def test_valid_user(self):

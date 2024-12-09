@@ -9,7 +9,9 @@ from invoicer.helpers.generate_invoice_id import generate_invoice_id
 from invoicer.models import get_latest_id_number
 from request_handler.models import Request, Venue
 from user_system.fixtures import create_test_users as create_fixtures
-from user_system.models import Day, KnowledgeArea, User
+from user_system.models.day_model import Day
+from user_system.models.knowledge_area_model import KnowledgeArea
+from user_system.models.user_model import User
 
 
 class TestGenerateInvoice(TestCase):

@@ -1,16 +1,20 @@
+from datetime import datetime
 from unittest.mock import patch
-from django.db.models import Max
+
 from django.test import TestCase
 from django.urls import reverse
-from user_system.models import User, Day
-from request_handler.models import Request, Venue
+
 from calendar_scheduler.models import Booking
-from datetime import datetime, timedelta
+from request_handler.models import Request, Venue
+from user_system.models.day_model import Day
+from user_system.models.user_model import User
+
 
 class AcceptRequestViewTestCase(TestCase):
     def setUp(self):
         self.tutor = User.objects.create_user(username="@tutor", email="tutor@example.com", password="Password123")
-        self.student = User.objects.create_user(username="@student", email="student@example.com", password="Password123")
+        self.student = User.objects.create_user(username="@student", email="student@example.com",
+                                                password="Password123")
         self.day_monday, created = Day.objects.get_or_create(day="Monday")
         self.day_friday, created = Day.objects.get_or_create(day="Friday")
         venue_online, created = Venue.objects.get_or_create(venue="Online")
@@ -60,7 +64,7 @@ class AcceptRequestViewTestCase(TestCase):
     def test_biweekly_booking_frequency(self):
         self.lesson_request.frequency = 'Biweekly'
         self.lesson_request.day2 = self.day_friday
-        
+
         self.lesson_request.save()
 
         with patch('django.utils.timezone.now') as mock_now:
@@ -71,17 +75,15 @@ class AcceptRequestViewTestCase(TestCase):
         bookings = Booking.objects.all()
         self.assertEqual(bookings.count(), 30)  # Biweekly frequency should create 30 sessions
         bookings = bookings[:5]
-        #Ensure the first 5 dates are correct
-        dates = ["2024-09-02","2024-09-06","2024-09-09","2024-09-13","2024-09-16"]
+        # Ensure the first 5 dates are correct
+        dates = ["2024-09-02", "2024-09-06", "2024-09-09", "2024-09-13", "2024-09-16"]
         matches = True
         for i in bookings:
             if str(i.date) != dates[0]:
                 matches = False
             dates.pop(0)
-        
+
         self.assertEqual(matches, True)
-
-
 
     # Test the lesson frequency for biweekly bookings with the first date being before the second
     def test_biweekly_booking_frequency_later_date(self):
@@ -90,7 +92,7 @@ class AcceptRequestViewTestCase(TestCase):
         self.lesson_request.day2 = self.day_monday
 
         self.lesson_request.save()
-        
+
         with patch('django.utils.timezone.now') as mock_now:
             mock_now.return_value = datetime(2024, 8, 1)
             response = self.client.post(reverse('accept_request', kwargs={'request_id': self.lesson_request.id}))
@@ -98,17 +100,18 @@ class AcceptRequestViewTestCase(TestCase):
         # Check the number of sessions created
         bookings = Booking.objects.all()
         self.assertEqual(bookings.count(), 30)  # Biweekly frequency should create 30 sessions
-        
+
         bookings = bookings[:5]
-        #Ensure the first 5 dates are correct
-        dates = ["2024-09-06","2024-09-09","2024-09-13","2024-09-16","2024-09-20"]
+        # Ensure the first 5 dates are correct
+        dates = ["2024-09-06", "2024-09-09", "2024-09-13", "2024-09-16", "2024-09-20"]
         matches = True
         for i in bookings:
             if str(i.date) != dates[0]:
                 matches = False
             dates.pop(0)
-        
+
         self.assertEqual(matches, True)
+
     # Test the lesson frequency for fortnightly bookings.
     def test_fortnightly_booking_frequency(self):
         self.lesson_request.frequency = 'Fortnightly'
@@ -137,7 +140,8 @@ class AcceptRequestViewTestCase(TestCase):
 
     # Test that another user cannot accept a request.
     def test_user_not_admin(self):
-        other_user = User.objects.create_user(username="@other_user", email="other_user@example.com", password="Password123")
+        other_user = User.objects.create_user(username="@other_user", email="other_user@example.com",
+                                              password="Password123")
         self.client.login(username="@other_user", password="Password123")
 
         response = self.client.post(reverse('accept_request', args=[self.lesson_request.id]))

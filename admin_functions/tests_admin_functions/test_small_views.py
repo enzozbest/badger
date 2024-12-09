@@ -1,7 +1,7 @@
 from django.shortcuts import reverse
 from django.test import TestCase
 
-from user_system.models import User
+from user_system.models.user_model import User
 
 
 class SmallViewsTestCase(TestCase):
@@ -11,7 +11,7 @@ class SmallViewsTestCase(TestCase):
 
     def test_unauthenticated_user_cannot_access_admin_dashboard(self):
         response = self.client.get(reverse('admin_dash'), follow=True)
-        self.assertRedirects(response, f"{reverse('log_in')}?next=/admins/dashboard", status_code=302,
+        self.assertRedirects(response, f"{reverse('log_in')}?next=/admins/dashboard/", status_code=302,
                              target_status_code=200)
         self.assertTemplateUsed(response, 'log_in.html')
 

@@ -1,4 +1,4 @@
-from user_system.models import User
+from user_system.models.user_model import User
 
 
 def generate_invoice_id(student: User, latest_number: int) -> str:

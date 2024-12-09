@@ -7,7 +7,7 @@ from invoicer.helpers import invoice_generator as ig
 from invoicer.helpers.generate_invoice_id import generate_invoice_id
 from invoicer.models import Invoice, get_latest_id_number
 from request_handler.models import Request
-from user_system.models import User
+from user_system.models.user_model import User
 
 LOCAL_STORE = not settings.USE_AWS_S3
 OUTPUT_PATH = settings.INVOICE_OUTPUT_PATH
