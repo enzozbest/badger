@@ -43,7 +43,7 @@ class Request(models.Model):
     venue = models.ForeignKey(Venue, null=True, blank=True, on_delete=models.SET_NULL, related_name='allocated_venue')
     invoice = models.ForeignKey(Invoice, null=True, blank=True, on_delete=models.SET_NULL,
                                 related_name='request_invoice')
-    rejected_request = models.BooleanField(default=False)
+    rejected_request = models.BooleanField(default=False, null=True)
     rejection_reason = models.TextField(blank=True, null=True)
 
     @property

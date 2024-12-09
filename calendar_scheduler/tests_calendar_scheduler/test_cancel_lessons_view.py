@@ -74,15 +74,15 @@ class CancelLessonsViewTests(TestCase):
         self.assertTemplateUsed(response, 'tutor_cancel_lessons.html')
 
         # Test if the date is more than 2 weeks away
-        future_date = (datetime(2024, 12, 3) + timedelta(days=20)).date()  # More than 2 weeks ahead
+        future_date = (datetime(2035, 12, 3) + timedelta(days=20)).date()  # More than 2 weeks ahead
         response = self.client.get(reverse('tutor_cancel_lessons'),
                                    {'day': future_date.day, 'month': future_date.month, 'year': future_date.year,
                                     'lesson': '1'})
         self.assertContains(response,
-                            'Click below to cancel your individual lesson')  # When close_date is False
+                            'Click below to cancel all lessons for your term')
 
         # Test if the date is within 2 weeks
-        close_date = (datetime(2024, 12, 3) + timedelta(days=5)).date()  # Within 2 weeks
+        close_date = (datetime(2024, 11, 5) + timedelta(days=5)).date()  # Within 2 weeks
         response = self.client.get(reverse('tutor_cancel_lessons'),
                                    {'day': close_date.day, 'month': close_date.month, 'year': close_date.year,
                                     'lesson': '1'})
@@ -340,5 +340,6 @@ class AdminCancelLessonsViewTest(TestCase):
                 'month': self.booking_date.month,
                 'year': self.booking_date.year,
             })
+        expected_date = (self.booking_date + timedelta(days=1)).strftime('%Y-%m-%d')
         self.assertEqual(response.status_code, 500)
-        self.assertIn("Error processing cancellation: No booking found for lesson_id: 1 on 2024-12-19", response.content.decode())
+        self.assertIn(f"Error processing cancellation: No booking found for lesson_id: 1 on {expected_date}", response.content.decode())
