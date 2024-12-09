@@ -1,13 +1,22 @@
+<head>
+    <title>Calendar</title>
+</head>
 <body>
     <h1>{{ title }}</h1>
     <div class="calendar">
         <div class="row">
             <!-- Month navigation buttons -->
             <div>
+                <a href="{% url 'dashboard' %}">Click here to go to the main dashboard</a>
+                {% if user.user_type == "Admin" %}
+                    <a href="{% url 'view_all_users' %}">Click here to go back to viewing all users</a>
+                {% endif %}
+            </div>
+            <div>
                 <a href="?year={{ prev_year }}&month={{ prev_month }}">Previous Month</a>
                 <a href="?year={{ next_year }}&month={{ next_month }}">Next Month</a>
             </div>
-            <h3>{{ month }}</h3>
+            <h3>{{ month_name }} {{ year }}</h3>
             <!-- Display the calendar header with days of the week -->
             <table class="table table-bordered">
                 <thead>
@@ -41,7 +50,6 @@
                                                 <li>{{ i.cancellation_requested }}</li>
                                                 <!-- Form to submit lesson cancellation -->
                                                 <form method="GET" action="{% block calendar_action %}{% endblock %}">
-                                                    {% csrf_token %}
                                                     <button type="submit">Cancel</button>
                                                     <input type="hidden" name="day" value="{{ day }}">
                                                     <input type="hidden" name="month" value="{{ month }}">
