@@ -39,7 +39,7 @@
             {% for area in knowledge_areas %}
                 <li>
                     {{ area.subject }}
-                    <a href="{% url 'delete_knowledge_area' area.id %}" class="text-danger" style="font-size: 12px; text-decoration: underline;">Delete</a>
+                    <a id ="id_delete_knowledge_area_{{ area.id }}" href="{% url 'delete_knowledge_area' area.id %}" class="text-danger" style="font-size: 12px; text-decoration: underline;">Delete</a>
                 </li>
             {% empty %}
                 <p>No Knowledge Areas have been added yet.</p>

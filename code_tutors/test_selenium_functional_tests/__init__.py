@@ -1,6 +1,33 @@
+from django.shortcuts import reverse
+from selenium.webdriver.common.by import By
+from selenium.webdriver.ie.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+
+"""Package initialiser to ensure all Selenium tests have access to these common functions"""
+
+
+def log_in_via_form(driver: WebDriver, live_server_url: str, username: str, password: str):
+    """
+    Automates the login process for a user in Selenium.
+
+    :param username: The username to log in with.
+    :param password: The password to log in with.:
+    :param live_server_url: The URL of the live server.
+    :param driver: The selenium webdriver instance.
+    """
+    driver.get(f"{live_server_url}{reverse('log_in')}")
+    wait(driver)
+
+    username_input = driver.find_element(By.ID, "id_username")
+    password_input = driver.find_element(By.ID, "id_password")
+    login_button = driver.find_element(By.ID, "id_submit_log_in_page")
+    username_input.send_keys(username)
+    password_input.send_keys(password)
+    login_button.click()
+
+    wait(driver)
 
 
 def wait(driver_client):
