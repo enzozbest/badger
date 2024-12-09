@@ -14,7 +14,7 @@ The project is called `CodeConnect by Code Tutors`. The application consists of 
 - request_handler: responsible for managing the Request model and dealing with most of the Request logic, e.g. creation, deletion, updates.
 - admin_functions: responsible for managing functionality exclusive to users with Admin privileges, e.g. Request allocation and making other users Admins.
 - invoicer: responsible for generating PDF invoices automatically and storing them in a pre-defined location (be that locally or remotely on Amazon's S3)
-- timetabler: largely responsible for booking allocated requests into actual sessions, and displaying them in a calendar format to the relevant users (student and tutors)
+- calendar_scheduler: largely responsible for booking allocated requests into actual sessions, and displaying them in a calendar format to the relevant users (student and tutors)
 
 ## Deployed version of the application
 The deployed version of the application can be found at [*badger2024.ddns.net*](http://badger2024.ddns.net).
@@ -94,6 +94,8 @@ Run all tests with:
 ```
 $ python3 manage.py test
 ```
+
+All tests should pass, and coverage is at 100% if the variable USE_AMAZON_S3 in code_tutors/settings.py is set. Note that if you do not use AWS (i.e. you do not have it set up locally and/or the variable is not set), AWS-related tests will be skipped and this may impact the coverage report! 
 
 ## Sources
 The packages used by this application are specified in `requirements.txt`
