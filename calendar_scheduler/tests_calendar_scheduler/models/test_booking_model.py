@@ -1,8 +1,8 @@
 from django.test import TestCase
-from user_system.models import User, Day
+from user_system.models import User
 from request_handler.models import Venue
 from calendar_scheduler.models import Booking
-from datetime import date, datetime
+from datetime import date
 
 class BookingModelTest(TestCase):
     def setUp(self):
