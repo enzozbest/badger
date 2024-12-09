@@ -37,6 +37,14 @@ def get_month_days(year, month):
 
     return month_days
 
+def get_month_name(month_number):
+    MONTHS = {
+        1: "January", 2: "February", 3: "March", 4: "April",
+        5: "May", 6: "June", 7: "July", 8: "August",
+        9: "September", 10: "October", 11: "November", 12: "December"
+    }
+    return MONTHS.get(month_number, "Invalid month")
+
 def get_week_days():
     today = date.today()
     start_of_week = today - timedelta(days=today.weekday())
@@ -102,6 +110,7 @@ def retrieve_calendar_events(calendar, request, user_for_calendar=None):
             "calendar": calendar,
             "year": year,
             "month": month,
+            "month_name": get_month_name(month),
             "month_days": month_days,
             "events": events,
             "day": day,
