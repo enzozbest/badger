@@ -1,5 +1,5 @@
 from django.test import TestCase
-from user_system.models import User
+from user_system.models.user_model import User
 from request_handler.models import Venue
 from calendar_scheduler.models import Booking
 from datetime import date

@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
-from user_system.models import User
+from user_system.models.user_model import User
 from calendar_scheduler.models import Booking
 from datetime import date
 import random

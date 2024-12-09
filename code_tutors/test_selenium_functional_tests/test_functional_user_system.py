@@ -11,7 +11,8 @@ from selenium.webdriver.support.ui import Select
 
 from code_tutors.test_selenium_functional_tests import log_in_via_form, wait, wait_for_clickable, wait_for_element
 from user_system.fixtures.create_test_users import create_test_users
-from user_system.models import KnowledgeArea, User
+from user_system.models.user_model import User
+from user_system.models.knowledge_area_model import KnowledgeArea
 
 geckodriver_autoinstaller.install()
 
