@@ -37,6 +37,7 @@
       </div>
     </div>
 
+    {% if user.user_type != 'Admin' %}
     <div class="col-md-6 col-lg-4 mb-4">
       <div class="card shadow-lg bg-dark text-white h-100">
         <div class="card-body text-center">
@@ -44,11 +45,17 @@
             <i class="bi bi-calendar text-success" style="font-size: 2rem;"></i>
           </div>
           <h5 class="card-title">View Your Calendar</h5>
-          <p class="card-text">Stay organized by reviewing your calendar of lessons.</p>
-          <a href="{% url 'view_requests' %}" class="btn btn-success">View Calendar</a>
+          {% if user.is_tutor %}
+            <p class="card-text">View your scheduled lessons and manage your availability as a tutor.</p>
+            <a href="{% url 'tutor_calendar' %}" class="btn btn-success">Tutor Calendar</a>
+          {% elif user.is_student %}
+            <p class="card-text">Keep track of your upcoming lessons and plan accordingly.</p>
+            <a href="{% url 'student_calendar' %}" class="btn btn-success">Student Calendar</a>
+          {% endif %}
         </div>
       </div>
     </div>
+    {% endif %}
 
     {% if user.user_type == 'Admin' %}
       <div class="col-md-6 col-lg-4 mb-4">
