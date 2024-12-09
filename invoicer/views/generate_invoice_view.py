@@ -10,6 +10,7 @@ from request_handler.models import Request
 from user_system.models import User
 
 LOCAL_STORE = not settings.USE_AWS_S3
+OUTPUT_PATH = settings.INVOICE_OUTPUT_PATH
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -25,7 +26,7 @@ def generate_invoice_for_request(http_request: HttpRequest, tutoring_request_id:
 
     if request_obj.invoice is not None:
         return HttpResponse(f"Invoice already generated. "
-                            f"Found at: {request_obj.invoice.location if LOCAL_STORE else f'AWS S3 at invoices/pdfs/{request_obj.invoice_id}.pdf'} ",
+                            f"Found at: {OUTPUT_PATH / f'{request_obj.invoice_id}'}" if LOCAL_STORE else f'AWS S3 at invoices/pdfs/{request_obj.invoice_id}.pdf',
                             status=204)
 
     # Get necessary parameters for invoice generation:

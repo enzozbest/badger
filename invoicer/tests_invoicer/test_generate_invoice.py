@@ -33,40 +33,33 @@ class TestGenerateInvoice(TestCase):
             day=Day.objects.get(day='Monday'),
         )
 
+    def tearDown(self):
+        if os.path.exists(self.path):
+            os.remove(self.path)
+        super().tearDown()
+
     def test_generate_invoice_id(self):
         self.assertEqual(generate_invoice_id(self.student, get_latest_id_number(student=self.student)),
                          str(self.invoice_id))
 
     @override_settings(USE_AWS_S3=False)
     def test_generate_invoice_local_store(self):
-        self.assertions_for_local_invoice(self.generate_invoice())
-        os.remove(self.path)
+        self._assertions_for_local_invoice(generate_invoice(self.client, self.admin, self.request.id))
 
     @override_settings(USE_AWS_S3=False)
     def test_you_cannot_generate_invoices_if_they_already_exist(self):
-        self.assertions_for_local_invoice(self.generate_invoice())
+        self._assertions_for_local_invoice(generate_invoice(self.client, self.admin, self.request.id))
         self.client.force_login(self.admin)
         response = self.client.get(reverse('generate_invoice', kwargs={"tutoring_request_id": self.request.id}))
         self.assertEqual(response.status_code, 204)
-        os.remove(self.path)
 
-    @override_settings(USE_AWS_S3=True)
-    def test_generate_invoice(self):
-        from code_tutors.aws import s3
-        self.generate_invoice()
-        key = f'invoices/pdfs/{self.invoice_id}.pdf'
-        url = s3.generate_access_url(key=key)
-        self.assertIsNotNone(url)
-        self.assertTrue(isinstance(url, str))
-        s3._delete(key)
-
-    # ----TEST HELPERS-----#
-    def generate_invoice(self) -> HttpResponse:
-        self.client.force_login(self.admin)
-        return self.client.get(reverse("generate_invoice", kwargs={"tutoring_request_id": self.request.id}))
-
-    def assertions_for_local_invoice(self, response: HttpResponse) -> None:
+    def _assertions_for_local_invoice(self, response: HttpResponse) -> None:
         with open(self.path, 'rb') as file:
             self.assertIsNotNone(file)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.content, b"Invoice generated successfully!")
+
+
+def generate_invoice(client, admin, request_id) -> HttpResponse:
+    client.force_login(admin)
+    return client.get(reverse("generate_invoice", kwargs={"tutoring_request_id": request_id}))

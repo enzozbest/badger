@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reject Request</title>
+</head>
+<body>
+    <h1>Reject Request</h1>
+    <p>Are you sure you want to reject the request from {{ request.student.first_name }} {{ request.student.last_name }}?</p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit Rejection</button>
+    </form>
+
+    <a href="{% url 'view_requests' %}">Back to Requests</a>
+</body>
+</html>

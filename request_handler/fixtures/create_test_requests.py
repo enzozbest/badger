@@ -36,7 +36,7 @@ def create_test_requests():
                     print("Tutor not found!")
                 day_name = request_json.pop('day', [])
                 venue_name = request_json.pop('venue', [])
-                venue = Venue.objects.get(venue=venue_name)
+                venue = Venue.objects.filter(venue=venue_name).all()[0]
                 day = Day.objects.get(day=day_name)
                 request_json['day'] = day
                 request_json['venue'] = venue
@@ -44,6 +44,6 @@ def create_test_requests():
             else:
                 request, _ = Request.objects.get_or_create(**request_json)
                 if venue_pref:
-                    request.venue_preference.add(Venue.objects.get(venue=venue_pref))
+                    request.venue_preference.add(Venue.objects.filter(venue=venue_pref).all()[0])
                 else:
-                    request.venue_preference.add(Venue.objects.get(venue="No Preference"))
+                    request.venue_preference.add(Venue.objects.filter(venue="No Preference").all()[0])

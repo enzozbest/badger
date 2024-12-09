@@ -1,11 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from admin_functions.helpers.mixins import SortingMixin
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, reverse
 from django.views.generic import ListView
 
 from admin_functions.helpers.filters import UserFilter
+from admin_functions.helpers.mixins import SortingMixin
 from user_system.models import User
 
 
@@ -26,14 +26,12 @@ class AllUsersView(LoginRequiredMixin, SortingMixin, ListView):
     filterset_class = UserFilter
     valid_sort_fields = ['first_name', 'last_name', 'email', 'user_type']
 
-
     def get_queryset(self):
         queryset = super().get_queryset()
         if hasattr(self, 'filterset_class'):
             self.filterset = self.filterset_class(self.request.GET, queryset=queryset)
             if self.filterset.is_valid():
                 queryset = self.filterset.qs
-
         return self.get_sorting_queryset(queryset)
 
     def get_context_data(self, **kwargs):

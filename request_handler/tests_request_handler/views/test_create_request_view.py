@@ -1,4 +1,5 @@
 from datetime import datetime
+from unittest.mock import patch
 
 from django.test import TestCase
 from django.urls import reverse
@@ -8,7 +9,6 @@ from user_system.fixtures.create_test_users import create_test_users
 from user_system.models import Day, User
 
 INVALID_REQUEST_ID = 999
-
 
 class TestViews(TestCase):
     def setUp(self):
@@ -83,13 +83,29 @@ class TestViews(TestCase):
             'venue_preference': [self.online.id]
         }
         # Purposefully choosing a late term
-        if datetime.now().month >= 1 and datetime.now().month < 5:
+        today_date = datetime.now()
+        if today_date.month >= 1 and today_date.month < 5:
             data['term'] = 'January'
-        elif datetime.now().month > 8 and datetime.now().month <= 12:
+        elif today_date.month > 8 and today_date.month <= 12:
             data['term'] = 'September'
-        elif datetime.now().month < 9:
+        elif today_date.now().month < 9:
             data['term'] = 'May'
 
         url = reverse('create_request')
         response = self.client.post(url, data, follow=True)
         self.assertRedirects(response, reverse('processing_late_request'), status_code=302, target_status_code=200)
+
+    @patch('request_handler.models.Request.save', side_effect=Exception("Database error"))
+    def test_post_handles_exception(self, mock_save):
+        self.client.force_login(self.student)
+        data = {
+            'knowledge_area': 'Python',
+            'term': 'May',
+            'frequency': 'Weekly',
+            'duration': '2',
+            'venue_preference': [self.online.id],
+        }
+        response = self.client.post(self.url, data)
+        self.assertContains(response, 'There was an error submitting this form! Database error')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'create_request.html')
