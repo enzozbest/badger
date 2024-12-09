@@ -142,27 +142,3 @@ class AcceptRequestViewTestCase(TestCase):
 
         response = self.client.post(reverse('accept_request', args=[self.lesson_request.id]))
         self.assertEqual(response.status_code, 404)
-
-    # For some reason, this test is getting the first day from September 2025 (but putting the year as 2024)
-    '''
-    def test_booking_date_for_september(self):
-        # Simulate current month as September
-        with patch('django.utils.timezone.now', return_value=datetime(2024, 9, 1)):
-            # Post the request to accept the request --> booking
-            response = self.client.post(reverse('accept_request', args=[self.lesson_request.id]))
-
-            self.assertEqual(response.status_code, 302)  # Assuming redirect happens after successful booking
-
-            # Fetch the first Booking object and assert that it has a start date
-            booking = Booking.objects.first()
-            self.assertIsNotNone(booking, "Booking object was not created.")
-
-            from django.utils.timezone import make_aware
-
-            expected_date = make_aware(datetime(2024, 9, 2, 12, 0))  # Add timezone awareness
-
-            # Assert that the booking's start and end date are correct
-            #expected_date = datetime(2024, 9, 2, 12, 0) # Assuming first weekday of September 2024 is Monday
-            self.assertEqual(booking.start, expected_date)
-            self.assertEqual(booking.end, expected_date)
-    '''
