@@ -1,14 +1,18 @@
 from calendar import Calendar
-from django.shortcuts import render, get_object_or_404, redirect
-from calendar_scheduler.models import Booking
-from schedule.models import Calendar
-from datetime import datetime,date,timedelta
+from datetime import date, datetime, timedelta
+
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views import View
 from django.http import HttpRequest, HttpResponse
-from user_system.models import User
+from django.shortcuts import get_object_or_404, render
+from django.views import View
+from schedule.models import Calendar
+
+from calendar_scheduler.models import Booking
+from user_system.models.user_model import User
 
 ''' Returns all the days for a particular month as a list, per the year and month parameters '''
+
+
 def get_month_days(year, month):
     # Get the first day of the month and the total days in the month
     first_day = datetime(year, month, 1)
@@ -37,6 +41,7 @@ def get_month_days(year, month):
 
     return month_days
 
+
 def get_month_name(month_number):
     MONTHS = {
         1: "January", 2: "February", 3: "March", 4: "April",
@@ -45,10 +50,12 @@ def get_month_name(month_number):
     }
     return MONTHS.get(month_number, "Invalid month")
 
+
 def get_week_days():
     today = date.today()
     start_of_week = today - timedelta(days=today.weekday())
     return [start_of_week + timedelta(days=i) for i in range(7)]
+
 
 ''' Retrieves all relevant tutoring sessions for a particular day 
 
@@ -56,6 +63,8 @@ The day is associated with the day attribute of the request parameter
 
 The calendar parameter is a Calendar object from django-scheduler/schedule
 '''
+
+
 def retrieve_calendar_events(calendar, request, user_for_calendar=None):
     # Get today's date for the default display
     today = datetime.today()
@@ -76,19 +85,19 @@ def retrieve_calendar_events(calendar, request, user_for_calendar=None):
     next_month = month + 1 if month < 12 else 1
     next_year = year + 1 if month == 12 else year
 
-    month_days = get_month_days(year,month)
+    month_days = get_month_days(year, month)
     events = []
 
-    for day in range(1,31):
+    for day in range(1, 31):
         try:
             selected_date = date(year, month, day)
             if request.user.user_type == 'Student':
                 newEvent = Booking.objects.filter(student=request.user, date=selected_date)
-                if(newEvent.exists()): # Only append events where the queryset isn't empty
+                if (newEvent.exists()):  # Only append events where the queryset isn't empty
                     events.append(newEvent)
             elif request.user.user_type == 'Tutor':
                 newEvent = Booking.objects.filter(tutor=request.user, date=selected_date)
-                if(newEvent.exists()): # Only append events where the queryset isn't empty
+                if (newEvent.exists()):  # Only append events where the queryset isn't empty
                     events.append(newEvent)
             elif request.user.user_type == 'Admin':
                 if user_for_calendar:
@@ -107,21 +116,24 @@ def retrieve_calendar_events(calendar, request, user_for_calendar=None):
         except ValueError:
             break
     return {
-            "calendar": calendar,
-            "year": year,
-            "month": month,
-            "month_name": get_month_name(month),
-            "month_days": month_days,
-            "events": events,
-            "day": day,
-            "prev_month": prev_month,
-            "prev_year": prev_year,
-            "next_month": next_month,
-            "next_year": next_year,
-        }
+        "calendar": calendar,
+        "year": year,
+        "month": month,
+        "month_name": get_month_name(month),
+        "month_days": month_days,
+        "events": events,
+        "day": day,
+        "prev_month": prev_month,
+        "prev_year": prev_year,
+        "next_month": next_month,
+        "next_year": next_year,
+    }
+
 
 '''A view to display the Tutor Calendar. '''
-class TutorCalendarView(LoginRequiredMixin,View):
+
+
+class TutorCalendarView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, pk: int = None) -> HttpResponse:
         if request.user.is_student:
             return render(request, 'permission_denied.html', status=401)
@@ -139,13 +151,16 @@ class TutorCalendarView(LoginRequiredMixin,View):
 
         try:
             calendar = Calendar.objects.get(slug='tutor')
-            data = retrieve_calendar_events(calendar,request)
-            return render(request,'tutor_calendar.html', data)
+            data = retrieve_calendar_events(calendar, request)
+            return render(request, 'tutor_calendar.html', data)
         except Calendar.DoesNotExist:
-            return render(request, 'dashboard.html',status=404)
+            return render(request, 'dashboard.html', status=404)
+
 
 '''A view to display the Student Calendar. '''
-class StudentCalendarView(LoginRequiredMixin,View):
+
+
+class StudentCalendarView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, pk: int = None) -> HttpResponse:
         if request.user.is_tutor:
             return render(request, 'permission_denied.html', status=401)
@@ -164,6 +179,6 @@ class StudentCalendarView(LoginRequiredMixin,View):
         try:
             calendar = Calendar.objects.get(slug='tutor')
             data = retrieve_calendar_events(calendar, request)
-            return render(request,'student_calendar.html', data)
+            return render(request, 'student_calendar.html', data)
         except Calendar.DoesNotExist:
-            return render(request, 'dashboard.html',status=404)
+            return render(request, 'dashboard.html', status=404)
