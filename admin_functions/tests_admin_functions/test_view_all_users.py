@@ -6,7 +6,6 @@ from admin_functions.views.view_all_users import AllUsersView
 from user_system.fixtures.create_test_users import create_test_users
 from user_system.models import User
 
-
 class ViewAllUsersTestCase(TestCase):
     def setUp(self):
         create_test_users()

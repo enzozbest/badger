@@ -20,6 +20,7 @@ class Command(BaseCommand):
         self.faker.add_provider(venue_provider.VenueProvider)
         self.frequencies = ['Weekly', 'Fortnightly', 'Biweekly']
 
+
     def handle(self, *args, **options):
         self.__init__()
         self.create_requests()
