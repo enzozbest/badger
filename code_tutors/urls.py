@@ -19,14 +19,17 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
+from user_system import views as tutorial_views
+from request_handler.views import accept_request as accept_request_view, create_request as create_request_view, delete_request as delete_request_view, \
+    edit_request as edit_request_view, show_all_requests as view_requests_view, small_views as request_handler_views
 from admin_functions.views import allocate_requests as allocate_requests_view, make_user_admin as make_user_admin_view, \
-    small_views as small_views_view, view_all_users as view_all_users_view
+    small_views as small_views_view, view_all_users as view_all_users_view, view_cancellation_requests as cancellation_request_view
+from calendar_scheduler.views import calendar as calendar_view, cancel_lessons as cancel_lessons_view
 from invoicer.views.generate_invoice_view import generate_invoice_for_request
 from invoicer.views.get_invoice_view import get_invoice
 from invoicer.views.set_payment_status_view import set_payment_status
-from request_handler.views import create_request as create_request_view, delete_request as delete_request_view, \
-    edit_request as edit_request_view, show_all_requests as view_requests_view, small_views as request_handler_views
-from user_system import views as tutorial_views
+from request_handler.views import reject_request as reject_request_view
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -57,7 +60,18 @@ urlpatterns = [
          name="allocate_request"),
     path("admins/generate_invoice/<int:tutoring_request_id>/", generate_invoice_for_request, name="generate_invoice"),
     path("get_invoice/<str:invoice_id>", get_invoice, name='get_invoice'),
-    path("set_payment_status/<str:invoice_id>/<int:payment_status>", set_payment_status, name="set_payment_status"),
+    path("set_payment_status/<str:invoice_id>/<int:payment_status>", set_payment_status,name="set_payment_status"),
+    path('accept_request/<int:request_id>/', accept_request_view.AcceptRequestView.as_view(), name="accept_request"),
+    path('tutor/calendar/', calendar_view.TutorCalendarView.as_view(), name='tutor_calendar'),
+    path('student/calendar/', calendar_view.StudentCalendarView.as_view(),name='student_calendar'),
+    path('admin-tutor/calendar/<int:pk>/', calendar_view.TutorCalendarView.as_view(), name='admin_tutor_calendar'),
+    path('admin-student/calendar/<int:pk>/', calendar_view.StudentCalendarView.as_view(),name='admin_student_calendar'),
+    path('tutor/calendar/cancel/', cancel_lessons_view.CancelLessonsView.as_view(), name='tutor_cancel_lessons'),
+    path('student/calendar/cancel/', cancel_lessons_view.CancelLessonsView.as_view(),name='student_cancel_lessons'),
+    path('admins/calendar/cancel/',cancel_lessons_view.AdminCancelLessonsView.as_view(),name='admin_calendar_cancel_lessons'),
+    path('admins/cancel/', cancel_lessons_view.CancelLessonsView.as_view(),name='admin_cancel_lessons'),
+    path('admins/cancellation_requests/', cancellation_request_view.ViewCancellationRequests.as_view(),name='view_cancellation_requests'),
+    path('reject_request/<int:request_id>/', reject_request_view.reject_request, name='reject_request'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
