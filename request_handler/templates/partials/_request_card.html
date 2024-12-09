@@ -35,13 +35,20 @@
                     {% for venue in request.venue_preference.all %}
                         <li>{{ venue }}</li>
                     {% empty %}
-                        <li>No Preference</li>
+                        <li>No Venue Preference</li>
                     {% endfor %}
                 </ul>
             </div>
 
-            <p class="mb-0">
-                <strong>Status:</strong> 
+            <p><strong>Term:</strong> {{ request.term }}</p>
+            <p><strong>Recurring:</strong> {% if request.is_recurring %}Yes{% else %}No{% endif %}</p>
+            <p><strong>Rejected:</strong> {% if request.rejected_request %}Yes{% else %}No{% endif %}</p>
+            {% if request.rejected_request %}
+                <p><strong>Rejection Reason:</strong> {{ request.rejection_reason }}</p>
+            {% endif %}
+            <p><strong>On Time:</strong> {% if request.late %}Late{% else %}On Time{% endif %}</p>
+            <p><strong>Paid:</strong> {% if request.paid_status %}Successfully Paid{% else %}Payment Pending{% endif %}</p>
+            <p><strong>Status:</strong> 
                 {% if request.allocated %}
                     Allocated to {{ request.tutor_name }}
                 {% else %}
