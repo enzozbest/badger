@@ -1,33 +1,66 @@
+{% extends 'base_content.html' %}
+{% block content %}
 <head>
     <title>Calendar</title>
+    <style>
+        .event-card {
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .event-card h6 {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .event-card p {
+            font-size: 12px;
+            margin: 0;
+        }
+        .event-card .btn {
+            font-size: 12px;
+            padding: 5px 10px;
+        }
+        .cancel-btn {
+            background: #ff4d4d;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+        .cancel-btn:hover {
+            background: #cc0000;
+        }
+    </style>
 </head>
 <body>
-    <h1>{{ title }}</h1>
-    <div class="calendar">
-        <div class="row">
-            <!-- Month navigation buttons -->
-            <div>
-                <a href="{% url 'dashboard' %}">Click here to go to the main dashboard</a>
-                {% if user.user_type == "Admin" %}
-                    <a href="{% url 'view_all_users' %}">Click here to go back to viewing all users</a>
-                {% endif %}
+    <div class="container-fluid mb-4">
+        <h1 class="text-center mb-4">{{ title }}</h1>
+        <div class="calendar mx-auto">
+            <div class="row mb-3">
+                <div class="col text-start">
+                    <a href="{% url 'dashboard' %}" class="btn btn-primary">Go to Dashboard</a>
+                    {% if user.user_type == "Admin" %}
+                        <a href="{% url 'view_all_users' %}" class="btn btn-warning">View All Users</a>
+                    {% endif %}
+                </div>
+                <div class="col text-end">
+                    <a href="?year={{ prev_year }}&month={{ prev_month }}" class="btn btn-outline-secondary">Previous Month</a>
+                    <a href="?year={{ next_year }}&month={{ next_month }}" class="btn btn-outline-secondary">Next Month</a>
+                </div>
             </div>
-            <div>
-                <a href="?year={{ prev_year }}&month={{ prev_month }}">Previous Month</a>
-                <a href="?year={{ next_year }}&month={{ next_month }}">Next Month</a>
-            </div>
-            <h3>{{ month_name }} {{ year }}</h3>
-            <!-- Display the calendar header with days of the week -->
-            <table class="table table-bordered">
+            <h3 class="text-center text-light">{{ month_name }} {{ year }}</h3>
+            <table class="table">
                 <thead>
-                    <tr>
+                    <tr class="text-center">
                         <th>Mon</th>
                         <th>Tue</th>
                         <th>Wed</th>
                         <th>Thu</th>
                         <th>Fri</th>
-                        <th>Sat</th>
-                        <th>Sun</th>
+                        <th class="text-danger">Sat</th>
+                        <th class="text-danger">Sun</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -36,33 +69,33 @@
                         {% for day in week %}
                         <td>
                             {% if day %}
-                                <!-- Display events for the day -->
-                                <h3>{{ day }}</h3>
-                                <ul>
-                                    {% for event in events %}
-                                        {% for i in event %}
-                                            {% if i.date.day == day %}
-                                                <li>{{ i.title }}</li>
-                                                <li>{{ i.knowledge_area }}</li>
-                                                <li>{{ i.duration }}</li>
-                                                <li>{{ i.venue }}</li>
-                                                <li>Recurring: {{ i.is_recurring }}</li>
-                                                <li>{{ i.cancellation_requested }}</li>
-                                                <!-- Form to submit lesson cancellation -->
-                                                <form method="GET" action="{% block calendar_action %}{% endblock %}">
-                                                    <button type="submit">Cancel</button>
-                                                    <input type="hidden" name="day" value="{{ day }}">
-                                                    <input type="hidden" name="month" value="{{ month }}">
-                                                    <input type="hidden" name="year" value="{{ year }}">
-                                                    <input type="hidden" name="recurring" value="{{ i.is_recurring }}">
-                                                    <input type="hidden" name="lesson" value="{{ i.lesson_identifier }}">
-                                                </form>
-                                                <p> --------------</p>
-                                            {% endif %}
+                                <div>
+                                    <h5 class="fw-bold">{{ day }}</h5>
+                                    <div>
+                                        {% for event in events %}
+                                            {% for i in event %}
+                                                {% if i.date.day == day %}
+                                                    <div class="event-card text-dark">
+                                                        <h6>{{ i.title }}</h6>
+                                                        <p><strong>{{ i.knowledge_area }}</strong></p>
+                                                        <p>Duration: {{ i.duration }}</p>
+                                                        <p>Venue: {{ i.venue }}</p>
+                                                        <p>Recurring: {{ i.is_recurring|yesno:"✔,✘" }}</p>
+                                                        <p>Cancellation: {{ i.cancellation_requested|yesno:"✔,✘" }}</p>
+                                                        <form method="GET" action="{% block calendar_action %}{% endblock %}">
+                                                            <input type="hidden" name="day" value="{{ day }}">
+                                                            <input type="hidden" name="month" value="{{ month }}">
+                                                            <input type="hidden" name="year" value="{{ year }}">
+                                                            <input type="hidden" name="recurring" value="{{ i.is_recurring }}">
+                                                            <input type="hidden" name="lesson" value="{{ i.lesson_identifier }}">
+                                                            <button type="submit" class="cancel-btn btn btn-sm">Cancel</button>
+                                                        </form>
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
                                         {% endfor %}
-                                        
-                                    {% endfor %}
-                                </ul>
+                                    </div>
+                                </div>
                             {% endif %}
                         </td>
                         {% endfor %}
@@ -73,3 +106,4 @@
         </div>
     </div>
 </body>
+{% endblock %}
