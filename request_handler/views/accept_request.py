@@ -1,4 +1,3 @@
-import logging
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -7,7 +6,6 @@ from request_handler.models import Request
 from calendar_scheduler.models import Booking
 from django.db.models import Max
 
-logger = logging.getLogger(__name__)
 
 def get_first_weekday(year, month, target_day):
     """
@@ -103,7 +101,6 @@ class AcceptRequestView(LoginRequiredMixin, View):
                         booking_date += timedelta(days=14)
 
             except Exception as e:
-                logger.error(f"Error creating booking: {e}")
                 return redirect('view_requests')
 
         lesson_request.delete()
