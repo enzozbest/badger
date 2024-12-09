@@ -1,4 +1,5 @@
 import time
+from functools import partial
 
 import geckodriver_autoinstaller
 from django.conf import settings
@@ -6,6 +7,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.shortcuts import reverse
 from django.test import LiveServerTestCase
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import Select
@@ -90,6 +92,13 @@ class TestFunctionalUserSystem(StaticLiveServerTestCase):
         self.assertEqual(self.driver.current_url,
                          f"{self.live_server_url}{reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)}")
 
+    def test_logging_in_with_wrong_credentials_does_not_log_in(self):
+        log_in_via_form(self.driver, self.live_server_url, self.student.username, 'WrongPassword')
+        self.assertNotEqual(self.driver.current_url,
+                            f"{self.live_server_url}{reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)}")
+        self.assertEqual(self.driver.current_url, f"{self.live_server_url}{reverse('log_in')}")
+        self.assertIn("The credentials provided were invalid!", self.driver.page_source)
+
     def test_student_can_update_their_maximum_hourly_rate(self):
         log_in_via_form(self.driver, self.live_server_url, self.student.username, 'Password123')
         self.driver.get(f"{self.live_server_url}{reverse('profile')}")
@@ -101,6 +110,15 @@ class TestFunctionalUserSystem(StaticLiveServerTestCase):
         wait(self.driver)
         self.student.refresh_from_db()
         self.assertEqual(self.student.student_max_rate, 15.00)
+
+    def test_tutors_cannot_update_maximum_hourly_rate(self):
+        log_in_via_form(self.driver, self.live_server_url, self.tutor.username, 'Password123')
+        self.driver.get(f"{self.live_server_url}{reverse('profile')}")
+        wait(self.driver)
+
+        with self.assertRaises(NoSuchElementException):
+            find_non_existent = partial(self.driver.find_element, By.ID, "id_student_max_rate")
+            find_non_existent()
 
     def test_tutor_can_set_their_hourly_rate(self):
         log_in_via_form(self.driver, self.live_server_url, self.tutor.username, 'Password123')
@@ -114,19 +132,20 @@ class TestFunctionalUserSystem(StaticLiveServerTestCase):
         self.tutor.refresh_from_db()
         self.assertEqual(self.tutor.hourly_rate, 15.00)
 
+    def test_students_cannot_set_an_hourly_rate(self):
+        log_in_via_form(self.driver, self.live_server_url, self.student.username, 'Password123')
+        self.driver.get(f"{self.live_server_url}{reverse('profile')}")
+        wait(self.driver)
+
+        with self.assertRaises(NoSuchElementException):
+            find_non_existent = partial(self.driver.find_element, By.ID, "id_hourly_rate")
+            find_non_existent()
+
     def test_user_can_change_their_password(self):
         log_in_via_form(self.driver, self.live_server_url, self.student.username, 'Password123')
         self.driver.get(f"{self.live_server_url}{reverse('password')}")
         wait(self.driver)
-        new_password_input = wait_for_element(self.driver, By.ID, "id_new_password")
-        password_confirmation_input = wait_for_element(self.driver, By.ID, "id_password_confirmation")
-        current_password_input = wait_for_element(self.driver, By.ID, "id_password")
-        new_password_input.send_keys("NewPassword123")
-        password_confirmation_input.send_keys("NewPassword123")
-        current_password_input.send_keys("Password123")
-        time.sleep(0.5)
-        submit_button = wait_for_clickable(self.driver, wait_for_element(self.driver, By.ID, "id_change_password"))
-        submit_button.click()
+        self.populate_password_fields(self.get_password_change_fields())
         wait(self.driver)
         self.student.refresh_from_db()
         self.assertTrue(self.student.check_password("NewPassword123"))
@@ -168,3 +187,17 @@ class TestFunctionalUserSystem(StaticLiveServerTestCase):
         time.sleep(0.5)
         self.driver.find_element(By.ID, "id_add_knowledge_areas").click()
         time.sleep(0.5)
+
+    def get_password_change_fields(self) -> tuple:
+        new_password_input = wait_for_element(self.driver, By.ID, "id_new_password")
+        password_confirmation_input = wait_for_element(self.driver, By.ID, "id_password_confirmation")
+        current_password_input = wait_for_element(self.driver, By.ID, "id_password")
+        submit_button = wait_for_clickable(self.driver, wait_for_element(self.driver, By.ID, "id_change_password"))
+        return new_password_input, password_confirmation_input, current_password_input, submit_button
+
+    def populate_password_fields(self, fields: tuple):
+        new_password_input, password_confirmation_input, current_password_input, submit_button = fields
+        new_password_input.send_keys("NewPassword123")
+        password_confirmation_input.send_keys("NewPassword123")
+        current_password_input.send_keys("Password123")
+        submit_button.click()

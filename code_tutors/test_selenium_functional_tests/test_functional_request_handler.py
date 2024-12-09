@@ -33,6 +33,9 @@ class TestFunctionalRequestHandler(StaticLiveServerTestCase):
         log_in_via_form(self.driver, self.live_server_url, self.student.username, 'Password123')
         self.create_request_via_form()
 
+    def test_tutor_cannot_create_a_request(self):
+        pass
+
     def test_student_can_edit_a_request(self):
         log_in_via_form(self.driver, self.live_server_url, self.student.username, 'Password123')
         create_test_requests()
