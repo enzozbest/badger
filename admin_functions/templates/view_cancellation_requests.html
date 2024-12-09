@@ -1,17 +1,67 @@
 <body>
     <h1>Cancellation requests</h1>
+
+    <!-- Filter Form -->
+    <form method="get">
+        {{ filter.form.as_p }}
+        {% for key, value in request.GET.items %}
+            {% if key not in filter.form.fields.keys and key != 'page' %}
+                <input type="hidden" name="{{ key }}" value="{{ value }}">
+            {% endif %}
+        {% endfor %}
+        <button type="submit">Go</button>
+    </form>
+
+
     <table>
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Student</th>
-                <th>Tutor</th>
-                <th>Lesson date</th>
+                <th>
+                    <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if current_sort == 'id' %}-id{% else %}id{% endif %}">
+                        ID
+                        {% if current_sort == 'id' %}
+                            ▲
+                        {% elif current_sort == '-id' %}
+                            ▼
+                        {% endif %}
+                    </a>
+                </th>
+                <th>
+                    <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if current_sort == 'student__first_name' %}-student__first_name{% else %}student__first_name{% endif %}">
+                        Student
+                        {% if current_sort == 'student__first_name' %}
+                            ▲
+                        {% elif current_sort == '-student__first_name' %}
+                            ▼
+                        {% endif %}
+                    </a>
+                </th>
+                <th>
+                    <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if current_sort == 'tutor__first_name' %}-tutor__first_name{% else %}tutor__first_name{% endif %}">
+                        Tutor
+                        {% if current_sort == 'tutor__first_name' %}
+                            ▲
+                        {% elif current_sort == '-tutor__first_name' %}
+                            ▼
+                        {% endif %}
+                    </a>
+                </th>
+                <th>
+                    <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if current_sort == 'date' %}-date{% else %}date{% endif %}">
+                        Lesson Date
+                        {% if current_sort == 'date' %}
+                            ▲
+                        {% elif current_sort == '-date' %}
+                            ▼
+                        {% endif %}
+                    </a>
+                </th>
                 <th>Action</th>
             </tr>
         </thead>
+
         <tbody>
-            {% for i in lessons.all %}
+            {% for i in lessons %}
             <tr>
                 <td>{{ i.id }}</td>
                 <td>{{ i.student.first_name }}  {{ i.student.last_name }}</td>
@@ -39,4 +89,21 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">First</a>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next</a>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">Last</a>
+        {% endif %}
+    </div>
+
+
 </body>
