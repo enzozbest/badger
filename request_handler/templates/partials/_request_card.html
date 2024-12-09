@@ -38,17 +38,17 @@
                         <li>No Venue Preference</li>
                     {% endfor %}
                 </ul>
-            </div>
+            </div>            
 
-            <p><strong>Term:</strong> {{ request.term }}</p>
-            <p><strong>Recurring:</strong> {% if request.is_recurring %}Yes{% else %}No{% endif %}</p>
-            <p><strong>Rejected:</strong> {% if request.rejected_request %}Yes{% else %}No{% endif %}</p>
+            <p><strong><u>Term:</u></strong> {{ request.term }}</p>
+            <p><strong><u>Recurring:</u></strong> {% if request.is_recurring %}Yes{% else %}No{% endif %}</p>
+            <p><strong><u>Rejected:</u></strong> {% if request.rejected_request %}Yes{% else %}No{% endif %}</p>
             {% if request.rejected_request %}
                 <p><strong>Rejection Reason:</strong> {{ request.rejection_reason }}</p>
             {% endif %}
-            <p><strong>On Time:</strong> {% if request.late %}Late{% else %}On Time{% endif %}</p>
-            <p><strong>Paid:</strong> {% if request.paid_status %}Successfully Paid{% else %}Payment Pending{% endif %}</p>
-            <p><strong>Status:</strong> 
+            <p> {% if request.late %}Late{% else %}On Time{% endif %}</p>
+            <p><strong><u>Paid:</u></strong> {% if request.paid_status %}Successfully Paid{% else %}Payment Pending{% endif %}</p>
+            <p><strong><u>Status:</u></strong> 
                 {% if request.allocated %}
                     Allocated to {{ request.tutor_name }}
                 {% else %}
@@ -86,6 +86,13 @@
                     <form action="{% url 'generate_invoice' request.id %}" method="post" class="d-inline">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-outline-primary btn-sm">Generate Invoice</button>
+                    </form>
+                {% endif %}
+                
+                {% if user.is_tutor and request.allocated and request.tutor == user %}
+                    <form method="post" action="{% url 'accept_request' request.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-success btn-sm">Accept Request</button>
                     </form>
                 {% endif %}
             </div>
