@@ -4,6 +4,7 @@ import geckodriver_autoinstaller
 from django.conf import settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.shortcuts import reverse
+from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
@@ -11,12 +12,13 @@ from selenium.webdriver.support.ui import Select
 
 from code_tutors.test_selenium_functional_tests import log_in_via_form, wait, wait_for_clickable, wait_for_element
 from user_system.fixtures.create_test_users import create_test_users
-from user_system.models import KnowledgeArea, User
+from user_system.models.knowledge_area_model import KnowledgeArea
+from user_system.models.user_model import User
 
 geckodriver_autoinstaller.install()
 
 
-class TestFunctionalRegistration(StaticLiveServerTestCase):
+class TestFunctionalRegistration(LiveServerTestCase):
     def setUp(self):
         self.driver = webdriver.Firefox()
 

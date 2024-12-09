@@ -9,7 +9,7 @@ from code_tutors.test_selenium_functional_tests import log_in_via_form, wait, wa
 from request_handler.fixtures.create_test_requests import create_test_requests
 from request_handler.models import Request, Venue
 from user_system.fixtures.create_test_users import create_test_users
-from user_system.models import User
+from user_system.models.user_model import User
 
 geckodriver_autoinstaller.install()
 

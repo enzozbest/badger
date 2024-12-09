@@ -1,9 +1,15 @@
+import logging
+
 from django.shortcuts import reverse
 from selenium.webdriver.common.by import By
 from selenium.webdriver.ie.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+
+# Suppress Selenium warnings
+logging.getLogger("selenium").setLevel(logging.CRITICAL)
+logging.getLogger("django.request").setLevel(logging.CRITICAL)
 
 """Package initialiser to ensure all Selenium tests have access to these common functions"""
 
