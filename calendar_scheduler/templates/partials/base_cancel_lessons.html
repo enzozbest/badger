@@ -1,56 +1,108 @@
-<head>
-    <title>Cancel Lessons</title>
-</head>
-<body>
-    {% if close_date == False %}
-        <p>Click below to cancel your individual lesson on {{day}}-{{month}}-{{year}}</p>
-        <form method="POST" action="{% block cancel_individual %}{% endblock %}">
-            {% csrf_token %}
-            <button type="submit">Cancel</button>
-            <input type="hidden" name="booking" value="{{ booking.id }}">
-            <input type="hidden" name="day" value="{{ day }}">
-            <input type="hidden" name="month" value="{{ month }}">
-            <input type="hidden" name="year" value="{{ year }}">
-            <input type="hidden" name="lesson" value="{{ lesson }}">
-            <input type="hidden" name="cancellation" value="day">
-        </form>
-    {% else %}
-        {% if user.user_type != "Admin" %}
-        <p> Your lesson on {{day}}-{{month}}-{{year}} is less than 2 weeks away.</p>
-        <p> You may only request an individual lesson cancellation that can either be accepted or refused.</p>
-        <form method="POST" action="{% block request_cancellation %}{% endblock %}">
-            {% csrf_token %}
-            <button type="submit">Request cancellation</button>
-            <input type="hidden" name="day" value="{{ day }}">
-            <input type="hidden" name="month" value="{{ month }}">
-            <input type="hidden" name="year" value="{{ year }}">
-            <input type="hidden" name="lesson" value="{{ lesson }}">
-            <input type="hidden" name="cancellation" value="request">
-        </form>
-        {% endif %}
-    {% endif %}
+{% extends 'base_content.html' %}
 
-    <p>Click below to cancel all lessons for your term</p>
-        <form method="POST" action="{% block cancel_term %}{% endblock %}">
-            {% csrf_token %}
-            <button type="submit">Cancel</button>
-            <input type="hidden" name="day" value="{{ day }}">
-            <input type="hidden" name="month" value="{{ month }}">
-            <input type="hidden" name="year" value="{{ year }}">
-            <input type="hidden" name="lesson" value="{{ lesson }}">
-            <input type="hidden" name="cancellation" value="term">
-        </form>
+{% block content %}
+<div class="container py-5 w-100 d-flex  align-items-center">
+    <div class="row w-100 justify-content-center">
+        <div class="col-md-6 w-75 col-lg-5">
+            <div class="card bg-dark  shadow-lg rounded-4 border">
+                <div class="card-body text-center p-5">
+                    {% if close_date == False %}
+                        <div class="mb-4">
+                            <i class="bi bi-calendar-x-fill text-warning" style="font-size: 3.5rem;"></i>
+                        </div>
+                        <h5 class="card-title display-6 mb-3">Cancel Individual Lesson</h5>
+                        <p class="card-text fs-5 mb-4">Click below to cancel your individual lesson on <strong>{{ day }}-{{ month }}-{{ year }}</strong>.</p>
+                        <div class="d-flex justify-content-center gap-3 mt-4">
+                            <form method="POST" action="{% block cancel_individual %}{% endblock %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="booking" value="{{ booking.id }}">
+                                <input type="hidden" name="day" value="{{ day }}">
+                                <input type="hidden" name="month" value="{{ month }}">
+                                <input type="hidden" name="year" value="{{ year }}">
+                                <input type="hidden" name="lesson" value="{{ lesson }}">
+                                <input type="hidden" name="cancellation" value="day">
+                                <button type="submit" class="btn btn-danger btn-lg d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-x-circle me-2"></i>Cancel Lesson
+                                </button>
+                            </form>
+                        </div>
+                    {% else %}
+                        {% if user.user_type != "Admin" %}
+                            <div class="mb-4">
+                                <i class="bi bi-exclamation-circle-fill text-warning" style="font-size: 3.5rem;"></i>
+                            </div>
+                            <h5 class="card-title display-6 mb-3">Request Cancellation</h5>
+                            <p class="card-text fs-5 mb-4">Your lesson on <strong>{{ day }}-{{ month }}-{{ year }}</strong> is less than 2 weeks away. You may only request an individual lesson cancellation that can either be accepted or refused.</p>
+                            <div class="d-flex justify-content-center gap-3 mt-4">
+                                <form method="POST" action="{% block request_cancellation %}{% endblock %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="day" value="{{ day }}">
+                                    <input type="hidden" name="month" value="{{ month }}">
+                                    <input type="hidden" name="year" value="{{ year }}">
+                                    <input type="hidden" name="lesson" value="{{ lesson }}">
+                                    <input type="hidden" name="cancellation" value="request">
+                                    <button type="submit" class="btn btn-warning btn-lg d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-envelope-open me-2"></i>Request Cancellation
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                    
+                    <hr class="text-white my-4">
 
-    {% if recurring == "True" %}
-        <p>Your lesson is recurring across all terms, click below to cancel for all terms</p>
-        <form method="POST" action="{% block cancel_recurring %}{% endblock %}">
-            {% csrf_token %}
-            <button type="submit">Cancel</button>
-            <input type="hidden" name="day" value="{{ day }}">
-            <input type="hidden" name="month" value="{{ month }}">
-            <input type="hidden" name="year" value="{{ year }}">
-            <input type="hidden" name="lesson" value="{{ lesson }}">
-            <input type="hidden" name="cancellation" value="recurring">
-        </form>
-    {% endif %}
-</body>
+                    <h5 class="card-title display-6 mb-3">Cancel All Lessons</h5>
+                    <p class="card-text fs-5 mb-4">Click below to cancel all lessons for your term.</p>
+                    <div class="d-flex justify-content-center gap-3 mt-4">
+                        <form method="POST" action="{% block cancel_term %}{% endblock %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="day" value="{{ day }}">
+                            <input type="hidden" name="month" value="{{ month }}">
+                            <input type="hidden" name="year" value="{{ year }}">
+                            <input type="hidden" name="lesson" value="{{ lesson }}">
+                            <input type="hidden" name="cancellation" value="term">
+                            <button type="submit" class="btn btn-primary btn-lg d-flex align-items-center justify-content-center">
+                                <i class="bi bi-calendar2-x me-2"></i>Cancel Term
+                            </button>
+                        </form>
+                    </div>
+                    
+                    {% if recurring == "True" %}
+                        <hr class="text-white my-4">
+                        <h5 class="card-title display-6 mb-3">Cancel Recurring Lessons</h5>
+                        <p class="card-text fs-5 mb-4">Your lesson is recurring across all terms. Click below to cancel for all terms.</p>
+                        <div class="d-flex justify-content-center gap-3 mt-4">
+                            <form method="POST" action="{% block cancel_recurring %}{% endblock %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="day" value="{{ day }}">
+                                <input type="hidden" name="month" value="{{ month }}">
+                                <input type="hidden" name="year" value="{{ year }}">
+                                <input type="hidden" name="lesson" value="{{ lesson }}">
+                                <input type="hidden" name="cancellation" value="recurring">
+                                <button type="submit" class="btn btn-secondary btn-lg w-75 d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-arrow-repeat me-2"></i>Cancel Recurring Lessons
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+                    
+                    <hr class="text-white my-4">
+                    
+                    <div class="d-flex justify-content-center gap-3 mt-4">
+                        {% if user.user_type == "Student" %}
+                            <a href="{% url 'student_calendar' %}" class="btn btn-outline-light btn-lg w-75 d-flex align-items-center justify-content-center">
+                                <i class="bi bi-calendar3 me-2"></i>Go Back to Calendar
+                            </a>
+                        {% elif user.user_type == "Tutor" %}
+                            <a href="{% url 'tutor_calendar' %}" class="btn btn-outline-light btn-lg w-75 d-flex align-items-center justify-content-center">
+                                <i class="bi bi-calendar3 me-2"></i>Go Back to Calendar
+                            </a>
+                        {% endif %}
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
