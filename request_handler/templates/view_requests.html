@@ -134,7 +134,7 @@
                                 <li> <a href="{% url 'delete_request' request.id%}">Delete</a> </li>
                         {% endif %}
                         {% if user.user_type == 'Admin' %}
-                            <li><a href="{% url 'allocate_request' request.id %}">Allocate</a></li>
+                            <li><a id="id_allocation_button_{{ request.id }}" href="{% url 'allocate_request' request.id %}">Allocate</a></li>
                             {% if not request.rejected_request %}
                                 <li>
                                 <form action="{% url 'reject_request' request.id %}" method="POST">

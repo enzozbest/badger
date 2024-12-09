@@ -1,4 +1,3 @@
-import geckodriver_autoinstaller
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.shortcuts import reverse
 from selenium import webdriver
@@ -10,8 +9,6 @@ from request_handler.fixtures.create_test_requests import create_test_requests
 from request_handler.models import Request, Venue
 from user_system.fixtures.create_test_users import create_test_users
 from user_system.models.user_model import User
-
-geckodriver_autoinstaller.install()
 
 
 class TestFunctionalRequestHandler(StaticLiveServerTestCase):

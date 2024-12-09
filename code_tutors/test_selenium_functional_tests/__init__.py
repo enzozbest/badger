@@ -1,11 +1,15 @@
 import logging
 
+import geckodriver_autoinstaller
 from django.shortcuts import reverse
 from selenium.webdriver.common.by import By
 from selenium.webdriver.ie.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+
+# Install Firefox Webdriver
+geckodriver_autoinstaller.install()
 
 # Suppress Selenium warnings
 logging.getLogger("selenium").setLevel(logging.CRITICAL)

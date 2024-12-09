@@ -1,11 +1,9 @@
 import time
 from functools import partial
 
-import geckodriver_autoinstaller
 from django.conf import settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.shortcuts import reverse
-from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -17,10 +15,8 @@ from user_system.fixtures.create_test_users import create_test_users
 from user_system.models.knowledge_area_model import KnowledgeArea
 from user_system.models.user_model import User
 
-geckodriver_autoinstaller.install()
 
-
-class TestFunctionalRegistration(LiveServerTestCase):
+class TestFunctionalRegistration(StaticLiveServerTestCase):
     def setUp(self):
         self.driver = webdriver.Firefox()
 
