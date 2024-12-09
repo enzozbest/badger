@@ -68,7 +68,8 @@ urlpatterns = [
     path('admin-student/calendar/<int:pk>/', calendar_view.StudentCalendarView.as_view(),name='admin_student_calendar'),
     path('tutor/calendar/cancel/', cancel_lessons_view.CancelLessonsView.as_view(), name='tutor_cancel_lessons'),
     path('student/calendar/cancel/', cancel_lessons_view.CancelLessonsView.as_view(),name='student_cancel_lessons'),
-    path('admins/calendar/cancel/',cancel_lessons_view.AdminCancelLessonsView.as_view(),name='admin_cancel_lessons'),
+    path('admins/calendar/cancel/',cancel_lessons_view.AdminCancelLessonsView.as_view(),name='admin_calendar_cancel_lessons'),
+    path('admins/cancel/', cancel_lessons_view.CancelLessonsView.as_view(),name='admin_cancel_lessons'),
     path('admins/cancellation_requests/', cancellation_request_view.ViewCancellationRequests.as_view(),name='view_cancellation_requests'),
     path('reject_request/<int:request_id>/', reject_request_view.reject_request, name='reject_request'),
 ]
