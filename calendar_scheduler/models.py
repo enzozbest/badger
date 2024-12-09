@@ -29,4 +29,4 @@ class Booking(models.Model):
 
 
     def __str__(self):
-        return f"{self.student} -> {self.tutor} ({self.day}) {self.date}"
+        return f"{self.student} is taught by {self.tutor} in the term {self.term}."
