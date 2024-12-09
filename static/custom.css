@@ -170,7 +170,7 @@ h3.profile-title {
 }
 
 .btn-outline-light {
-  border: 2px solid #fff;
+  border:#fff;
   color: #fff;
   font-weight: 500;
   padding: 10px 20px;
@@ -181,3 +181,10 @@ h3.profile-title {
   color: #000;
   transform: scale(1.05);
 }
+
+.center-button {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0; /* Adjust spacing as needed */
+}
+
