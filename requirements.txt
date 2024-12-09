@@ -42,4 +42,4 @@ charset-normalizer==3.4.0
 packaging==24.2
 python-dotenv==1.0.1
 requests==2.32.3
-webdriver-manager==4.0.2
+geckodriver-autoinstaller==0.1.0

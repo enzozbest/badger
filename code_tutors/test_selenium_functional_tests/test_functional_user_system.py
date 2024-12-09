@@ -1,23 +1,24 @@
 import time
 
+import geckodriver_autoinstaller
 from django.conf import settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.shortcuts import reverse
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import Select
-from webdriver_manager.firefox import GeckoDriverManager
 
 from code_tutors.test_selenium_functional_tests import wait
 from user_system.fixtures.create_test_users import create_test_users
 from user_system.models import User
 
+geckodriver_autoinstaller.install()
+
 
 class TestFunctionalRegistration(StaticLiveServerTestCase):
     def setUp(self):
-        self.driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+        self.driver = webdriver.Firefox()
 
     def tearDown(self):
         self.driver.quit()
@@ -72,7 +73,7 @@ class TestFunctionalRegistration(StaticLiveServerTestCase):
 
 class TestFunctionalUserSystem(StaticLiveServerTestCase):
     def setUp(self):
-        self.driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+        self.driver = webdriver.Firefox()
         create_test_users()
         self.student = User.objects.get(user_type='Student')
         self.tutor = User.objects.get(user_type='Tutor')
