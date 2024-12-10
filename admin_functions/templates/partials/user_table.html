@@ -23,11 +23,16 @@
                 </td>
                 <td>
                     {% if user.user_type == 'Tutor' %}
-                        <a href="{% url 'admin_tutor_calendar' user.id %}" class="btn btn-info btn-sm">View Tutor Calendar</a>
+                        <a href="{% url 'admin_tutor_calendar' user.id %}" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-calendar"></i> Calendar
+                        </a>
                     {% elif user.user_type == 'Student' %}
-                        <a href="{% url 'admin_student_calendar' user.id %}" class="btn btn-info btn-sm">View Student Calendar</a>
+                        <a href="{% url 'admin_student_calendar' user.id %}" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-calendar"> </i> Calendar
+                        </a>
                     {% endif %}
                 </td>
+                
             </tr>
         {% empty %}
             <tr>
