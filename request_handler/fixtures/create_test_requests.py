@@ -1,7 +1,8 @@
 import json
 
 from request_handler.models import Request, Venue
-from user_system.models import Day, User
+from user_system.models.user_model import User
+from user_system.models.day_model import Day
 
 
 def create_test_requests():

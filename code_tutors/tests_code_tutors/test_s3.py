@@ -9,7 +9,7 @@ from invoicer.tests_invoicer.test_generate_invoice import generate_invoice, gene
 from request_handler.fixtures.create_test_requests import create_test_requests
 from request_handler.models import Request
 from user_system.fixtures.create_test_users import create_test_users
-from user_system.models import User
+from user_system.models.user_model import User
 
 
 @skipIf(not settings.USE_AWS_S3, "These tests should only run if there is an appropriate local AWS configuration")

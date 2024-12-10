@@ -1,17 +1,20 @@
+from datetime import date, datetime, timedelta
 from unittest.mock import patch
-from django.test import TestCase, Client
+
+from django.test import Client, TestCase
 from django.urls import reverse
-from calendar_scheduler.views.cancel_lessons import CancelLessonsView, cancel_day, cancel_term, cancel_recurring
-from user_system.models import User
+
 from calendar_scheduler.models import Booking
-from datetime import datetime, timedelta, date
+from calendar_scheduler.views.cancel_lessons import cancel_day, cancel_recurring, cancel_term
 from user_system.fixtures import create_test_users
+from user_system.models.user_model import User
 
 """ Class to represent the cancelling of lessons
 
 This class is used as a view for the website. It creates multiple bookings and attempts to delete them in multiple ways
 and by multiple users, as the functionality works in the cancel_lessons view.
 """
+
 
 class CancelLessonsViewTests(TestCase):
     def setUp(self):
@@ -21,7 +24,7 @@ class CancelLessonsViewTests(TestCase):
         self.tutor = User.objects.get(user_type=User.ACCOUNT_TYPE_TUTOR)
         self.student = User.objects.get(user_type=User.ACCOUNT_TYPE_STUDENT)
 
-        self.booking_sep = Booking.objects.create( # September term booking
+        self.booking_sep = Booking.objects.create(  # September term booking
             student=self.student,
             tutor=self.tutor,
             start="2024-12-03 10:00:00",
@@ -30,7 +33,7 @@ class CancelLessonsViewTests(TestCase):
             date=date(2024, 12, 3)
         )
 
-        self.booking_jan = Booking.objects.create( # January term booking
+        self.booking_jan = Booking.objects.create(  # January term booking
             student=self.student,
             tutor=self.tutor,
             start="2025-03-03 10:00:00",
@@ -39,7 +42,7 @@ class CancelLessonsViewTests(TestCase):
             date=date(2025, 3, 3)
         )
 
-        self.booking_may = Booking.objects.create( # May term booking
+        self.booking_may = Booking.objects.create(  # May term booking
             student=self.student,
             tutor=self.tutor,
             start="2025-06-03 10:00:00",
@@ -55,7 +58,7 @@ class CancelLessonsViewTests(TestCase):
             end="2025-07-03 11:00:00",
             lesson_identifier="4",
             date=date(2025, 2, 3),
-            is_recurring = True
+            is_recurring=True
         )
 
         self.booking = Booking.objects.create(
@@ -236,6 +239,8 @@ class CancelLessonsViewTests(TestCase):
 This class is used as a view for the website. It creates multiple bookings and attempts to delete them in multiple ways
 through an admin (and as other forbidden users), as the functionality works in the cancel_lessons view.
 """
+
+
 class AdminCancelLessonsViewTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -336,10 +341,11 @@ class AdminCancelLessonsViewTest(TestCase):
             response = self.client.post('/admins/calendar/cancel/', {
                 'lesson': '1',
                 'cancellation': 'day',
-                'day': self.booking_date.day+1,
+                'day': self.booking_date.day + 1,
                 'month': self.booking_date.month,
                 'year': self.booking_date.year,
             })
         expected_date = (self.booking_date + timedelta(days=1)).strftime('%Y-%m-%d')
         self.assertEqual(response.status_code, 500)
-        self.assertIn(f"Error processing cancellation: No booking found for lesson_id: 1 on {expected_date}", response.content.decode())
+        self.assertIn(f"Error processing cancellation: No booking found for lesson_id: 1 on {expected_date}",
+                      response.content.decode())
