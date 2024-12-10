@@ -130,50 +130,39 @@ def retrieve_calendar_events(calendar, request, user_for_calendar=None):
         "next_year": prev_next_dates[3],
     }
 
-class TutorCalendarView(LoginRequiredMixin, View):
-    '''A view to display the Tutor Calendar. '''
+class BaseCalendarView(LoginRequiredMixin, View):
+    calendar_slug = None
+    template_name = None
+    user_type = None
+    admin_template_name = None
+
     def get(self, request: HttpRequest, pk: int = None) -> HttpResponse:
-        if request.user.is_student:
+        if request.user.user_type != self.user_type and not request.user.is_admin:
             return render(request, 'permission_denied.html', status=401)
-
-        elif request.user.is_admin and pk:
+        
+        user_for_calendar = None
+        if request.user.is_admin and pk:
             user_for_calendar = get_object_or_404(User, pk=pk)
-            if user_for_calendar.user_type == 'Tutor':
-                calendar = Calendar.objects.get(slug='tutor')
-                template = 'admin_tutor_calendar.html'
+            if user_for_calendar.user_type != self.user_type:
+                raise ValueError(f"Unexpected user type. Only {self.user_type} is expected for this calendar.")
             else:
-                raise ValueError("Unexpected user type. Only 'Tutor' is expected for this calendar.")
-
-            data = retrieve_calendar_events(calendar, request, user_for_calendar)
-            return render(request, template, data)
-
+                self.template_name = self.admin_template_name
         try:
-            calendar = Calendar.objects.get(slug='tutor')
-            data = retrieve_calendar_events(calendar, request)
-            return render(request, 'tutor_calendar.html', data)
+            calendar = Calendar.objects.get(slug=self.calendar_slug)
+            data = retrieve_calendar_events(calendar, request, user_for_calendar)
+            return render(request, self.template_name, data)
         except Calendar.DoesNotExist:
             return render(request, 'dashboard.html', status=404)
+        
+    
+class TutorCalendarView(BaseCalendarView):
+    calendar_slug = 'tutor'
+    template_name = 'tutor_calendar.html'
+    user_type = 'Tutor'
+    admin_template_name = 'admin_tutor_calendar.html'
 
-class StudentCalendarView(LoginRequiredMixin, View):
-    '''A view to display the Student Calendar. '''
-    def get(self, request: HttpRequest, pk: int = None) -> HttpResponse:
-        if request.user.is_tutor:
-            return render(request, 'permission_denied.html', status=401)
-
-        elif request.user.is_admin and pk:
-            user_for_calendar = get_object_or_404(User, pk=pk)
-            if user_for_calendar.user_type == 'Student':
-                calendar = Calendar.objects.get(slug='student')
-                template = 'admin_student_calendar.html'
-            else:
-                raise ValueError("Unexpected user type. Only 'Student' is expected for this calendar.")
-
-            data = retrieve_calendar_events(calendar, request, user_for_calendar)
-            return render(request, template, data)
-
-        try:
-            calendar = Calendar.objects.get(slug='tutor')
-            data = retrieve_calendar_events(calendar, request)
-            return render(request, 'student_calendar.html', data)
-        except Calendar.DoesNotExist:
-            return render(request, 'dashboard.html', status=404)
+class StudentCalendarView(BaseCalendarView):
+    calendar_slug = 'student'
+    template_name = 'student_calendar.html'
+    user_type = 'Student'
+    admin_template_name = 'admin_student_calendar.html'
