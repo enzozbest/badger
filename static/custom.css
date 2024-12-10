@@ -1,9 +1,9 @@
-/* General Styles */
+
 html, body {
   height: 100%;
   margin: 0;
-  background-color: #000; /* Black background */
-  color: #fff; /* White text */
+  background-color: #000;
+  color: #fff; 
 }
 
 .wrapper {
@@ -13,42 +13,40 @@ html, body {
 }
 
 .content {
-  flex: 1; /* Ensures content takes up the remaining space */
+  flex: 1;
   padding-top: 10px;
 }
 
-/* Typography */
+
 h1, h2, h3, p {
-  text-shadow: 1px 1px 2px #333; /* Subtle shadow for readability */
+  text-shadow: 1px 1px 2px #333; 
 }
 
-/* Hyperlinks */
+
 .content a {
   text-decoration: none;
-  color: #1e90ff; /* Light blue */
+  color: #1e90ff; 
 }
 .content a:hover {
   text-decoration: underline;
-  color: #87ceeb; /* Lighter blue on hover */
+  color: #87ceeb; 
 }
 
-/* Lists */
 ul.errorlist {
   list-style-type: none;
   padding: 0;
   margin: 0;
-  color: #ff6347; /* Red text for errors */
+  color: #ff6347; 
 }
 
-/* Alerts */
+
 .alert {
   border-radius: 0px;
 }
 
-/* Cover Page */
 .cover-card {
-  background-color: rgba(245, 245, 245, 0.6); /* Semi-transparent light background */
-  color: #fff; /* White text */
+  background-color: rgba(245, 245, 245, 0.6); 
+  color: #fff; 
   max-width: 30rem;
   padding: 30px 50px;
   border-radius: 15%;
@@ -101,15 +99,15 @@ h3.profile-title {
   font-style: italic;
 }
 
-/* Footer */
+
 .footer {
-  background-color: #131313; /* Match the black background */
+  background-color: #131313; 
   text-align: center;
-  color: #fff; /* White text for consistency */
+  color: #fff; 
   flex-shrink: 0;
 }
 
-/* Additional Styles */
+
 .low-key {
   color: #777;
   font-weight: 300;
@@ -121,52 +119,52 @@ h3.profile-title {
 }
 
 .form-control.bg-light {
-  background-color: #f8f9fa; /* Light grey background */
-  color: #000; /* Dark text */
-  border: 1px solid #ced4da; /* Border for clarity */
+  background-color: #f8f9fa; 
+  color: #000; 
+  border: 1px solid #ced4da; 
 }
 
 .form-control.bg-light:focus {
-  background-color: #e9ecef; /* Slightly darker grey on focus */
+  background-color: #e9ecef;
   outline: none;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Focus effect */
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); 
 }
 
 .card {
-  border: none; /* Remove default border */
+  border: none; 
 }
 
 .card-footer {
-  background-color: transparent; /* Match dark theme */
+  background-color: transparent;
   border-top: none;
 }
 
 /* Card Enhancements */
 .card.shadow-lg {
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.5); /* Enhanced shadow for better depth */
-  border-radius: 10px; /* Smooth rounded corners */
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.5); 
+  border-radius: 10px; 
 }
 
 /* Card Header */
 .card-header.bg-gradient-primary {
-  background: linear-gradient(90deg, #1e90ff, #0056b3); /* Blue gradient for header */
+  background: linear-gradient(90deg, #1e90ff, #0056b3); 
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
-  font-size: 1.5rem; /* Slightly larger header text */
+  font-size: 1.5rem; 
   font-weight: bold;
 }
 
 /* Buttons */
 .btn-success {
-  background-color: #28a745; /* Consistent success green */
+  background-color: #28a745; 
   border: none;
   font-weight: 500;
   padding: 10px 20px;
   transition: all 0.3s ease;
 }
 .btn-success:hover {
-  background-color: #218838; /* Darker green on hover */
-  transform: scale(1.05); /* Subtle hover effect */
+  background-color: #218838;
+  transform: scale(1.05); 
 }
 
 .btn-outline-light {
@@ -181,18 +179,13 @@ h3.profile-title {
   transform: scale(1.05);
 }
 
-.center-button {
-  display: flex;
-  justify-content: center;
-  margin: 1rem 0; /* Adjust spacing as needed */
-}
 
 .calendar .event h6, .calendar .event p {
   text-shadow: none;
 }
 
 .calendar {
-  background-color: #222222; /* Slightly lighter dark grey for calendar */
+  background-color: #222222; 
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
@@ -203,30 +196,29 @@ h3.profile-title {
   width: 100%;
 }
 .calendar .table th, .calendar .table td {
-  border: 1px solid #4d4d4d; /* Subtle border color */
+  border: 1px solid #4d4d4d; 
   padding: 10px;
   vertical-align: top;
 }
 .calendar .table th {
   background-color: #444;
-  color: #ddd; /* Light grey text for headers */
+  color: #ddd; 
 }
 .calendar .table td {
-  background-color: #3a3a3a; /* Match calendar background */
-  color: #ffffff; /* White text */
+  background-color: #3a3a3a; 
+  color: #ffffff;
   height: 150px;
 }
 .calendar .table td:hover {
-  background-color: #3b3b3b; /* Slightly lighter grey on hover */
+  background-color: #3b3b3b; 
   cursor: pointer;
 }
 .calendar .event {
-  background-color: #17a2b8; /* Teal for events */
   border-radius: 5px;
   padding: 8px;
   margin-top: 8px;
   color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 .calendar .event p {
   margin: 0;
@@ -234,30 +226,78 @@ h3.profile-title {
   text-shadow: none;
 }
 
+.cancel-btn {
+  background: #ff4d4d;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+}
+.cancel-btn:hover {
+  background: #cc0000;
+}
+.event-card {
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.event-card h6 {
+  font-size: 14px;
+  font-weight: bold;
+}
+.event-card p {
+  font-size: 12px;
+  margin: 0;
+  text-shadow: none;
+}
+.event-card .btn {
+  font-size: 12px;
+  padding: 5px 10px;
+}
+
+
+.summary-title {
+  cursor: pointer;
+  font-weight: bold;
+  color: #010101;
+  margin-bottom: 10px;
+}
+
+summary:hover {
+  text-decoration: underline;
+}
+
+details[open] .summary-title {
+  color: #060606;
+}
+
+
 
 
 .btn {
   border-radius: 20px;
 }
 .btn-danger {
-  background-color: #c0392b; /* Deep red for cancel button */
+  background-color: #c0392b; 
   border-color: #c0392b;
 }
 .btn-danger:hover {
-  background-color: #e74c3c; /* Lighter red on hover */
+  background-color: #e74c3c; 
 }
 .text-danger {
-  color: #e74c3c !important; /* Highlight weekends */
+  color: #e74c3c !important; 
 }
 
-/* View Users Table Enhancements */
+
 .table-users {
-  background-color: #1f1f1f; /* Dark grey for user table */
+  background-color: #1f1f1f; 
   color: #fff;
 }
 .table-users th {
   background-color: #333;
-  color: #ddd; /* Lighter text */
+  color: #ddd; 
   font-weight: bold;
 }
 .table-users td {
@@ -269,7 +309,7 @@ h3.profile-title {
 }
 
 .table-users .btn {
-  width: 160px; /* Fixed width for buttons */
+  width: 160px;
   font-size: 0.9rem;
   padding: 5px 10px;
 }
@@ -288,3 +328,7 @@ h3.profile-title {
 .table-users .btn-primary:hover {
   background-color: #0056b3;
 }
+
+
+
+
