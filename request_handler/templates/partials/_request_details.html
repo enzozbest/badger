@@ -1,32 +1,39 @@
-<div class="card request-details-card shadow-sm border-0 rounded-4 p-4">
-    <div class="card-body">
-        <!-- Knowledge Area -->
-        <p class="mb-3"><strong>Knowledge Area:</strong> <span class="text-primary">{{ request.knowledge_area|upper }}</span></p>
+<form method="get" class="bg-dark text-white p-3 rounded mb-4">
+    <p class="text-white">Showing {{ count }} out of {{ total }} requests:</p>
+    <div class="d-flex flex-wrap justify-content-start align-items-center mb-4">
 
-        <!-- Term -->
-        <p class="mb-3"><strong>Term:</strong> <span class="text-secondary">{{ request.term }}</span></p>
+        <div class="me-2 mb-2">
+            <select name="allocated" class="form-select form-select-sm">
+                <option value="">All</option>
+                <option value="true" {% if request.GET.allocated == "true" %}selected{% endif %}>Allocated</option>
+                <option value="false" {% if request.GET.allocated == "false" %}selected{% endif %}>Unallocated</option>
+            </select>
+        </div>
 
-        <!-- Availability -->
-        <p class="mb-2"><strong>Availability:</strong></p>
-        <ul class="list-unstyled ms-3 mb-3">
-            {% for day in request.availability.all %}
-                <li><i class="bi bi-calendar-event-fill text-muted"></i> {{ day }}</li>
-            {% endfor %}
-        </ul>
 
-        <!-- Frequency -->
-        <p class="mb-3"><strong>Frequency:</strong> <span class="text-secondary">{{ request.frequency }}</span></p>
+        <div class="me-2 mb-2">
+            <select name="sort" class="form-select form-select-sm">
+                <option value="">Sort By</option>
+                <option value="id" {% if request.GET.sort == "id" %}selected{% endif %}>ID (Ascending)</option>
+                <option value="-id" {% if request.GET.sort == "-id" %}selected{% endif %}>ID (Descending)</option>
+                <option value="student__first_name" {% if request.GET.sort == "student__first_name" %}selected{% endif %}>Student Name (A-Z)</option>
+                <option value="-student__first_name" {% if request.GET.sort == "-student__first_name" %}selected{% endif %}>Student Name (Z-A)</option>
+                <option value="knowledge_area" {% if request.GET.sort == "knowledge_area" %}selected{% endif %}>Requested Area (A-Z)</option>
+                <option value="-knowledge_area" {% if request.GET.sort == "-knowledge_area" %}selected{% endif %}>Requested Area (Z-A)</option>
+            </select>
+        </div>
 
-        <!-- Duration -->
-        <p class="mb-3"><strong>Duration:</strong> <span class="text-secondary">{{ request.duration }}</span></p>
+        <div class="flex-grow-1 me-2 mb-2">
+            <input 
+                type="text" 
+                name="search" 
+                class="form-control form-control-sm" 
+                placeholder="Search requests..." 
+                value="{{ request.GET.search }}">
+        </div>
 
-        <!-- Venue Preference -->
-        <p class="mb-2"><strong>Venue Preference:</strong></p>
-        <ul class="list-unstyled ms-3">
-            {% for mode in request.venue_preference.all %}
-                <li><i class="bi bi-geo-alt-fill text-muted"></i> {{ mode }}</li>
-            {% endfor %}
-        </ul>
+        <div class="mb-2">
+            <button type="submit" class="btn btn-outline-light btn-sm">Apply</button>
+        </div>
     </div>
-</div>
-
+</form>
