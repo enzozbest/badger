@@ -5,7 +5,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from calendar_scheduler.models import Booking
 from datetime import date, datetime, timedelta
 
-def cancel_day(id,day):
+def cancel_day(id, day):
+    ''' Cancels an individual lesson, determined by the id and the lessons date '''
     try:
         lesson = Booking.objects.get(lesson_identifier=id, date=day)
         lesson.delete()
@@ -13,6 +14,7 @@ def cancel_day(id,day):
         return HttpResponseNotFound(f"Booking with lesson_identifier={id} and date={day} doesn't seem to exist.")
 
 def cancel_term(id,month):
+    ''' Cancels all lessons for a term, where the term is determined by the month of requested cancelation '''
     months = []
     match month:
         case "9"|"10"|"11"|"12":
@@ -28,37 +30,51 @@ def cancel_term(id,month):
             lesson.delete()
 
 def cancel_recurring(id):
+    ''' Cancels all lesson that are a part of a recurring booking, based on the id they share'''
     lesson = Booking.objects.filter(lesson_identifier=id)
     for i in lesson:
         i.delete()
 
-'''This method is used to match the type of cancellation the user is requesting. '''
 def student_tutor_cancel(request,):
-        day = request.POST.get("day")
-        month = request.POST.get("month")
-        year = request.POST.get("year")
-        lesson_id = request.POST.get("lesson")
-        cancellation = request.POST.get("cancellation")
+    '''This method is used to match the type of cancellation the user is requesting. '''
+    day = request.POST.get("day")
+    month = request.POST.get("month")
+    year = request.POST.get("year")
+    lesson_id = request.POST.get("lesson")
+    cancellation = request.POST.get("cancellation")
 
-        #Delete lessons from the database, according to whether the user only wants to delete:
-        #The lesson for that specific day
-        #The lessons for that term
-        #All lessons if it's a recurring request
-        match cancellation:
-            case "day":
-                day = date(int(year),int(month),int(day))
-                cancel_day(lesson_id,day)
-            case "term":
-                cancel_term(lesson_id,month)
-            case "recurring":
-                cancel_recurring(lesson_id)
-            case "request":
-                #Set the cancellation_requested field to true
-                day = date(int(year),int(month),int(day))
-                lesson = Booking.objects.get(lesson_identifier=lesson_id, date=day)
-                lesson.cancellation_requested = True
-                lesson.save()
-        return
+    #Delete lessons from the database, according to whether the user only wants to delete:
+    #The lesson for that specific day
+    #The lessons for that term
+    #All lessons if it's a recurring request
+    match cancellation:
+        case "day":
+            day = date(int(year),int(month),int(day))
+            cancel_day(lesson_id,day)
+        case "term":
+            cancel_term(lesson_id,month)
+        case "recurring":
+            cancel_recurring(lesson_id)
+        case "request":
+            #Set the cancellation_requested field to true
+            day = date(int(year),int(month),int(day))
+            lesson = Booking.objects.get(lesson_identifier=lesson_id, date=day)
+            lesson.cancellation_requested = True
+            lesson.save()
+    return
+
+def check_close_cancellation(year, month, day, recurring, lesson):
+    ''' This method checks whether the date the user has requested to cancel is too close (<2 weeks)
+    Such dates require admin approval
+    '''
+    cancel_day = date(int(year),int(month),int(day))
+    dayDatetime = datetime.combine(cancel_day, datetime.min.time())
+    today = datetime.now()
+    if (dayDatetime - today) >= timedelta(days=14):
+        close_date = False
+    else:
+        close_date = True
+    context = {"day":day, "month":month, "year":year, "recurring":recurring, "lesson":lesson, "close_date": close_date}
 
 """ These classes allow users to cancel lessons from the calendar.
 
@@ -77,15 +93,7 @@ class CancelLessonsView(LoginRequiredMixin,View):
         recurring = request.GET.get("recurring")
         lesson = request.GET.get('lesson')
 
-        # Check whether the day they are cancelling is at least two weeks away
-        cancel_day = date(int(year),int(month),int(day))
-        dayDatetime = datetime.combine(cancel_day, datetime.min.time())
-        today = datetime.now()
-        if (dayDatetime - today) >= timedelta(days=14):
-            close_date = False
-        else:
-            close_date = True
-        context = {"day":day, "month":month, "year":year, "recurring":recurring, "lesson":lesson, "close_date": close_date}
+        context = check_close_cancellation(year,month,day, recurring, lesson)
         if request.user.is_tutor:
             return render(request,'tutor_cancel_lessons.html', context)
         elif request.user.is_student:
@@ -98,7 +106,6 @@ class CancelLessonsView(LoginRequiredMixin,View):
                 return redirect('student_calendar')
             else:
                 return redirect('tutor_calendar')
-
         elif request.user.user_type == "Admin" and request.POST.get('cancellation')=="accept":
             lesson_id = request.POST.get("lesson")
             lesson = Booking.objects.get(id=lesson_id)
@@ -111,7 +118,6 @@ class CancelLessonsView(LoginRequiredMixin,View):
             lesson = Booking.objects.get(id=lesson_id)
             lesson.cancellation_requested = False
             lesson.save()
-
             return redirect('view_cancellation_requests')
 
 class AdminCancelLessonsView(LoginRequiredMixin, View):
@@ -123,23 +129,7 @@ class AdminCancelLessonsView(LoginRequiredMixin, View):
         lesson_id = request.GET.get("lesson")
 
         # Confirm whether the cancellation window is open (e.g., >= 2 weeks before the lesson)
-        cancel_day = date(int(year), int(month), int(day))
-        dayDatetime = datetime.combine(cancel_day, datetime.min.time())
-        today = datetime.now()
-        if (dayDatetime - today) >= timedelta(days=14):
-            close_date = False
-        else:
-            close_date = True
-
-        context = {
-            "day": day,
-            "month": month,
-            "year": year,
-            "recurring": recurring,
-            "lesson": lesson_id,
-            "close_date": close_date,
-        }
-
+        context = check_close_cancellation(year, month, day, recurring, lesson_id)
         return render(request, 'admin_cancel_lessons.html', context)
 
     def post(self, request: HttpRequest) -> HttpResponse:

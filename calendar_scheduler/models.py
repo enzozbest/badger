@@ -12,7 +12,6 @@ This Model represents a booking accepted by the tutor. It contains all the neces
 student or tutor wants to view their booked lessons.
 """
 
-
 class Booking(models.Model):
     lesson_identifier = models.IntegerField(blank=False, null=False, default=-1)
     student = models.ForeignKey(User, default=None, null=True, on_delete=models.CASCADE, related_name='booking_student')
