@@ -2,37 +2,6 @@
 {% block content %}
 <head>
     <title>Calendar</title>
-    <style>
-        .event-card {
-            background: #ffffff;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 10px;
-            margin-bottom: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .event-card h6 {
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .event-card p {
-            font-size: 12px;
-            margin: 0;
-        }
-        .event-card .btn {
-            font-size: 12px;
-            padding: 5px 10px;
-        }
-        .cancel-btn {
-            background: #ff4d4d;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-        }
-        .cancel-btn:hover {
-            background: #cc0000;
-        }
-    </style>
 </head>
 <body>
     <div class="container-fluid mb-4 ">
@@ -75,24 +44,34 @@
                                         {% for event in events %}
                                             {% for i in event %}
                                                 {% if i.date.day == day %}
-                                                    <div class="event-card text-dark">
-                                                        <h6>{{ i.title }}</h6>
-                                                        <hr class="text-black my-4">
-                                                        <p><strong>{{ i.knowledge_area }}</strong></p>
-                                                        <p>Duration: {{ i.duration }}</p>
-                                                        <p>Venue: {{ i.venue }}</p>
-                                                        <p>Recurring: {{ i.is_recurring|yesno:"✔,✘" }}</p>
-                                                        <p>Cancellation: {{ i.cancellation_requested|yesno:"✔,✘" }}</p>
-                                                        <hr class="text-black my-4">
-                                                        <form method="GET" action="{% block calendar_action %}{% endblock %}">
-                                                            <input type="hidden" name="day" value="{{ day }}">
-                                                            <input type="hidden" name="month" value="{{ month }}">
-                                                            <input type="hidden" name="year" value="{{ year }}">
-                                                            <input type="hidden" name="recurring" value="{{ i.is_recurring }}">
-                                                            <input type="hidden" name="lesson" value="{{ i.lesson_identifier }}">
-                                                            <button type="submit" class="cancel-btn text-center btn-sm">Cancel</button>
-                                                        </form>
-                                                    </div>
+                                                    <div class="event-card bg-light border rounded-3 text-dark">
+                                                        <!-- Toggle Section -->
+                                                        <details>
+                                                            <summary class="summary-title">
+                                                                <h6>{{ i.title }}</h6>
+                                                                <p class="text-muted">{{ i.knowledge_area | upper}}</p>
+                                                            </summary>
+                                                            
+                                                            <!-- Hidden Details -->
+                                                            <hr class="text-black my-4">
+                                                            
+                                                            <p>Duration: {{ i.duration }}</p>
+                                                            <p>Venue: {{ i.venue }}</p>
+                                                            <p>Recurring: {{ i.is_recurring|yesno:"✔,✘" }}</p>
+                                                            <p>Cancellation: {{ i.cancellation_requested|yesno:"✔,✘" }}</p>
+                                                            <hr class="text-black my-4">
+                                                            
+                                                            <!-- Cancel Form -->
+                                                            <form method="GET" action="{% block calendar_action %}{% endblock %}">
+                                                                <input type="hidden" name="day" value="{{ day }}">
+                                                                <input type="hidden" name="month" value="{{ month }}">
+                                                                <input type="hidden" name="year" value="{{ year }}">
+                                                                <input type="hidden" name="recurring" value="{{ i.is_recurring }}">
+                                                                <input type="hidden" name="lesson" value="{{ i.lesson_identifier }}">
+                                                                <button type="submit" class="cancel-btn text-center btn-sm">Cancel</button>
+                                                            </form>
+                                                        </details>
+                                                    </div>                                                                                         
                                                 {% endif %}
                                             {% endfor %}
                                         {% endfor %}
