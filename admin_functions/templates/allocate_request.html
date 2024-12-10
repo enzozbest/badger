@@ -1,59 +1,66 @@
 {% extends 'base_content.html' %}
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-lg bg-dark text-white rounded-3">
-                <div class="card-header bg-gradient-primary text-white text-center">
-                    <h2>Allocate Request #{{ lesson_request.id }}</h2>
+<div id="allocate-request-container" class="container mt-5">
+    <div id="allocate-request-row" class="row justify-content-center">
+        <div id="allocate-request-column" class="col-md-8">
+            <div id="allocate-request-card" class="card shadow-lg bg-dark text-white rounded-3">
+                <div id="allocate-request-header" class="card-header bg-gradient-primary text-white text-center">
+                    <h2 id="allocate-request-title">Allocate Request #{{ lesson_request.id }}</h2>
                 </div>
-                <div class="card-body">
-                    <p><strong>Student:</strong> {{ lesson_request.student.full_name }}</p>
-                    <p><strong>Requested Area:</strong> {{ lesson_request.knowledge_area }}</p>
-                    <p><strong>Frequency:</strong> {{ lesson_request.frequency }}</p>
-                    <p><strong>Venue Preference:</strong>
+                <div id="allocate-request-body" class="card-body">
+                    <p id="student-info"><strong>Student:</strong> {{ lesson_request.student.full_name }}</p>
+                    <p id="requested-area-info"><strong>Requested Area:</strong> {{ lesson_request.knowledge_area }}</p>
+                    <p id="frequency-info"><strong>Frequency:</strong> {{ lesson_request.frequency }}</p>
+                    <p id="venue-preference-info"><strong>Venue Preference:</strong>
                         {% for venue in venue_preferences %}
                             {{ venue }}{% if not forloop.last %}, {% endif %}
                         {% endfor %}
                     </p>
 
-                    <form method="get" action="" id="get-form" class="mt-4">
-                        <div class="form-group">
-                            <label for="day1" class="text-light">{% if lesson_request.frequency == 'Biweekly' %}First day{% else %}Day{% endif %} for Allocation:</label>
+                    <form id="allocate-request-get-form" method="get" action="" class="mt-4">
+                        <div id="day1-group" class="form-group">
+                            <label for="day1" class="text-light">
+                                {% if lesson_request.frequency == 'Biweekly' %}
+                                    First day
+                                {% else %}
+                                    Day
+                                {% endif %}
+                                for Allocation:
+                            </label>
                             {{ form.day1 }}
                         </div>
 
                         {% if lesson_request.frequency == 'Biweekly' and day1 %}
-                        <div class="form-group mt-3">
+                        <div id="day2-group" class="form-group mt-3">
                             <label for="day2" class="text-light">Second Day for Allocation:</label>
                             {{ form.day2 }}
                         </div>
                         {% endif %}
 
                         {% if day1 and lesson_request.frequency == 'Biweekly' and day2 or lesson_request.frequency != 'Biweekly' and day1 %}
-                        <div class="form-group mt-3">
+                        <div id="venue-group" class="form-group mt-3">
                             <label for="venue" class="text-light">Venue for Allocation:</label>
                             {{ form.venue }}
                         </div>
                         {% endif %}
                     </form>
 
-                    <form method="post" action="" class="mt-4">
+                    <form id="allocate-request-post-form" method="post" action="" class="mt-4">
                         {% csrf_token %}
                         {% if day1 and lesson_request.frequency == 'Biweekly' and day2 and venue or lesson_request.frequency != 'Biweekly' and day1 and venue %}
-                        <div class="form-group">
+                        <div id="tutor-group" class="form-group">
                             <label for="tutor" class="text-light">Tutor:</label>
                             {{ form.tutor }}
                         </div>
                         {% endif %}
 
-                        <input type="hidden" name="day1" value="{{ day1 }}">
-                        <input type="hidden" name="day2" value="{{ day2 }}">
-                        <input type="hidden" name="venue" value="{{ venue }}">
+                        <input id="hidden-day1" type="hidden" name="day1" value="{{ day1 }}">
+                        <input id="hidden-day2" type="hidden" name="day2" value="{{ day2 }}">
+                        <input id="hidden-venue" type="hidden" name="venue" value="{{ venue }}">
 
-                        <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-success btn-lg px-4">Allocate</button>
-                            <a href="{% url 'view_requests' %}" class="btn btn-outline-light btn-lg px-4 ms-3">Cancel</a>
+                        <div id="form-actions" class="text-center mt-4">
+                            <button id="allocate-btn" type="submit" class="btn btn-success btn-lg px-4">Allocate</button>
+                            <a id="cancel-btn" href="{% url 'view_requests' %}" class="btn btn-outline-light btn-lg px-4 ms-3">Cancel</a>
                         </div>
                     </form>
                 </div>

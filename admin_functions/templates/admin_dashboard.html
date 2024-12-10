@@ -1,49 +1,59 @@
 {% extends 'base_content.html' %}
 {% block content %}
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-12 text-center">
-      <h1 class="display-5 text-white">Welcome to the <span class="text-warning">Admin Dashboard</span></h1>
-      <p class="text-muted mt-3">Oversee platform operations, manage users, and access insights at your fingertips.</p>
+<div id="admin-dashboard-container" class="container mt-5">
+  <div id="admin-dashboard-header" class="row justify-content-center">
+    <div id="admin-dashboard-title" class="col-12 text-center">
+      <h1 class="display-5 text-white">
+        Welcome to the <span class="text-warning">Admin Dashboard</span>
+      </h1>
+      <p id="admin-dashboard-subtitle" class="text-muted mt-3">
+        Oversee platform operations, manage users, and access insights at your fingertips.
+      </p>
     </div>
   </div>
 
-  <div class="row mt-5 justify-content-center">
-    <div class="col-md-6 col-lg-4 mb-4">
+  <div id="admin-dashboard-cards" class="row mt-5 justify-content-center">
+    <div id="view-users-card" class="col-md-6 col-lg-4 mb-4">
       <div class="card shadow-lg bg-dark text-white h-100 border-0">
-        <div class="card-body text-center">
-          <div class="mb-3">
+        <div id="view-users-card-body" class="card-body text-center">
+          <div id="view-users-icon" class="mb-3">
             <i class="bi bi-people text-primary" style="font-size: 2.5rem;"></i>
           </div>
-          <h5 class="card-title">View All Users</h5>
-          <p class="card-text">Access and manage the list of all registered users on the platform.</p>
-          <a href="{% url 'view_all_users' %}" class="btn btn-primary">View Users</a>
+          <h5 id="view-users-title" class="card-title">View All Users</h5>
+          <p id="view-users-text" class="card-text">
+            Access and manage the list of all registered users on the platform.
+          </p>
+          <a id="view-users-link" href="{% url 'view_all_users' %}" class="btn btn-primary">View Users</a>
         </div>
       </div>
     </div>
 
-    <div class="col-md-6 col-lg-4 mb-4">
+    <div id="main-dashboard-card" class="col-md-6 col-lg-4 mb-4">
       <div class="card shadow-lg bg-dark text-white h-100 border-0">
-        <div class="card-body text-center">
-          <div class="mb-3">
+        <div id="main-dashboard-card-body" class="card-body text-center">
+          <div id="main-dashboard-icon" class="mb-3">
             <i class="bi bi-arrow-left-circle text-secondary" style="font-size: 2.5rem;"></i>
           </div>
-          <h5 class="card-title">Main Dashboard</h5>
-          <p class="card-text">Return to the main dashboard for user-specific features.</p>
-          <a href="{% url 'dashboard' %}" class="btn btn-secondary">Go to Dashboard</a>
+          <h5 id="main-dashboard-title" class="card-title">Main Dashboard</h5>
+          <p id="main-dashboard-text" class="card-text">
+            Return to the main dashboard for user-specific features.
+          </p>
+          <a id="main-dashboard-link" href="{% url 'dashboard' %}" class="btn btn-secondary">Go to Dashboard</a>
         </div>
       </div>
     </div>
 
-    <div class="col-md-6 col-lg-4 mb-4">
+    <div id="cancellation-requests-card" class="col-md-6 col-lg-4 mb-4">
       <div class="card shadow-lg bg-dark text-white h-100 border-0">
-        <div class="card-body text-center">
-          <div class="mb-3">
+        <div id="cancellation-requests-card-body" class="card-body text-center">
+          <div id="cancellation-requests-icon" class="mb-3">
             <i class="bi bi-file-earmark-text text-warning" style="font-size: 2.5rem;"></i>
           </div>
-          <h5 class="card-title">Cancellation Requests</h5>
-          <p class="card-text">Review and manage all cancellation requests submitted by users.</p>
-          <a href="{% url 'view_cancellation_requests' %}" class="btn btn-warning">View Requests</a>
+          <h5 id="cancellation-requests-title" class="card-title">Cancellation Requests</h5>
+          <p id="cancellation-requests-text" class="card-text">
+            Review and manage all cancellation requests submitted by users.
+          </p>
+          <a id="cancellation-requests-link" href="{% url 'view_cancellation_requests' %}" class="btn btn-warning">View Requests</a>
         </div>
       </div>
     </div>
