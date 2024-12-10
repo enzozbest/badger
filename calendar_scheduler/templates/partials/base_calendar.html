@@ -5,8 +5,8 @@
 </head>
 <body>
     <div id="calendar-container" class="container-fluid mb-4">
-        <h1 id="calendar-title" class="text-center mb-4">{{ title }}</h1>
-        <div id="calendar" class="calendar mx-auto bg-dark">
+        <h1 id="calendar-title" class="display-5 text-white">Calendar</h1>
+        <div id="calendar" class="calendar mx-auto bg-dark mt-4">
             <div id="calendar-header" class="row mb-3 bg">
                 <div id="calendar-navigation-left" class="col text-start">
                     <a id="dashboard-link" href="{% url 'dashboard' %}" class="btn btn-primary">Go to Dashboard</a>
@@ -28,8 +28,8 @@
                         <th>Wed</th>
                         <th>Thu</th>
                         <th>Fri</th>
-                        <th class="text-danger">Sat</th>
-                        <th class="text-danger">Sun</th>
+                        <th class="text-black">Sat</th>
+                        <th class="text-black">Sun</th>
                     </tr>
                 </thead>
                 <tbody>

@@ -204,21 +204,21 @@ h3.profile-title {
   width: 100%;
 }
 .calendar .table th, .calendar .table td {
-  border: 1px solid #4d4d4d; 
+  border: 1px solid #2f2f2f; 
   padding: 10px;
   vertical-align: top;
 }
 .calendar .table th {
-  background-color: #444;
+  background-color: rgb(105, 110, 115);
   color: #ddd; 
 }
 .calendar .table td {
-  background-color: #3a3a3a; 
+  background-color: rgb(78, 80, 82); 
   color: #ffffff;
   height: 150px;
 }
 .calendar .table td:hover {
-  background-color: #3b3b3b; 
+  background-color: rgb(64, 66, 68); 
   cursor: pointer;
 }
 .calendar .event {
