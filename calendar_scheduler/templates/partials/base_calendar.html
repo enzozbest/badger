@@ -35,11 +35,11 @@
     </style>
 </head>
 <body>
-    <div class="container-fluid mb-4">
+    <div class="container-fluid mb-4 ">
         <h1 class="text-center mb-4">{{ title }}</h1>
-        <div class="calendar mx-auto">
-            <div class="row mb-3">
-                <div class="col text-start">
+        <div class="calendar mx-auto bg-dark">
+            <div class="row mb-3 bg">
+                <div class="col text-start bg-dark">
                     <a href="{% url 'dashboard' %}" class="btn btn-primary">Go to Dashboard</a>
                     {% if user.user_type == "Admin" %}
                         <a href="{% url 'view_all_users' %}" class="btn btn-warning">View All Users</a>
@@ -77,18 +77,20 @@
                                                 {% if i.date.day == day %}
                                                     <div class="event-card text-dark">
                                                         <h6>{{ i.title }}</h6>
+                                                        <hr class="text-black my-4">
                                                         <p><strong>{{ i.knowledge_area }}</strong></p>
                                                         <p>Duration: {{ i.duration }}</p>
                                                         <p>Venue: {{ i.venue }}</p>
                                                         <p>Recurring: {{ i.is_recurring|yesno:"✔,✘" }}</p>
                                                         <p>Cancellation: {{ i.cancellation_requested|yesno:"✔,✘" }}</p>
+                                                        <hr class="text-black my-4">
                                                         <form method="GET" action="{% block calendar_action %}{% endblock %}">
                                                             <input type="hidden" name="day" value="{{ day }}">
                                                             <input type="hidden" name="month" value="{{ month }}">
                                                             <input type="hidden" name="year" value="{{ year }}">
                                                             <input type="hidden" name="recurring" value="{{ i.is_recurring }}">
                                                             <input type="hidden" name="lesson" value="{{ i.lesson_identifier }}">
-                                                            <button type="submit" class="cancel-btn btn btn-sm">Cancel</button>
+                                                            <button type="submit" class="cancel-btn text-center btn-sm">Cancel</button>
                                                         </form>
                                                     </div>
                                                 {% endif %}
