@@ -1,0 +1,38 @@
+<table class="table table-dark table-striped table-hover mt-3">
+    <thead>
+        <tr>
+            <th scope="col">Email Address</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Account Type</th>
+            <th scope="col">Actions</th>
+            <th scope="col">Calendars</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in page_obj %}
+            <tr>
+                <td>{{ user.email|lower }}</td>
+                <td>{{ user.first_name }}</td>
+                <td>{{ user.last_name }}</td>
+                <td>{{ user.user_type }}</td>
+                <td>
+                    {% if user.user_type != "Admin" %}
+                        <a href="{% url 'make_admin' user.id %}" class="btn btn-primary btn-sm">Make Administrator</a>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.user_type == 'Tutor' %}
+                        <a href="{% url 'admin_tutor_calendar' user.id %}" class="btn btn-info btn-sm">View Tutor Calendar</a>
+                    {% elif user.user_type == 'Student' %}
+                        <a href="{% url 'admin_student_calendar' user.id %}" class="btn btn-info btn-sm">View Student Calendar</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="6" class="text-center text-muted">No users registered.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
