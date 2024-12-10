@@ -103,7 +103,7 @@ h3.profile-title {
 
 /* Footer */
 .footer {
-  background-color: #1f1f1f; /* Match the black background */
+  background-color: #131313; /* Match the black background */
   text-align: center;
   color: #fff; /* White text for consistency */
   flex-shrink: 0;
@@ -188,7 +188,7 @@ h3.profile-title {
 }
 
 .calendar .event h6, .calendar .event p {
-  text-shadow: none; /* Remove text shadow */
+  text-shadow: none;
 }
 
 .calendar {
@@ -231,6 +231,7 @@ h3.profile-title {
 .calendar .event p {
   margin: 0;
   font-size: 0.85rem;
+  text-shadow: none;
 }
 
 
