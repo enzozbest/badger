@@ -147,10 +147,12 @@
 
                         {% if request.invoice is None %}
                             {% if user.user_type == 'Admin' %}
-                                <li><a href="{% url 'generate_invoice' request.id %}">Generate Invoice</a></li>
+                                <li><a id="id_generate_invoice_{{ request.id }}" href="{% url 'generate_invoice' request.id %}">Generate Invoice</a></li>
                             {% endif %}
                         {% else %}
-                            <li><a href="{% url 'get_invoice' request.invoice.invoice_id %}">View Invoice</a></li>
+                            {% if user.user_type != 'Tutor' %}
+                                <li><a id="id_view_invoice_{{ request.invoice.invoice_id }}" href="{% url 'get_invoice' request.invoice.invoice_id %}">View Invoice</a></li>
+                            {% endif %}
                             {% if user.user_type == 'Admin' %}
                                 {% if not request.invoice.payment_status %}
                                     <li>

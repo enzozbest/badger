@@ -40,6 +40,10 @@ def log_in_via_form(driver: WebDriver, live_server_url: str, username: str, pass
     wait(driver)
 
 
+def logout(driver: WebDriver, live_server_url: str):
+    driver.get(f"{live_server_url}{reverse('log_out')}")
+
+
 def wait(driver_client):
     WebDriverWait(driver_client, 10).until(
         lambda driver: driver.execute_script("return document.readyState") == "complete"

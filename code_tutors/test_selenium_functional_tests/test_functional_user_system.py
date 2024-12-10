@@ -167,6 +167,12 @@ class TestFunctionalUserSystem(StaticLiveServerTestCase):
 
         self.assertFalse(KnowledgeArea.objects.filter(id=area.id).exists())
 
+    def test_users_cannot_change_their_account_type(self):
+        log_in_via_form(self.driver, self.live_server_url, self.student.username, 'Password123')
+        self.driver.get(f"{self.live_server_url}{reverse('profile')}")
+        account_type = wait_for_element(self.driver, By.ID, "id_user_type")
+        self.assertFalse(account_type.is_enabled())
+
     # -- HELPERS --#
 
     def populate_rate_field(self, field: WebElement):

@@ -77,6 +77,7 @@ class TestViewInvoices(TestCase):
         self.assertIn('Content-Type', response.headers)
         self.assertEqual(response.headers['Content-Type'], 'application/pdf')
 
+    @override_settings(USE_AWS_S3=False)
     def generate_invoice(self):
         self.client.login(username='@johndoe', password='Password123')
         self.client.get(f'{reverse("generate_invoice", kwargs={"tutoring_request_id": self.request_alloc.id})}')
