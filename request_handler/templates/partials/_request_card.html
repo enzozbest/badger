@@ -1,7 +1,14 @@
 <div class="col">
-    <div class="card h-100 bg-dark text-white rounded-3 shadow-sm border">
+    <div class="card h-100 bg-dark text-white rounded-3 shadow-sm border  ">
         <div class="card-body">
             <div class="p-3 bg-dark d-flex align-items-center">
+                <a href="{% url 'confirm_delete_request' request.id %}" 
+                    class="position-absolute text-danger" 
+                    style="left: 1rem; top: 1rem;" 
+                    title="Delete Request">
+                        <i class="fas fa-trash"></i>
+                </a>
+                
                 <div id="request-id-{{ request.id }}" class="text-muted small position-absolute" style="right: 1rem; top: 1rem;">
                     #{{ request.id }}
                 </div>
@@ -21,6 +28,7 @@
 
             <hr class="text-white my-2">
 
+            <!-- Consistent alignment for all fields -->
             <div class="d-flex align-items-start mb-3">
                 <i class="fas fa-user fa-lg me-2 mt-1"></i>
                 <div>
@@ -38,26 +46,41 @@
                         <li>No Venue Preference</li>
                     {% endfor %}
                 </ul>
-            </div>            
+            </div>
 
-            <ul class="list-unstyled">
-                <li><strong>Term:</strong> {{ request.term }}</li>
-                <li><strong>Recurring:</strong> {% if request.is_recurring %}Yes{% else %}No{% endif %}</li>
-                <li><strong>Rejected:</strong> {% if request.rejected_request %}Yes{% else %}No{% endif %}</li>
-                <li><strong>Paid:</strong> {% if request.paid_status %}Successfully Paid{% else %}Payment Pending{% endif %}</li>
-                <li><strong>Status:</strong> 
+            <div class="d-flex align-items-start mb-3">
+                <i class="fas fa-calendar fa-lg me-2 mt-1"></i>
+                <div>{{ request.term }} Term</div>
+            </div>
+
+            <div class="d-flex align-items-start mb-3">
+                <i class="fas fa-money-bill fa-lg me-2 mt-1"></i>
+                <div> {% if request.paid_status %}Successfully Paid{% else %}Payment Pending{% endif %}</div>
+            </div>
+
+            <div class="d-flex align-items-start mb-3">
+                <i class="fas fa-info-circle fa-lg me-2 mt-1"></i>
+                <div>  
                     {% if request.allocated %}
                         Allocated to {{ request.tutor_name }}
                     {% else %}
                         Unallocated
                     {% endif %}
-                </li>
-            </ul>
-            
+                </div>
+            </div>
+
             {% if request.rejected_request %}
-                <p><strong>Rejection Reason:</strong> {{ request.rejection_reason }}</p>
+            <div class="d-flex align-items-start mb-3">
+                <i class="fas fa-times-circle text-danger fa-lg me-2 mt-1"></i>
+                <div><strong>Rejected</strong><br>Reason: {{ request.rejection_reason }}</div>
+            </div>
             {% endif %}
-            <p> {% if request.late %}Late{% else %}On Time{% endif %}</p>
+
+            <div class="d-flex align-items-start">
+                <i class="fas fa-clock fa-lg me-2 mt-1"></i>
+                <div>{% if request.late %}Late{% else %}On Time {% endif %}</div> /
+                <div>{% if request.is_recurring %}Recurring{% else %}Not Recurring{% endif %}</div>
+            </div>
         </div>
 
         <div id="footer-{{ request.id }}" class="card-footer bg-transparent border-0">
@@ -67,7 +90,7 @@
                         <a href="{% url 'allocate_request' request.id %}" class="btn btn-outline-warning btn-sm">Allocate</a>
                     {% endif %}
                     <a href="{% url 'edit_request' request.id %}" class="btn btn-outline-info btn-sm">Update</a>
-                    <a href="{% url 'confirm_delete_request' request.id %}" class="btn btn-outline-danger btn-sm">Delete</a>
+                    <a href="{% url 'reject_request' request.id %}" class="btn btn-outline-danger btn-sm">Reject</a>
                 {% endif %}
 
                 {% if request.invoice %}
