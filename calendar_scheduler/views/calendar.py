@@ -10,10 +10,8 @@ from schedule.models import Calendar
 from calendar_scheduler.models import Booking
 from user_system.models.user_model import User
 
-''' Returns all the days for a particular month as a list, per the year and month parameters '''
-
-
-def get_month_days(year, month):
+def get_month_days(year: int, month: int):
+    ''' Returns all the days for a particular month as a list, per the year and month parameters '''
     # Get the first day of the month and the total days in the month
     first_day = datetime(year, month, 1)
     last_day = datetime(year, month + 1, 1) if month != 12 else datetime(year + 1, 1, 1)
@@ -24,7 +22,6 @@ def get_month_days(year, month):
     # Get the total number of days in the month
     total_days = (last_day - first_day).days
 
-    # Prepare a list to hold weeks (each week is a list of days)
     month_days = []
     week = [''] * first_weekday  # Start with empty days until the first day
 
@@ -35,14 +32,14 @@ def get_month_days(year, month):
             month_days.append(week)
             week = []
 
-    # If the week has leftover days (less than 7), add them as well
+    # If the week has any days leftover (less than 7), add them as well
     if week:
         month_days.append(week)
 
     return month_days
 
-
-def get_month_name(month_number):
+def get_month_name(month_number: int):
+    ''' Returns the name of the month corresponding to the passed number e.g. get_month_name(4) returns April '''
     MONTHS = {
         1: "January", 2: "February", 3: "March", 4: "April",
         5: "May", 6: "June", 7: "July", 8: "August",
@@ -50,27 +47,16 @@ def get_month_name(month_number):
     }
     return MONTHS.get(month_number, "Invalid month")
 
-
 def get_week_days():
+    ''' Returns the week days of the current week '''
     today = date.today()
     start_of_week = today - timedelta(days=today.weekday())
     return [start_of_week + timedelta(days=i) for i in range(7)]
 
-
-''' Retrieves all relevant tutoring sessions for a particular day 
-
-The day is associated with the day attribute of the request parameter
-
-The calendar parameter is a Calendar object from django-scheduler/schedule
-'''
-
-
-def retrieve_calendar_events(calendar, request, user_for_calendar=None):
-    # Get today's date for the default display
-    today = datetime.today()
-    year = int(request.GET.get("year", today.year))
-    month = int(request.GET.get("month", today.month))
-
+def compute_months(month:int, year:int):
+    """ Caclulates the previous and next months and years for the calendar display
+    This allows users to click between each month on the calendar
+    """
     # Ensure month/year remain valid
     if month < 1:
         month = 12
@@ -85,36 +71,52 @@ def retrieve_calendar_events(calendar, request, user_for_calendar=None):
     next_month = month + 1 if month < 12 else 1
     next_year = year + 1 if month == 12 else year
 
-    month_days = get_month_days(year, month)
-    events = []
+    return [prev_month, prev_year, next_month, next_year], month, year
 
+def produce_month_events(request: HttpRequest, year: int, month: int, user_for_calendar: User):
+    ''' Collates all the events for the given month into an events list'''
+    events = []
     for day in range(1, 31):
         try:
             selected_date = date(year, month, day)
-            if request.user.user_type == 'Student':
-                newEvent = Booking.objects.filter(student=request.user, date=selected_date)
-                if (newEvent.exists()):  # Only append events where the queryset isn't empty
-                    events.append(newEvent)
-            elif request.user.user_type == 'Tutor':
-                newEvent = Booking.objects.filter(tutor=request.user, date=selected_date)
-                if (newEvent.exists()):  # Only append events where the queryset isn't empty
-                    events.append(newEvent)
-            elif request.user.user_type == 'Admin':
-                if user_for_calendar:
-                    # Admin is viewing a specific user's calendar
-                    if user_for_calendar.user_type == 'Student':
-                        newEvent = Booking.objects.filter(student=user_for_calendar, date=selected_date)
-                    elif user_for_calendar.user_type == 'Tutor':
-                        newEvent = Booking.objects.filter(tutor=user_for_calendar, date=selected_date)
+            match request.user.user_type:
+                case 'Student' if Booking.objects.filter(student=request.user, date=selected_date).exists():
+                    events.append(Booking.objects.filter(student=request.user, date=selected_date))
+                case 'Tutor' if Booking.objects.filter(tutor=request.user, date=selected_date).exists():
+                    events.append(Booking.objects.filter(tutor=request.user, date=selected_date))
+                case 'Admin' if user_for_calendar and user_for_calendar.user_type == 'Student':
+                    newEvent = Booking.objects.filter(student=user_for_calendar, date=selected_date)
                     if newEvent.exists():
                         events.append(newEvent)
-                else:
-                    # If no specific user is selected, admin sees all events
+                case 'Admin' if user_for_calendar and user_for_calendar.user_type == 'Tutor':
+                    newEvent = Booking.objects.filter(tutor=user_for_calendar, date=selected_date)
+                    if newEvent.exists():
+                        events.append(newEvent)
+                case 'Admin' if not user_for_calendar: # If no specific user is selected, admin sees all events
                     newEvent = Booking.objects.filter(date=selected_date)
                     if newEvent.exists():
                         events.append(newEvent)
         except ValueError:
             break
+    return events
+
+def retrieve_calendar_events(calendar, request, user_for_calendar=None):
+    """ Retrieves all relevant tutoring sessions for a particular day 
+    The day is associated with the day attribute of the request parameter
+    The calendar parameter is a Calendar object from django-scheduler/schedule
+    """
+
+    # Get today's date for the default display
+    today = datetime.today()
+    year = int(request.GET.get("year", today.year))
+    month = int(request.GET.get("month", today.month))
+
+    prev_next_dates, month, year = compute_months(month, year)
+
+    month_days = get_month_days(year, month)
+
+    events = produce_month_events(request, year, month, user_for_calendar)
+    
     return {
         "calendar": calendar,
         "year": year,
@@ -122,18 +124,14 @@ def retrieve_calendar_events(calendar, request, user_for_calendar=None):
         "month_name": get_month_name(month),
         "month_days": month_days,
         "events": events,
-        "day": day,
-        "prev_month": prev_month,
-        "prev_year": prev_year,
-        "next_month": next_month,
-        "next_year": next_year,
+        "prev_month": prev_next_dates[0],
+        "prev_year": prev_next_dates[1],
+        "next_month": prev_next_dates[2],
+        "next_year": prev_next_dates[3],
     }
 
-
-'''A view to display the Tutor Calendar. '''
-
-
 class TutorCalendarView(LoginRequiredMixin, View):
+    '''A view to display the Tutor Calendar. '''
     def get(self, request: HttpRequest, pk: int = None) -> HttpResponse:
         if request.user.is_student:
             return render(request, 'permission_denied.html', status=401)
@@ -156,11 +154,8 @@ class TutorCalendarView(LoginRequiredMixin, View):
         except Calendar.DoesNotExist:
             return render(request, 'dashboard.html', status=404)
 
-
-'''A view to display the Student Calendar. '''
-
-
 class StudentCalendarView(LoginRequiredMixin, View):
+    '''A view to display the Student Calendar. '''
     def get(self, request: HttpRequest, pk: int = None) -> HttpResponse:
         if request.user.is_tutor:
             return render(request, 'permission_denied.html', status=401)
