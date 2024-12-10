@@ -1,8 +1,10 @@
-<form method="get" class="bg-dark text-white p-3 rounded mb-4">
-    <p class="text-white">Showing {{ count }} out of {{ total }} requests:</p>
+<form id="filter-form" method="get" class="bg-dark text-white p-3 rounded mb-4">
+    <p id="requests-summary" class="text-white">
+        Showing {{ count }} out of {{ total }} requests:
+    </p>
     <div class="d-flex flex-wrap justify-content-start align-items-center mb-4">
 
-        <div class="me-2 mb-2">
+        <div id="filter-allocated" class="me-2 mb-2">
             <select name="allocated" class="form-select form-select-sm">
                 <option value="">All</option>
                 <option value="true" {% if request.GET.allocated == "true" %}selected{% endif %}>Allocated</option>
@@ -10,8 +12,7 @@
             </select>
         </div>
 
-
-        <div class="me-2 mb-2">
+        <div id="filter-sort" class="me-2 mb-2">
             <select name="sort" class="form-select form-select-sm">
                 <option value="">Sort By</option>
                 <option value="id" {% if request.GET.sort == "id" %}selected{% endif %}>ID (Ascending)</option>
@@ -23,7 +24,7 @@
             </select>
         </div>
 
-        <div class="flex-grow-1 me-2 mb-2">
+        <div id="filter-search" class="flex-grow-1 me-2 mb-2">
             <input 
                 type="text" 
                 name="search" 
@@ -32,7 +33,7 @@
                 value="{{ request.GET.search }}">
         </div>
 
-        <div class="mb-2">
+        <div id="filter-apply" class="mb-2">
             <button type="submit" class="btn btn-outline-light btn-sm">Apply</button>
         </div>
     </div>

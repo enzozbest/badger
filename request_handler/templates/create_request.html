@@ -1,20 +1,20 @@
 {% extends 'base_content.html' %}
 {% block content %}
-<div class="container mb-4">
+<div id="create-request-container" class="container mb-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow-lg bg-dark text-white rounded-3">
-                <div class="card-header bg-gradient-primary text-white text-center">
-                    <h2>Create a Tutoring Request</h2>
+            <div id="create-request-card" class="card shadow-lg bg-dark text-white rounded-3">
+                <div id="create-request-header" class="card-header bg-gradient-primary text-white text-center">
+                    <h2 id="create-request-title">Create a Tutoring Request</h2>
                 </div>
-                <div class="card-body">
-                    <p class="text-muted text-center">Fill in the details below to create a Tutoring Request:</p>
+                <div id="create-request-body" class="card-body">
+                    <p id="create-request-instructions" class="text-muted text-center">Fill in the details below to create a Tutoring Request:</p>
 
-                    <form action="" method="POST" class="needs-validation">
+                    <form id="create-request-form" action="" method="POST" class="needs-validation">
                         {% csrf_token %}
 
                         {% for field in form %}
-                            <div class="form-group mb-4">
+                            <div id="form-group-{{ field.name }}" class="form-group mb-4">
                                 <label for="{{ field.id_for_label }}" class="form-label text-light">
                                     {{ field.label }}
                                     {% if field.field.required %}
@@ -31,9 +31,9 @@
                             </div>
                         {% endfor %}
 
-                        <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-success btn-lg px-4">Submit Request</button>
-                            <a href="{% url 'dashboard' %}" class="btn btn-outline-light btn-lg px-4 ms-3">Cancel</a>
+                        <div id="form-actions" class="text-center mt-4">
+                            <button id="submit-request-btn" type="submit" class="btn btn-success btn-lg px-4">Submit Request</button>
+                            <a id="cancel-request-btn" href="{% url 'dashboard' %}" class="btn btn-outline-light btn-lg px-4 ms-3">Cancel</a>
                         </div>
                     </form>
                 </div>

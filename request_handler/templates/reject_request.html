@@ -1,19 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Reject Request</title>
-</head>
-<body>
-    <h1>Reject Request</h1>
-    <p>Are you sure you want to reject the request from {{ request.student.first_name }} {{ request.student.last_name }}?</p>
-    
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Submit Rejection</button>
-    </form>
+{% extends 'base_content.html' %}
+{% block content %}
+<div id="reject-request-container" class="container py-5 d-flex justify-content-center align-items-center">
+    <div class="row w-100 justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div id="reject-request-card" class="card bg-dark text-white shadow-lg rounded-4 border">
+                <div id="reject-request-body" class="card-body text-center p-5">
+                    <h1 id="reject-request-title" class="card-title display-6 mb-4">Reject Request</h1>
+                    <p id="reject-request-message" class="card-text fs-5 text-light mb-4">
+                        Are you sure you want to reject the request from <strong>{{ request.student.first_name }} {{ request.student.last_name }}</strong>?
+                    </p>
+                    <form id="reject-request-form" method="POST">
+                        {% csrf_token %}
+                        <div id="form-fields" class="mb-4">
+                            {{ form.as_p }}
+                        </div>
+                        <div id="form-actions" class="text-center mt-4">
+                            <button id="submit-rejection-btn" type="submit" class="btn btn-danger btn-lg px-4">
+                                Submit Rejection
+                            </button>
+                            <a id="cancel-rejection-btn" href="{% url 'view_requests' %}" class="btn btn-outline-light btn-lg px-4 ms-3">
+                                Back to Requests
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-    <a href="{% url 'view_requests' %}">Back to Requests</a>
-</body>
-</html>
