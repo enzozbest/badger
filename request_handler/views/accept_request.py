@@ -47,16 +47,9 @@ class AcceptRequestView(LoginRequiredMixin, View):
             case _:
                 return redirect('view_requests')
 
-        sessions = 0
-        match lesson_request.frequency:
-            case "Weekly":
-                sessions = 15
-            case "Biweekly":
-                sessions = 30
-            case "Fortnightly":
-                sessions = 7
-            case _:
-                return redirect('view_requests')
+        
+        session_counts = {"Weekly": 15, "Biweekly": 30, "Fortnightly": 7}
+        sessions = session_counts.get(lesson_request.frequency, 0)
 
         # Retrieves the lesson_identifier of the last group of bookings
         last_identifier = Booking.objects.aggregate(Max('lesson_identifier'))['lesson_identifier__max']
