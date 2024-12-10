@@ -3,6 +3,7 @@ from django.shortcuts import reverse
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import Select
 
@@ -16,7 +17,10 @@ from user_system.models.user_model import User
 
 class TestFunctionalAdminFunctions(StaticLiveServerTestCase):
     def setUp(self):
-        self.driver = webdriver.Firefox()
+        options = Options()
+        options.add_argument("--headless")  # Run Firefox in headless mode
+        self.driver = webdriver.Firefox(options=options)
+
         create_test_users()
         self.student = User.objects.get(user_type='Student')
         self.tutor = User.objects.get(user_type='Tutor')

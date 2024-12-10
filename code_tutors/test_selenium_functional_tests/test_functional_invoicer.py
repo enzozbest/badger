@@ -7,6 +7,7 @@ from django.test import override_settings
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options
 
 from code_tutors.test_selenium_functional_tests import log_in_via_form, logout, wait, wait_for_clickable, \
     wait_for_element
@@ -32,7 +33,9 @@ class TestFunctionalRegistration(StaticLiveServerTestCase):
         self.allocated_request = Request.objects.get(allocated=True)
         self.unallocated_request = Request.objects.get(allocated=False)
 
-        self.driver = webdriver.Firefox()
+        options = Options()
+        options.add_argument("--headless")  # Run Firefox in headless mode
+        self.driver = webdriver.Firefox(options=options)
 
     def tearDown(self):
         self.driver.quit()

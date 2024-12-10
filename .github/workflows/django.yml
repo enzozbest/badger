@@ -31,7 +31,8 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y firefox
 
       - name: Install GeckoDriver
-        run: sudo apt-get install -y wget
+        run: |
+          sudo apt-get install -y wget
           sudo wget https://github.com/mozilla/geckodriver/releases/download/v0.34.0/geckodriver-v0.34.0-linux64.tar.gz
           tar -xzf geckodriver-v0.34.0-linux64.tar.gz -C /tmp
           sudo mv /tmp/geckodriver /usr/local/bin/

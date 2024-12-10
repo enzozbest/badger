@@ -2,6 +2,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.shortcuts import reverse
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.ui import Select
 
 from code_tutors.test_selenium_functional_tests import log_in_via_form, wait, wait_for_clickable, wait_for_element
@@ -13,7 +14,10 @@ from user_system.models.user_model import User
 
 class TestFunctionalRequestHandler(StaticLiveServerTestCase):
     def setUp(self):
-        self.driver = webdriver.Firefox()
+        options = Options()
+        options.add_argument("--headless")  # Run Firefox in headless mode
+        self.driver = webdriver.Firefox(options=options)
+
         create_test_users()
         self.student = User.objects.get(user_type=User.ACCOUNT_TYPE_STUDENT)
         self.tutor = User.objects.get(user_type=User.ACCOUNT_TYPE_TUTOR)
