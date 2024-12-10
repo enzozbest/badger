@@ -8,7 +8,6 @@ from django.shortcuts import reverse
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import Select
 
@@ -18,11 +17,10 @@ from user_system.models.knowledge_area_model import KnowledgeArea
 from user_system.models.user_model import User
 
 
+@skipIf(os.environ.get('GITHUB_ACTIONS') == 'true', 'These tests require headed browsers to work properly')
 class TestFunctionalRegistration(StaticLiveServerTestCase):
     def setUp(self):
-        options = Options()
-        options.add_argument("--headless")
-        self.driver = webdriver.Firefox(options=options)
+        self.driver = webdriver.Firefox()
 
     def tearDown(self):
         self.driver.quit()
