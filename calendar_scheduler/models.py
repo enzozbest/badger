@@ -30,9 +30,6 @@ class Booking(models.Model):
     date = models.DateField(null=False, blank=False, default=datetime.date(1900, 1,
                                                                            1))  # Could be changed to a datetimefield if we want to include time availability
     title = models.CharField(max_length=255, null=False, default="Tutor session")
-    start = models.DateTimeField(null=False, blank=False,
-                                 default=datetime.datetime(1900, 1, 1, 12, 0))  # Default is 12pm
-    end = models.DateTimeField(null=False, blank=False, default=datetime.datetime(1900, 1, 1, 12, 0))  # Default is 12pm
     cancellation_requested = models.BooleanField(blank=False, default=False)
 
     def __str__(self):

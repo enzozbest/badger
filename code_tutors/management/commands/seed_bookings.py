@@ -56,12 +56,10 @@ class Command(BaseCommand):
             self.date = get_first_weekday(2025,5,day).date()
 
         title = f"Tutor session with {student.first_name} {student.last_name} and {tutor.first_name} {tutor.last_name}"
-        start = self.date
-        end = self.date
         recurring = True if randint(0, 1) else False
         self.try_create_bookings(
-            {'knowledge_area': knowledge_area, 'term': term,'duration': duration,'student': student, 'tutor': tutor,'is_recurring': recurring, 
-             'venue':venue,'title':title, 'start':start, 'end':end,'day':day
+            {'knowledge_area': knowledge_area, 'term': term,'duration': duration,'student': student, 
+             'tutor': tutor,'is_recurring': recurring,'venue':venue,'title':title, 'day':day
              })
         
     def determine_biweekly_date(self,day):
@@ -109,8 +107,6 @@ class Command(BaseCommand):
                 venue=data['venue'],
                 date=self.date,
                 day=data['day'],
-                start=self.date,
-                end=self.date,
                 title=data['title'],
                 cancellation_requested = True if randint(0, 1) else False,
                 lesson_identifier=self.lesson_identifier,

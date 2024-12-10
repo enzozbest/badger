@@ -18,8 +18,6 @@ class BookingModelTest(TestCase):
             student=self.student,
             tutor=self.tutor,
             term = self.term,
-            start="2035-12-19 10:00:00",
-            end="2035-12-19 11:00:00",
             lesson_identifier="1",
             date=date(2024, 12, 3)
         )
