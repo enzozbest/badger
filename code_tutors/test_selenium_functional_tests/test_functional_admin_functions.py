@@ -18,7 +18,7 @@ from user_system.models.user_model import User
 class TestFunctionalAdminFunctions(StaticLiveServerTestCase):
     def setUp(self):
         options = Options()
-        options.add_argument("--headless")  # Run Firefox in headless mode
+        options.add_argument("--headless")
         self.driver = webdriver.Firefox(options=options)
 
         create_test_users()
@@ -171,8 +171,7 @@ class TestFunctionalAdminFunctions(StaticLiveServerTestCase):
 
     def navigate_to_view_requests_page(self, user: User):
         log_in_via_form(self.driver, self.live_server_url, user.username, 'Password123')
-        url = f"{self.live_server_url}{reverse('view_requests')}"
-        self.driver.get(url)
+        self.driver.get(f"{self.live_server_url}{reverse('view_requests')}")
         wait(self.driver)
 
     def navigate_to_requests_page_and_retrieve_allocate_button(self, user: User) -> WebElement:

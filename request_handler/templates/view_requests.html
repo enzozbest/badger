@@ -139,7 +139,7 @@
                                 <li>
                                 <form action="{% url 'reject_request' request.id %}" method="POST">
                                     {% csrf_token %}
-                                    <button type="submit">Reject</button>
+                                    <button id="id_reject_{{ request.id }}" type="submit">Reject</button>
                                 </form>
                             {% endif %}
                         {% endif %}
@@ -182,7 +182,7 @@
                         <li>
                             <form method="post" action="{% url 'accept_request' request.id %}">
                                 {% csrf_token %}
-                                <button type="submit">Accept Request</button>
+                                <button id="id_accept_request_{{ request.id }}" type="submit">Accept Request</button>
                             </form>
                         </li>
                     {% endif %}

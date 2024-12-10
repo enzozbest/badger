@@ -27,15 +27,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Install Firefox Dependencies
+        run: sudo apt-get update && sudo apt-get install -y libgtk-3-0 libdbus-glib-1-2
+
       - name: Install Firefox
         run: sudo apt-get update && sudo apt-get install -y firefox
-
-      - name: Install GeckoDriver
-        run: |
-          sudo apt-get install -y wget
-          sudo wget https://github.com/mozilla/geckodriver/releases/download/v0.34.0/geckodriver-v0.34.0-linux64.tar.gz
-          tar -xzf geckodriver-v0.34.0-linux64.tar.gz -C /tmp
-          sudo mv /tmp/geckodriver /usr/local/bin/
 
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v3

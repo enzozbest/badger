@@ -14,9 +14,9 @@
     </div>
     <div>
         {% if user.is_tutor %}
-            <a href="{% url 'tutor_calendar' %}">View Your Lessons (Tutor Calendar)</a>
+            <a id="id_view_tutor_calendar" href="{% url 'tutor_calendar' %}">View Your Lessons (Tutor Calendar)</a>
         {% elif user.is_student %}
-            <a href="{% url 'student_calendar' %}">View Your Lessons (Student Calendar)</a>
+            <a id="id_view_student_calendar" href="{% url 'student_calendar' %}">View Your Lessons (Student Calendar)</a>
         {% endif %}
     </div>
     <div class="col-12">

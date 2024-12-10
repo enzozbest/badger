@@ -7,7 +7,7 @@
       <form action="{% url 'profile' %}" method="post">
         {% csrf_token %}
         {% include 'partials/bootstrap_form.html' with form=form %}
-        <input id="id_submit_profile_page" type="submit" value="Update" class="btn btn-primary">
+        <input id="id_submit_profile_page" type="submit" class="btn btn-primary" />
           {%  if user.is_authenticated and user.is_tutor %} <!-- make sure to create this in models -->
           <a id="id_add_knowledge_areas" href="{%  url 'add_knowledge_areas' %}" class="btn btn-primary">Add Knowledge Areas</a>
           {% endif %}

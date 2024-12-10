@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from schedule.models import Calendar
 
@@ -17,6 +17,7 @@ calendar functionality.
 """
 
 
+@override_settings(USE_AWS_S3=False)
 class CalendarHelperTests(TestCase):
     # Tests that the months and their days are retrieved correctly.
     def test_get_month_days(self):

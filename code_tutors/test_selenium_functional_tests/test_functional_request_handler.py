@@ -1,6 +1,7 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.shortcuts import reverse
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.ui import Select
@@ -15,7 +16,7 @@ from user_system.models.user_model import User
 class TestFunctionalRequestHandler(StaticLiveServerTestCase):
     def setUp(self):
         options = Options()
-        options.add_argument("--headless")  # Run Firefox in headless mode
+        options.add_argument("--headless")
         self.driver = webdriver.Firefox(options=options)
 
         create_test_users()
@@ -124,6 +125,119 @@ class TestFunctionalRequestHandler(StaticLiveServerTestCase):
         self.assertEqual(self.driver.current_url, f"{self.live_server_url}{reverse('view_requests')}")
         self.assertFalse(Request.objects.filter(id=request.id).exists())
 
+    def test_tutor_view_the_accept_request_button(self):
+        create_test_requests()
+        allocated_request = Request.objects.get(allocated=True)
+        self.navigate_to_requests_page(self.tutor)
+        try:
+            button = wait_for_clickable(self.driver, wait_for_element(self.driver, By.ID,
+                                                                      f"id_accept_request_{allocated_request.id}"))
+            self.assertTrue(button.is_displayed())
+            self.assertTrue(button.is_enabled())
+        except NoSuchElementException:
+            self.fail("The button was not visible")
+
+    def test_student_cannot_view_the_accept_request_button(self):
+        create_test_requests()
+        allocated_request = Request.objects.get(allocated=True)
+        self.navigate_to_requests_page(self.student)
+        with self.assertRaises(NoSuchElementException):
+            self.driver.find_element(By.ID,
+                                     f"id_accept_request_{allocated_request.id}")
+
+    def test_admin_cannot_view_the_accept_request_button(self):
+        create_test_requests()
+        allocated_request = Request.objects.get(allocated=True)
+        self.navigate_to_requests_page(self.admin)
+        with self.assertRaises(NoSuchElementException):
+            self.driver.find_element(By.ID,
+                                     f"id_accept_request_{allocated_request.id}")
+
+    def test_tutor_can_accept_a_request(self):
+        create_test_requests()
+        allocated_request = Request.objects.get(allocated=True)
+        self.navigate_to_requests_page(self.tutor)
+        button = wait_for_clickable(self.driver, wait_for_element(self.driver, By.ID,
+                                                                  f"id_accept_request_{allocated_request.id}"))
+        button.click()
+        wait(self.driver)
+        with self.assertRaises(NoSuchElementException):
+            self.driver.find_element(By.ID,
+                                     f"id_accept_request_{allocated_request.id}")
+
+    def test_admins_can_see_refuse_request_button(self):
+        create_test_requests()
+        unallocated_request = Request.objects.get(allocated=False)
+        self.navigate_to_requests_page(self.admin)
+        try:
+            button = wait_for_clickable(self.driver,
+                                        wait_for_element(self.driver, By.ID, f"id_reject_{unallocated_request.id}"))
+            self.assertTrue(button.is_displayed())
+            self.assertTrue(button.is_enabled())
+        except NoSuchElementException:
+            self.fail("The button was not visible")
+
+    def test_students_cannot_see_refuse_request_button(self):
+        create_test_requests()
+        unallocated_request = Request.objects.get(allocated=False)
+        self.navigate_to_requests_page(self.student)
+        with self.assertRaises(NoSuchElementException):
+            self.driver.find_element(By.ID, f"id_reject_{unallocated_request.id}")
+
+    def test_tutors_cannot_see_refuse_request_button(self):
+        create_test_requests()
+        unallocated_request = Request.objects.get(allocated=False)
+        self.navigate_to_requests_page(self.tutor)
+        with self.assertRaises(NoSuchElementException):
+            self.driver.find_element(By.ID, f"id_reject_{unallocated_request.id}")
+
+    def test_admins_can_refuse_requests(self):
+        create_test_requests()
+        unallocated_request = Request.objects.get(allocated=False)
+        self.navigate_to_requests_page(self.admin)
+        button = wait_for_clickable(self.driver,
+                                    wait_for_element(self.driver, By.ID, f"id_reject_{unallocated_request.id}"))
+        button.click()
+        wait(self.driver)
+        self.assertEqual(self.driver.current_url,
+                         f"{self.live_server_url}{reverse('reject_request', kwargs={'request_id': unallocated_request.id})}")
+        try:
+            reason = wait_for_element(self.driver, By.ID, "id_reason")
+            reason.send_keys("Reason")
+            submit = wait_for_clickable(self.driver, wait_for_element(self.driver, By.ID, "id_reject_request"))
+            submit.click()
+            wait(self.driver)
+            self.assertEqual(self.driver.current_url, f"{self.live_server_url}{reverse('view_requests')}")
+            unallocated_request.refresh_from_db()
+            self.assertTrue(unallocated_request.rejected_request)
+            self.assertIsNotNone(unallocated_request.rejection_reason)
+        except NoSuchElementException:
+            self.fail("The button was not visible")
+
+    def test_students_cannot_refuse_requests(self):
+        create_test_requests()
+        unallocated_request = Request.objects.get(allocated=False)
+        log_in_via_form(self.driver, self.live_server_url, self.student.username, 'Password123')
+        self.driver.get(
+            f"{self.live_server_url}{reverse('reject_request', kwargs={'request_id': unallocated_request.id})}")
+        wait(self.driver)
+        self.assertIn("You do not have permission to reject this request".lower(), self.driver.page_source.lower())
+        unallocated_request.refresh_from_db()
+        self.assertFalse(unallocated_request.rejected_request)
+        self.assertIsNone(unallocated_request.rejection_reason)
+
+    def test_tutors_cannot_refuse_requests(self):
+        create_test_requests()
+        unallocated_request = Request.objects.get(allocated=False)
+        log_in_via_form(self.driver, self.live_server_url, self.tutor.username, 'Password123')
+        self.driver.get(
+            f"{self.live_server_url}{reverse('reject_request', kwargs={'request_id': unallocated_request.id})}")
+        wait(self.driver)
+        self.assertIn("You do not have permission to reject this request".lower(), self.driver.page_source.lower())
+        unallocated_request.refresh_from_db()
+        self.assertFalse(unallocated_request.rejected_request)
+        self.assertIsNone(unallocated_request.rejection_reason)
+
     def create_request_via_form(self, user: User):
         self.driver.get(f'{self.live_server_url}{reverse("create_request")}')
         wait(self.driver)
@@ -151,3 +265,8 @@ class TestFunctionalRequestHandler(StaticLiveServerTestCase):
         duration.select_by_visible_text("1 hour")
         venue_preference.click()
         submit_button.click()
+
+    def navigate_to_requests_page(self, user: User):
+        log_in_via_form(self.driver, self.live_server_url, user.username, 'Password123')
+        self.driver.get(f"{self.live_server_url}{reverse('view_requests')}")
+        wait(self.driver)

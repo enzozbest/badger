@@ -34,7 +34,7 @@ class TestFunctionalRegistration(StaticLiveServerTestCase):
         self.unallocated_request = Request.objects.get(allocated=False)
 
         options = Options()
-        options.add_argument("--headless")  # Run Firefox in headless mode
+        options.add_argument("--headless")
         self.driver = webdriver.Firefox(options=options)
 
     def tearDown(self):
