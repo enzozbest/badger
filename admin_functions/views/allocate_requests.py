@@ -1,3 +1,5 @@
+from functools import partial
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q, QuerySet
 from django.http import HttpResponseBadRequest
@@ -23,7 +25,6 @@ class AllocateRequestView(LoginRequiredMixin, View):
 
     def get(self, http_request, request_id):
         lesson_request = get_object_or_404(Request, id=request_id)
-
         if lesson_request.allocated:
             return render(http_request, 'already_allocated_error.html', status=409)
 
@@ -136,11 +137,7 @@ def get_venue_preference(venue_preference: QuerySet) -> QuerySet:
 
 def get_suitable_tutors(request_id: int, day1_id: int, day2_id: int) -> QuerySet:
     lesson_request = get_object_or_404(Request, id=request_id)
-
-    if not day1_id:
-        return User.objects.none()
-
-    if lesson_request.frequency == 'Biweekly' and not day2_id:
+    if find_impediments(day1_id, lesson_request.frequency, day2_id):
         return User.objects.none()
 
     student = lesson_request.student
@@ -149,27 +146,33 @@ def get_suitable_tutors(request_id: int, day1_id: int, day2_id: int) -> QuerySet
     max_hourly_rate = student.student_max_rate
 
     if lesson_request.frequency == 'Biweekly':
-        suitable_tutors = User.objects.filter(
-            user_type="Tutor",
-            knowledgearea__in=knowledge_area_ids,
-            availability__in=Day.objects.filter(Q(id=day1_id) | Q(id=day2_id)),
-            hourly_rate__lte=max_hourly_rate,
-        ).distinct()
+        availability_query = partial(Day.objects.filter, Q(id=day1_id) | Q(id=day2_id))
     else:
-        suitable_tutors = User.objects.filter(
-            user_type="Tutor",
-            knowledgearea__in=knowledge_area_ids,
-            availability__in=Day.objects.filter(id=day1_id),
-            hourly_rate__lte=max_hourly_rate,
-        ).distinct()
+        availability_query = partial(Day.objects.filter, id=day1_id)
 
-    return suitable_tutors
+    return get_tutors_(knowledge_area_ids, max_hourly_rate, availability_query)
+
+
+#
+def get_tutors_(knowledge_area_ids, max_hourly_rate, availability_query):
+    return User.objects.filter(
+        user_type="Tutor",
+        knowledgearea__in=knowledge_area_ids,
+        availability__in=availability_query(),
+        hourly_rate__lte=max_hourly_rate,
+    ).distinct()
+
+
+def find_impediments(day1_id, frequency, day2_id) -> bool:
+    if (not day1_id) or (frequency == 'Biweekly' and not day2_id):
+        return True
+    return False
 
 
 def _allocate(lesson_request: Request, tutor: User, venue: Venue, day1: Day, day2: Day) -> None:
     weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     if lesson_request.frequency == 'Biweekly' and weekdays.index(day1.day) < weekdays.index(day2.day):
-        #Ensure day1 is before day2
+        # Ensure day1 is before day2
         lesson_request.day = day1
         lesson_request.day2 = day2
     elif lesson_request.frequency == 'Biweekly' and weekdays.index(day1.day) > weekdays.index(day2.day):
@@ -189,7 +192,6 @@ def _update_availabilities(lesson_request: Request, day1: Day, day2: Day) -> Non
     if lesson_request.frequency == 'Biweekly':
         lesson_request.student.availability.remove(day2)
         lesson_request.tutor.availability.remove(day2)
-
     lesson_request.student.availability.remove(day1)
     lesson_request.tutor.availability.remove(day1)
     lesson_request.student.save()
