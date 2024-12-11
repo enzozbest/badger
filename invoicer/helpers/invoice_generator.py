@@ -11,17 +11,15 @@ from code_tutors.aws.resources import yaml_loader
 from invoicer.models import Invoice
 from request_handler.models import Request
 
-_LOCAL_STORE = not settings.USE_AWS_S3
 _LOGO_PATH = settings.LOGO_PATH
 _OUTPUT_PATH = settings.INVOICE_OUTPUT_PATH
 
 
-
-def draw_invoice(pdf: canvas.Canvas,request_obj: Request, invoice: Invoice) -> None:
+def draw_invoice(pdf: canvas.Canvas, request_obj: Request, invoice: Invoice) -> None:
     """Draw the invoice header with the logo and title."""
     width, height = A4
     pdf.drawImage(_LOGO_PATH, x=20, y=height - 100, width=100, height=50, preserveAspectRatio=True, mask='auto')
-    
+
     # Add title
     pdf.setFont("Helvetica-Bold", 16)
     pdf.drawString(150, height - 60, "Invoice")
@@ -36,24 +34,17 @@ def draw_invoice(pdf: canvas.Canvas,request_obj: Request, invoice: Invoice) -> N
     pdf.drawString(20, height - 200, f"Lessons Booked: {calculate_num_lessons(request_obj.frequency)}")
     pdf.drawString(20, height - 220, f"Total Cost: £{invoice.total:.2f}")
 
-    # # Add payment information
-    # pdf.setFont("Helvetica-Bold", 12)
-    # pdf.drawString(20, height - 260, "Payment Information:")
-    # pdf.setFont("Helvetica", 12)
-    # pdf.drawString(20, height - 280, f"Bank Name: {bank_details['bank_name']}")
-    # pdf.drawString(20, height - 300, f"Account Number: {bank_details['account_number']}")
-    # pdf.drawString(20, height - 320, f"Sort Code: {bank_details['sort_code']}")
-    # pdf.drawString(20, height - 340, f"Reference: {bank_details['reference']}")
 
-def save_or_upload_pdf(buffer:BytesIO, invoice: Invoice, path: str):
+def save_or_upload_pdf(buffer: BytesIO, invoice: Invoice, path: str):
     """ Save the invoice pdf in local storeage or in AWS S3, depending on settings.py configurations """
-    if not _LOCAL_STORE:
+    if settings.USE_AWS_S3:
         buffer.seek(0)
         s3.upload(obj=buffer, bucket=yaml_loader.get_bucket_name('invoicer'),
                   key=f'invoices/pdfs/{invoice.invoice_id}.pdf')
     else:
         with open(path, "wb") as f:
             f.write(buffer.getvalue())
+
 
 def generate_invoice(request_obj: Request) -> None:
     """Function that automatically generates a formatted PDF file for an invoice.
@@ -63,21 +54,19 @@ def generate_invoice(request_obj: Request) -> None:
     in the code_tutors.aws module.
     :param request_obj: the tutoring request object for which an invoice is being generated.
     """
-    LOCAL_STORE = not settings.USE_AWS_S3
     invoice: Invoice = request_obj.invoice
     buffer = BytesIO()  # !!DO NOT REMOVE!!
     path = f'{_OUTPUT_PATH}/{invoice.invoice_id}.pdf'
 
-    if not LOCAL_STORE:
+    if not settings.USE_AWS_S3:
         pdf = canvas.Canvas(buffer, pagesize=A4)
     else:
         if not os.path.exists(path):
             os.makedirs(os.path.dirname(path), exist_ok=True)
         pdf = canvas.Canvas(buffer, pagesize=A4)
 
-    
     draw_invoice(pdf, request_obj, invoice)
-    
+
     # Finalize the PDF !!DO NOT REMOVE!!
     pdf.save()
 

@@ -62,6 +62,7 @@ class TestGenerateInvoice(TestCase):
         self.assertEqual(response.content, b"Invoice generated successfully!")
 
 
+@override_settings(USE_AWS_S3=False)
 def generate_invoice(client, admin, request_id) -> HttpResponse:
     client.force_login(admin)
     return client.get(reverse("generate_invoice", kwargs={"tutoring_request_id": request_id}))
