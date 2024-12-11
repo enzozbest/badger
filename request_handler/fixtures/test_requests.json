@@ -1,6 +1,6 @@
 [
   {
-    "student": "Charlie",
+    "student": "@charlie",
     "knowledge_area": "Python",
     "duration": "1h",
     "term": "January",
@@ -15,7 +15,7 @@
     "invoice": null
   },
   {
-    "student": "Charlie",
+    "student": "@charlie",
     "knowledge_area": "Java",
     "duration": "1h",
     "term": "January",
