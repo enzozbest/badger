@@ -9,7 +9,7 @@
     <form action="{% url 'edit_request' request_instance.id %}" method="POST">
         {% csrf_token %}
         {{ form.as_p }}
-        <input id="id_submit_button" type="submit" value="Update">
+        <input type="submit" value="Update">
     </form>
 </body>
 </html>
