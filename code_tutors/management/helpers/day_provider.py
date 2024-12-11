@@ -1,5 +1,8 @@
 from faker.providers import BaseProvider
-from request_handler.models import Day
+
+Day
+
+
 class DayProvider(BaseProvider):
     def days(self):
         days_list = list(Day.objects.all())

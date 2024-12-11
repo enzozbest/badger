@@ -1,7 +1,7 @@
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, redirect
 
-from request_handler.models import Request
+from request_handler.models.request_model import Request
 from request_handler.forms import RejectRequestForm
 
 

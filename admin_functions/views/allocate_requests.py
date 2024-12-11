@@ -8,9 +8,11 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
 from admin_functions.forms import AllocationForm
-from request_handler.models import Request, User, Venue
+from request_handler.models.request_model import Request
+from request_handler.models.venue_model import Venue
 from user_system.models.day_model import Day
 from user_system.models.knowledge_area_model import KnowledgeArea
+from user_system.models.user_model import User
 
 
 class AllocateRequestView(LoginRequiredMixin, View):

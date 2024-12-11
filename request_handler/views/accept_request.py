@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 
 from calendar_scheduler.models import Booking
-from request_handler.models import Request
+from request_handler.models.request_model import Request
 
 
 def get_first_weekday(year, month, target_day):

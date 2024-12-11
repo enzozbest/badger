@@ -2,16 +2,17 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView
 from admin_functions.helpers.mixins import SortingMixin
 from request_handler.helpers.request_filter import RequestFilter
-from request_handler.models import Request
+from request_handler.models.request_model import Request
 from django.db.models import Value, Case, When
 from django.db.models.fields import CharField
+
 
 class AllRequestsView(LoginRequiredMixin, SortingMixin, ListView):
     """Class-based ListView to represent display a list of all relevant tutoring requests in the database
 
     This view displays a filterable, sortable, searchable list of all relevant requests present in the database.
     """
-    
+
     model = Request
     template_name = 'view_requests.html'
     context_object_name = 'requests'
