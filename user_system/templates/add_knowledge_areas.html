@@ -5,15 +5,15 @@
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h1 class="display-5 text-white">Add Your Knowledge Area</h1>
-                    <a href="{% url 'dashboard' %}" class="btn btn-outline-success">Go to Dashboard</a>
+                    <a href="{% url 'profile' %}" class="btn btn-outline-success">Go to Profile</a>
                 </div>
                 
                 <!-- Add Knowledge Area Form -->
                 <div class="card shadow-sm bg-dark border-0 mb-5">
                     <div class="card-body">
-                        <form method="post" class="d-flex align-items-center">
+                        <form method="post">
                             {% csrf_token %}
-                            <div class="form-group me-3 flex-grow-1">
+                            <div class="form-group">
                                 <label for="id_subject" class="form-label text-white">Choose a Subject</label>
                                 <select name="subject" id="id_subject" class="form-select">
                                     {% for value, label in form.subject.field.choices %}

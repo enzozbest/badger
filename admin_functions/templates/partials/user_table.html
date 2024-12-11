@@ -18,7 +18,7 @@
                 <td id="user-account-type-{{ user.id }}">{{ user.user_type }}</td>
                 <td id="user-actions-{{ user.id }}">
                     {% if user.user_type != "Admin" %}
-                        <a id="make-admin-btn-{{ user.id }}" href="{% url 'make_admin' user.id %}" class="btn btn-primary btn-sm">Make Administrator</a>
+                        <a id="id_make_admin_{{ user.id }}" href="{% url 'make_admin' user.id %}" class="btn btn-primary btn-sm">Make Administrator</a>
                     {% endif %}
                 </td>
                 <td id="user-calendar-{{ user.id }}">

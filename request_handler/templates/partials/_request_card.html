@@ -28,7 +28,6 @@
 
             <hr class="text-white my-2">
 
-            <!-- Consistent alignment for all fields -->
             <div class="d-flex align-items-start mb-3">
                 <i class="fas fa-user fa-lg me-2 mt-1"></i>
                 <div>
@@ -87,38 +86,44 @@
             <div class="d-flex flex-wrap justify-content-center gap-2">
                 {% if not request.allocated %}
                     {% if user.user_type == 'Admin' %}
-                        <a href="{% url 'allocate_request' request.id %}" class="btn btn-outline-warning btn-sm">Allocate</a>
+                        <a id="id_allocation_button_{{ request.id }}" href="{% url 'allocate_request' request.id %}" class="btn btn-outline-warning btn-sm">Allocate</a>
+                        <a href="{% url 'edit_request' request.id %}" class="btn btn-outline-info btn-sm">Update</a>
+                        <a id="id_reject_{{ request.id }}" href="{% url 'reject_request' request.id %}" class="btn btn-outline-danger btn-sm">Reject</a>
+                    {% elif user.user_type == 'Student' %}
+                        <a href="{% url 'edit_request' request.id %}" class="btn btn-outline-info btn-sm">Update</a>
                     {% endif %}
-                    <a href="{% url 'edit_request' request.id %}" class="btn btn-outline-info btn-sm">Update</a>
-                    <a href="{% url 'reject_request' request.id %}" class="btn btn-outline-danger btn-sm">Reject</a>
                 {% endif %}
 
+
                 {% if request.invoice %}
-                    <a href="{% url 'get_invoice' request.invoice.invoice_id %}" class="btn btn-outline-light btn-sm">Invoice</a>
-                    {% if user.user_type == 'Admin' %}
-                        {% if request.invoice.payment_status == 0 %}
-                            <form action="{% url 'set_payment_status' request.invoice.invoice_id 1 %}" method="post" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-success btn-sm">Paid</button>
-                            </form>
-                        {% else %}
-                            <form action="{% url 'set_payment_status' request.invoice.invoice_id 0 %}" method="post" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-danger btn-sm">Unpaid</button>
-                            </form>
+                    {% if user.user_type != 'Tutor' %}
+                        <a id="id_view_invoice_{{ request.invoice.invoice_id }}" href="{% url 'get_invoice' request.invoice.invoice_id %}" class="btn btn-outline-light btn-sm">Invoice</a>
+                        {% if user.user_type == 'Admin' %}
+                            {% if request.invoice.payment_status == 0 %}
+                                <form action="{% url 'set_payment_status' request.invoice.invoice_id 1 %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-success btn-sm">Paid</button>
+                                </form>
+                            {% else %}
+                                <form action="{% url 'set_payment_status' request.invoice.invoice_id 0 %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Unpaid</button>
+                                </form>
+                            {% endif %}
                         {% endif %}
                     {% endif %}
                 {% elif user.user_type == 'Admin' and request.allocated %}
-                    <form action="{% url 'generate_invoice' request.id %}" method="post" class="d-inline">
+                    <form id="id_generate_invoice_{{ request.id }}" action="{% url 'generate_invoice' request.id %}" method="post" class="d-inline">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-outline-primary btn-sm">Generate Invoice</button>
                     </form>
                 {% endif %}
+
                 
                 {% if user.is_tutor and request.allocated and request.tutor == user %}
                     <form method="post" action="{% url 'accept_request' request.id %}" class="d-inline">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-outline-success btn-sm">Accept Request</button>
+                        <button id="id_accept_request_{{ request.id }}" type="submit" class="btn btn-outline-success btn-sm">Accept Request</button>
                     </form>
                 {% endif %}
             </div>
