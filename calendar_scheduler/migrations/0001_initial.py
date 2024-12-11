@@ -77,4 +77,14 @@ class Migration(migrations.Migration):
             name='title',
             field=models.CharField(default='Tutor session', max_length=255),
         ),
+        migrations.AddField(
+            model_name='booking',
+            name='end',
+            field=models.DateTimeField(blank=True, null=True),
+        ),
+        migrations.AddField(
+            model_name='booking',
+            name='start',
+            field=models.DateTimeField(blank=True, null=True),
+        ),
     ]
