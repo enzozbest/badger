@@ -17,7 +17,7 @@
                         {% endfor %}
                     </p>
 
-                    <form id="allocate-request-get-form" method="get" action="" class="mt-4">
+                    <form id="get-form" method="get" action="" class="mt-4">
                         <div id="day1-group" class="form-group">
                             <label for="day1" class="text-light">
                                 {% if lesson_request.frequency == 'Biweekly' %}
@@ -59,7 +59,7 @@
                         <input id="hidden-venue" type="hidden" name="venue" value="{{ venue }}">
 
                         <div id="form-actions" class="text-center mt-4">
-                            <button id="allocate-btn" type="submit" class="btn btn-success btn-lg px-4">Allocate</button>
+                            <button id="id_submit_request_allocation" type="submit" class="btn btn-success btn-lg px-4">Allocate</button>
                             <a id="cancel-btn" href="{% url 'view_requests' %}" class="btn btn-outline-light btn-lg px-4 ms-3">Cancel</a>
                         </div>
                     </form>

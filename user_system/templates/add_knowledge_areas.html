@@ -27,7 +27,7 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <button type="submit" class="btn mt-4 mb-0 btn-primary">Add Knowledge Area</button>
+                            <button id="id_add_knowledge_area" type="submit" class="btn mt-4 mb-0 btn-primary">Add Knowledge Area</button>
                         </form>
                     </div>
                 </div>
@@ -45,7 +45,7 @@
                                     <h5 class="mb-0">{{ area.subject }}</h5>
                                 </div>
                                 <!-- Delete Button -->
-                                <a href="{% url 'delete_knowledge_area' area.id %}" 
+                                <a id ="id_delete_knowledge_area_{{ area.id }}" href="{% url 'delete_knowledge_area' area.id %}" 
                                     
                                    class="btn btn-outline-danger btn-sm">
                                    <i class="fas fa-trash me-1"></i> Delete</a>

@@ -47,10 +47,10 @@
             <h5 class="card-title">View Your Calendar</h5>
             {% if user.is_tutor %}
               <p class="card-text">View your scheduled lessons and manage your availability as a tutor.</p>
-              <a href="{% url 'tutor_calendar' %}" class="btn btn-success">Tutor Calendar</a>
+              <a id="id_view_tutor_calendar" href="{% url 'tutor_calendar' %}" class="btn btn-success">Tutor Calendar</a>
             {% elif user.is_student %}
               <p class="card-text">Keep track of your upcoming lessons and plan accordingly.</p>
-              <a href="{% url 'student_calendar' %}" class="btn btn-success">Student Calendar</a>
+              <a id="id_view_student_calendar" href="{% url 'student_calendar' %}" class="btn btn-success">Student Calendar</a>
             {% endif %}
           </div>
         </div>
