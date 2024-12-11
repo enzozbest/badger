@@ -12,7 +12,6 @@ This Model represents a booking accepted by the tutor. It contains all the neces
 student or tutor wants to view their booked lessons.
 """
 
-
 class Booking(models.Model):
     lesson_identifier = models.IntegerField(blank=False, null=False, default=-1)
     student = models.ForeignKey(User, default=None, null=True, on_delete=models.CASCADE, related_name='booking_student')
@@ -27,13 +26,9 @@ class Booking(models.Model):
     day = models.ForeignKey(Day, null=True, blank=True, on_delete=models.SET_NULL, related_name='booking_allocated_day')
     venue = models.ForeignKey(Venue, null=True, blank=True, on_delete=models.SET_NULL,
                               related_name='booking_allocated_venue')
-    date = models.DateField(null=False, blank=False, default=datetime.date(1900, 1,
-                                                                           1))  # Could be changed to a datetimefield if we want to include time availability
+    date = models.DateField(null=False, blank=False, default=datetime.date(1900, 1, 1))
     title = models.CharField(max_length=255, null=False, default="Tutor session")
-    start = models.DateTimeField(null=False, blank=False,
-                                 default=datetime.datetime(1900, 1, 1, 12, 0))  # Default is 12pm
-    end = models.DateTimeField(null=False, blank=False, default=datetime.datetime(1900, 1, 1, 12, 0))  # Default is 12pm
     cancellation_requested = models.BooleanField(blank=False, default=False)
 
     def __str__(self):
-        return f"{self.student} -> {self.tutor} ({self.day}) {self.date}"
+        return f"{self.student} is taught by {self.tutor} in the term {self.term}."

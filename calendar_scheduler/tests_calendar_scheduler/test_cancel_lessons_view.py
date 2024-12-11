@@ -28,8 +28,6 @@ class CancelLessonsViewTests(TestCase):
         self.booking_sep = Booking.objects.create(  # September term booking
             student=self.student,
             tutor=self.tutor,
-            start="2024-12-03 10:00:00",
-            end="2024-12-03 11:00:00",
             lesson_identifier="1",
             date=date(2024, 12, 3)
         )
@@ -37,8 +35,6 @@ class CancelLessonsViewTests(TestCase):
         self.booking_jan = Booking.objects.create(  # January term booking
             student=self.student,
             tutor=self.tutor,
-            start="2025-03-03 10:00:00",
-            end="2025-03-03 11:00:00",
             lesson_identifier="2",
             date=date(2025, 3, 3)
         )
@@ -46,8 +42,6 @@ class CancelLessonsViewTests(TestCase):
         self.booking_may = Booking.objects.create(  # May term booking
             student=self.student,
             tutor=self.tutor,
-            start="2025-06-03 10:00:00",
-            end="2025-06-03 11:00:00",
             lesson_identifier="3",
             date=date(2025, 6, 3)
         )
@@ -55,8 +49,6 @@ class CancelLessonsViewTests(TestCase):
         self.booking_recurring = Booking.objects.create(  # Recurring booking
             student=self.student,
             tutor=self.tutor,
-            start="2025-02-03 10:00:00",
-            end="2025-07-03 11:00:00",
             lesson_identifier="4",
             date=date(2025, 2, 3),
             is_recurring=True
