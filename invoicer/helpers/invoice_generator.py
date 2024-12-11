@@ -45,9 +45,9 @@ def draw_invoice(pdf: canvas.Canvas,request_obj: Request, invoice: Invoice) -> N
     # pdf.drawString(20, height - 320, f"Sort Code: {bank_details['sort_code']}")
     # pdf.drawString(20, height - 340, f"Reference: {bank_details['reference']}")
 
-def save_or_upload_pdf(buffer:BytesIO, invoice: Invoice, path: str):
+def save_or_upload_pdf(buffer:BytesIO, invoice: Invoice, path: str, LOCAL_STORE):
     """ Save the invoice pdf in local storeage or in AWS S3, depending on settings.py configurations """
-    if not _LOCAL_STORE:
+    if not LOCAL_STORE:
         buffer.seek(0)
         s3.upload(obj=buffer, bucket=yaml_loader.get_bucket_name('invoicer'),
                   key=f'invoices/pdfs/{invoice.invoice_id}.pdf')
@@ -81,6 +81,6 @@ def generate_invoice(request_obj: Request) -> None:
     # Finalize the PDF !!DO NOT REMOVE!!
     pdf.save()
 
-    save_or_upload_pdf(buffer, invoice, path)
+    save_or_upload_pdf(buffer, invoice, path, LOCAL_STORE)
 
     buffer.close()  # !!DO NOT REMOVE!!
