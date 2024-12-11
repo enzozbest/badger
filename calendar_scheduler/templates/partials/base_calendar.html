@@ -1,68 +1,82 @@
+{% extends 'base_content.html' %}
+{% block content %}
 <head>
     <title>Calendar</title>
 </head>
 <body>
-    <h1>{{ title }}</h1>
-    <div class="calendar">
-        <div class="row">
-            <!-- Month navigation buttons -->
-            <div>
-                <a href="{% url 'dashboard' %}">Click here to go to the main dashboard</a>
-                {% if user.user_type == "Admin" %}
-                    <a href="{% url 'view_all_users' %}">Click here to go back to viewing all users</a>
-                {% endif %}
+    <div id="calendar-container" class="container-fluid mb-4">
+        <h1 id="calendar-title" class="display-5 text-white">Calendar</h1>
+        <div id="calendar" class="calendar mx-auto bg-dark mt-4">
+            <div id="calendar-header" class="row mb-3 bg">
+                <div id="calendar-navigation-left" class="col text-start">
+                    <a id="dashboard-link" href="{% url 'dashboard' %}" class="btn btn-primary">Go to Dashboard</a>
+                    {% if user.user_type == "Admin" %}
+                        <a id="view-users-link" href="{% url 'view_all_users' %}" class="btn btn-warning">View All Users</a>
+                    {% endif %}
+                </div>
+                <div id="calendar-navigation-right" class="col text-end">
+                    <a id="prev-month-link" href="?year={{ prev_year }}&month={{ prev_month }}" class="btn btn-outline-secondary">Previous Month</a>
+                    <a id="next-month-link" href="?year={{ next_year }}&month={{ next_month }}" class="btn btn-outline-secondary">Next Month</a>
+                </div>
             </div>
-            <div>
-                <a href="?year={{ prev_year }}&month={{ prev_month }}">Previous Month</a>
-                <a href="?year={{ next_year }}&month={{ next_month }}">Next Month</a>
-            </div>
-            <h3>{{ month_name }} {{ year }}</h3>
-            <!-- Display the calendar header with days of the week -->
-            <table class="table table-bordered">
+            <h3 id="calendar-month-year" class="text-center text-light">{{ month_name }} {{ year }}</h3>
+            <table id="calendar-table" class="table">
                 <thead>
-                    <tr>
+                    <tr id="calendar-days-header" class="text-center">
                         <th>Mon</th>
                         <th>Tue</th>
                         <th>Wed</th>
                         <th>Thu</th>
                         <th>Fri</th>
-                        <th>Sat</th>
-                        <th>Sun</th>
+                        <th class="text-black">Sat</th>
+                        <th class="text-black">Sun</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for week in month_days %}
                     <tr>
                         {% for day in week %}
-                        <td>
+                        <td id="calendar-day-{{ day }}">
                             {% if day %}
-                                <!-- Display events for the day -->
-                                <h3>{{ day }}</h3>
-                                <ul>
-                                    {% for event in events %}
-                                        {% for i in event %}
-                                            {% if i.date.day == day %}
-                                                <li>{{ i.title }}</li>
-                                                <li>{{ i.knowledge_area }}</li>
-                                                <li>{{ i.duration }}</li>
-                                                <li>{{ i.venue }}</li>
-                                                <li>Recurring: {{ i.is_recurring }}</li>
-                                                <li>{{ i.cancellation_requested }}</li>
-                                                <!-- Form to submit lesson cancellation -->
-                                                <form method="GET" action="{% block calendar_action %}{% endblock %}">
-                                                    <button type="submit">Cancel</button>
-                                                    <input type="hidden" name="day" value="{{ day }}">
-                                                    <input type="hidden" name="month" value="{{ month }}">
-                                                    <input type="hidden" name="year" value="{{ year }}">
-                                                    <input type="hidden" name="recurring" value="{{ i.is_recurring }}">
-                                                    <input type="hidden" name="lesson" value="{{ i.lesson_identifier }}">
-                                                </form>
-                                                <p> --------------</p>
-                                            {% endif %}
+                                <div class="day-container">
+                                    <h5 id="day-number-{{ day }}" class="fw-bold">{{ day }}</h5>
+                                    <div id="events-day-{{ day }}">
+                                        {% for event in events %}
+                                            {% for i in event %}
+                                                {% if i.date.day == day %}
+                                                    <div id="event-card-{{ i.lesson_identifier }}" class="event-card bg-light border rounded-3 text-dark">
+                                                        <!-- Toggle Section -->
+                                                        <details id="event-details-{{ i.lesson_identifier }}">
+                                                            <summary id="event-summary-{{ i.lesson_identifier }}" class="summary-title">
+                                                                <h6 id="event-title-{{ i.lesson_identifier }}">{{ i.title }}</h6>
+                                                                <p id="event-knowledge-{{ i.lesson_identifier }}" class="text-muted">{{ i.knowledge_area | upper }}</p>
+                                                            </summary>
+                                                            
+                                                            <!-- Hidden Details -->
+                                                            <hr id="event-divider-{{ i.lesson_identifier }}" class="text-black my-4">
+                                                            
+                                                            <p id="event-duration-{{ i.lesson_identifier }}">Duration: {{ i.duration }}</p>
+                                                            <p id="event-venue-{{ i.lesson_identifier }}">Venue: {{ i.venue }}</p>
+                                                            <p id="event-recurring-{{ i.lesson_identifier }}">Recurring: {{ i.is_recurring|yesno:"✔,✘" }}</p>
+                                                            <p id="event-cancellation-{{ i.lesson_identifier }}">Cancellation: {{ i.cancellation_requested|yesno:"✔,✘" }}</p>
+                                                            <hr id="event-details-divider-{{ i.lesson_identifier }}" class="text-black my-4">
+                                                            
+                                                            <!-- Cancel Form -->
+                                                            <form id="cancel-event-form-{{ i.lesson_identifier }}" method="GET" action="{% block calendar_action %}{% endblock %}">
+                                                                <input type="hidden" name="day" value="{{ day }}">
+                                                                <input type="hidden" name="month" value="{{ month }}">
+                                                                <input type="hidden" name="year" value="{{ year }}">
+                                                                <input type="hidden" name="recurring" value="{{ i.is_recurring }}">
+                                                                <input type="hidden" name="lesson" value="{{ i.lesson_identifier }}">
+                                                                <button id="cancel-event-btn-{{ i.lesson_identifier }}" type="submit" class="cancel-btn text-center btn-sm">Cancel</button>
+                                                            </form>
+                                                        </details>
+                                                    </div>                                                                                         
+                                                {% endif %}
+                                            {% endfor %}
                                         {% endfor %}
-                                        
-                                    {% endfor %}
-                                </ul>
+                                    </div>
+                                </div>
                             {% endif %}
                         </td>
                         {% endfor %}
@@ -73,3 +87,4 @@
         </div>
     </div>
 </body>
+{% endblock %}

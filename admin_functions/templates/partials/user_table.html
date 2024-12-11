@@ -1,0 +1,42 @@
+<table id="user-management-table" class="table table-dark table-striped table-hover mt-3">
+    <thead id="user-management-table-head">
+        <tr id="user-management-header-row">
+            <th id="email-header" scope="col">Email Address</th>
+            <th id="first-name-header" scope="col">First Name</th>
+            <th id="last-name-header" scope="col">Last Name</th>
+            <th id="account-type-header" scope="col">Account Type</th>
+            <th id="actions-header" scope="col">Actions</th>
+            <th id="calendars-header" scope="col">Calendars</th>
+        </tr>
+    </thead>
+    <tbody id="user-management-table-body">
+        {% for user in page_obj %}
+            <tr id="user-row-{{ user.id }}">
+                <td id="user-email-{{ user.id }}">{{ user.email|lower }}</td>
+                <td id="user-first-name-{{ user.id }}">{{ user.first_name }}</td>
+                <td id="user-last-name-{{ user.id }}">{{ user.last_name }}</td>
+                <td id="user-account-type-{{ user.id }}">{{ user.user_type }}</td>
+                <td id="user-actions-{{ user.id }}">
+                    {% if user.user_type != "Admin" %}
+                        <a id="id_make_admin_{{ user.id }}" href="{% url 'make_admin' user.id %}" class="btn btn-primary btn-sm">Make Administrator</a>
+                    {% endif %}
+                </td>
+                <td id="user-calendar-{{ user.id }}">
+                    {% if user.user_type == 'Tutor' %}
+                        <a id="tutor-calendar-link-{{ user.id }}" href="{% url 'admin_tutor_calendar' user.id %}" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-calendar"></i> Calendar
+                        </a>
+                    {% elif user.user_type == 'Student' %}
+                        <a id="student-calendar-link-{{ user.id }}" href="{% url 'admin_student_calendar' user.id %}" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-calendar"></i> Calendar
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% empty %}
+            <tr id="no-users-row">
+                <td colspan="6" class="text-center text-muted">No users registered.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

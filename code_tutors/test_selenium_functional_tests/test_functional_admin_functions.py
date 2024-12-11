@@ -21,6 +21,7 @@ from user_system.models.user_model import User
 class TestFunctionalAdminFunctions(StaticLiveServerTestCase):
     def setUp(self):
         self.driver = webdriver.Firefox()
+        self.driver.maximize_window()
 
         create_test_users()
         self.student = User.objects.get(user_type='Student')

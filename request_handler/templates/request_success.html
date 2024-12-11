@@ -1,10 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Request Successfully Created!</title>
-</head>
-<body>
-    <a href="{% url 'dashboard' %}">Back to Dashboard</a>
-</body>
-</html>
+{% extends 'base_content.html' %}
+{% load static %}
+{% block content %}
+<div id="success-container" class="container py-5 d-flex justify-content-center align-items-center">
+    <div class="row w-100 justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div id="success-card" class="card bg-dark text-white shadow-lg rounded-4 border">
+                <div id="success-body" class="card-body text-center p-5">
+                    <div id="success-icon" class="mb-4">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>
+                    </div>
+                    <h5 id="success-title" class="card-title display-6 mb-3">Request Successfully Created!</h5>
+                    <p id="success-message" class="card-text fs-5 text-muted mb-4">
+                        Your lesson request has been successfully submitted.
+                    </p>
+                    <div id="success-actions" class="d-flex justify-content-center gap-3">
+                        <a id="dashboard-link" href="{% url 'dashboard' %}" class="btn btn-primary btn-lg d-flex align-items-center justify-content-center px-4">
+                            <i class="bi bi-house-door me-2"></i>Dashboard
+                        </a>
+                        <a id="new-request-link" href="{% url 'create_request' %}" class="btn btn-outline-light btn-lg d-flex align-items-center justify-content-center px-4">
+                            <i class="bi bi-plus-circle me-2"></i>New Request
+                        </a>
+                    </div>                   
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

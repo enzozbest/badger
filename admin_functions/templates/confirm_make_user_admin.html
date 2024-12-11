@@ -1,13 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Make admin</title>
-</head>
-<body>
-    <div>
-        <a href="{% url 'admin_dash' %}">Click here to go to the administrator dashboard</a>
+{% extends 'base_content.html' %}
+{% load static %}
+{% block content %}
+<div id="promotion-container" class="container py-5 d-flex justify-content-center align-items-center">
+    <div id="promotion-row" class="row w-100 justify-content-center">
+        <div id="promotion-column" class="col-md-6 col-lg-5">
+            <div id="promotion-card" class="card bg-dark text-white shadow-lg rounded-4">
+                <div id="promotion-body" class="card-body text-center p-5">
+                    <div id="promotion-icon" class="mb-4">
+                        <i class="bi bi-person-badge text-success" style="font-size: 3.5rem;"></i>
+                    </div>
+                    <h5 id="promoted-user-name" class="card-title display-6 mb-3">
+                        {{ user.first_name }} {{ user.last_name }}
+                    </h5>
+                    <p id="promotion-message" class="card-text fs-5 mb-4">
+                        has been successfully promoted to an administrator.
+                    </p>
+                    <a id="admin-dashboard-link" href="{% url 'admin_dash' %}" class="btn btn-success btn-lg d-flex align-items-center justify-content-center">
+                        <i class="bi bi-arrow-right-circle me-2"></i>Go to Admin Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-<h1>{{user.first_name}} {{user.last_name}} is now an administrator</h1>
-</body>
-</html>
+</div>
+{% endblock %}

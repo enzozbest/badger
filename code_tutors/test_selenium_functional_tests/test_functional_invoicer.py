@@ -35,6 +35,8 @@ class TestFunctionalRegistration(StaticLiveServerTestCase):
         self.unallocated_request = Request.objects.get(allocated=False)
 
         self.driver = webdriver.Firefox()
+        self.driver.maximize_window()
+
 
     def tearDown(self):
         self.driver.quit()

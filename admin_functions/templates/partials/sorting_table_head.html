@@ -1,18 +1,49 @@
-<!-- sorting_table_head.html -->
-<thead>
-    <tr>
-        {% for field, label in valid_sorting_fields.items %}
-            <th>
-                <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if current_sort == field %}-{{ field }}{% else %}{{ field }}{% endif %}">
-                    {{ label }}
-                    {% if current_sort == field %}
-                        ▲
-                    {% elif current_sort == '-'|add:field %}
-                        ▼
-                    {% endif %}
-                </a>
-            </th>
-        {% endfor %}
-        <th>Actions</th>
-    </tr>
-</thead>
+<form id="user-filter-form" method="get" class="bg-dark text-white p-3 rounded mb-4">
+    <p id="user-count" class="text-white">Showing {{ count }} users</p>
+    <div id="filter-options" class="d-flex flex-wrap align-items-center">
+
+        <div id="user-type-filter" class="me-2 mb-2">
+            <label for="{{ filter.form.user_type.id_for_label }}" class="visually-hidden">User Type</label>
+            <select 
+                name="{{ filter.form.user_type.name }}" 
+                id="{{ filter.form.user_type.id_for_label }}" 
+                class="form-select form-select-sm">
+                {% for choice in filter.form.user_type.field.choices %}
+                    <option value="{{ choice.0 }}" {% if choice.0 == filter.form.user_type.value %}selected{% endif %}>
+                        {{ choice.1 }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="search-users" class="flex-grow-1 mb-2 me-3">
+            <label for="{{ filter.form.search.id_for_label }}" class="visually-hidden">Search</label>
+            <input 
+                type="text" 
+                name="{{ filter.form.search.name }}" 
+                id="{{ filter.form.search.id_for_label }}" 
+                class="form-control form-control-sm" 
+                placeholder="Search users..." 
+                value="{{ request.GET.search }}">
+        </div>
+
+        <div id="sort-options" class="me-2 mb-2">
+            <label for="sort" class="visually-hidden">Sort By</label>
+            <select name="sort" id="sort" class="form-select form-select-sm">
+                <option value="">Sort By</option>
+                <option value="email" {% if request.GET.sort == "email" %}selected{% endif %}>Email (A-Z)</option>
+                <option value="-email" {% if request.GET.sort == "-email" %}selected{% endif %}>Email (Z-A)</option>
+                <option value="first_name" {% if request.GET.sort == "first_name" %}selected{% endif %}>First Name (A-Z)</option>
+                <option value="-first_name" {% if request.GET.sort == "-first_name" %}selected{% endif %}>First Name (Z-A)</option>
+                <option value="last_name" {% if request.GET.sort == "last_name" %}selected{% endif %}>Last Name (A-Z)</option>
+                <option value="-last_name" {% if request.GET.sort == "-last_name" %}selected{% endif %}>Last Name (Z-A)</option>
+                <option value="user_type" {% if request.GET.sort == "user_type" %}selected{% endif %}>User Type (A-Z)</option>
+                <option value="-user_type" {% if request.GET.sort == "-user_type" %}selected{% endif %}>User Type (Z-A)</option>
+            </select>
+        </div>
+
+        <div id="apply-button" class="ms-2 mb-2">
+            <button id="apply-filter-btn" type="submit" class="btn btn-outline-light btn-sm">Apply</button>
+        </div>
+    </div>
+</form>

@@ -1,17 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Make admin</title>
-</head>
-<body>
-    <div>
-        <a href="{% url 'view_all_users' %}">Click here to go back</a>
+{% extends 'base_content.html' %}
+{% load static %}
+{% block content %}
+<div id="confirm-admin-container" class="container py-5 d-flex justify-content-center align-items-center">
+    <div id="confirm-admin-row" class="row w-100 justify-content-center">
+        <div id="confirm-admin-column" class="col-md-8 col-lg-6">
+            <div id="confirm-admin-card" class="card bg-dark text-white shadow-lg rounded-4">
+                <div id="confirm-admin-body" class="card-body text-center p-4">
+                    <h1 id="confirm-admin-title" class="card-title display-6 mb-3">
+                        <i class="bi bi-shield-lock-fill me-2"></i>Confirm Admin Status
+                    </h1>
+                    <p id="confirm-admin-message" class="fs-5">
+                        Are you sure you want to elevate <strong>{{ first_name }} {{ last_name }}</strong> to an administrator role?
+                    </p>
+                    <form id="confirm-admin-form" action="{% url 'confirm_make_admin' pk=pk %}" method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-center gap-3">
+                            <button id="id_confirm_admin_{{ pk }}" type="submit" class="btn btn-success btn-md d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill me-2"></i>Yes
+                            </button>
+                            <a id="confirm-admin-no-btn" href="{% url 'view_all_users' %}" class="btn btn-outline-light btn-md d-flex align-items-center">
+                                <i class="bi bi-x-circle-fill me-2"></i>No, Go Back
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-<h1>Please click yes to confirm you would like to make {{first_name}} {{last_name}} an admin </h1>
-    <form action="{% url 'confirm_make_admin' pk=pk %}" method="post">
-        {% csrf_token %}
-        <button id="id_confirm_admin_{{ pk }}" type="submit">Yes</button>
-    </form>
-</body>
-</html>
+</div>
+{% endblock %}
