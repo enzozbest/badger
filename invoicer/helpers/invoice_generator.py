@@ -71,11 +71,9 @@ def generate_invoice(request_obj: Request) -> None:
     pdf.drawImage(_LOGO_PATH, x=width - 150, y=height - 80, width=100, height=40, preserveAspectRatio=True, mask='auto')
     pdf.setFont("Helvetica-Bold", 16)
     pdf.drawString(20, height - 60, "Code Connect Tutors")
-    
 
     pdf.setLineWidth(1)  # Set line thickness
-    pdf.line(20 + 28, height - 90, width - 28, height - 90)  
-    
+    pdf.line(20 + 28, height - 90, width - 28, height - 90)
     
     # Tutor Details
     pdf.setFont("Helvetica-Bold", 12)
@@ -111,4 +109,4 @@ def generate_invoice(request_obj: Request) -> None:
 
     save_or_upload_pdf(buffer, invoice, path)
 
-    buffer.close()  # !!DO NOT REMOVE!!
+    buffer.close()
