@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from datetime import date,datetime,timedelta, time
@@ -8,12 +8,9 @@ from django.db.models import Max
 
 
 def get_first_weekday(year, month, target_day):
-    """
-    Get the first occurrence of a specific weekday in a given month.
+    """Get the first occurrence of a specific weekday in a given month.
 
-    Weekday parameter is the day that we would like the first of as an Int
-
-    Returns a date object for the first occurrence of the specified weekday
+    Returns a date object for the first occurrence of the specified weekday.
     """
     # Start with the first day of the month
     first_day = date(year, month, 1)
@@ -25,42 +22,20 @@ def get_first_weekday(year, month, target_day):
     lesson_time = time(12,0)
     return datetime.combine(target,lesson_time)
 
+
 class AcceptRequestView(LoginRequiredMixin, View):
+    """Class-based view for the tutor to accept a request once it has been allocated to them.
+
+    The AcceptRequestView allows a Tutor user to accept a request from a student whose current allocation status is
+    set to "allocated". This view is responsible for turning the request into a booking and storing the lessons
+    which will be shown in the calendar.
+    """
+
     def post(self, request, request_id):
         lesson_request = get_object_or_404(Request, id=request_id, allocated=True, tutor=request.user)
-
-        today = datetime.today()
-        current_year = today.year
-        current_month = today.month
-        first_term = lesson_request.term
-
-        match first_term:
-            case "September":
-                booking_date = get_first_weekday(current_year,9,lesson_request.day)
-            case "January" if current_month>8:
-                booking_date = get_first_weekday(current_year+1,1,lesson_request.day)
-            case "January" if current_month<6:
-                booking_date = get_first_weekday(current_year,1,lesson_request.day)
-            case "May" if current_month>8:
-                booking_date = get_first_weekday(current_year+1,5,lesson_request.day)
-            case "May" if current_month<6:
-                booking_date = get_first_weekday(current_year,5,lesson_request.day)
-
-        sessions = 0
-        match lesson_request.frequency:
-            case "Weekly":
-                sessions = 15
-            case "Biweekly":
-                sessions = 30
-            case "Fortnightly":
-                sessions = 7
-
-        # Retrieves the lesson_identifier of the last group of bookings
-        last_identifier = Booking.objects.aggregate(Max('lesson_identifier'))['lesson_identifier__max']
-        if last_identifier == None:
-            new_identifier = 1
-        else:
-            new_identifier = last_identifier + 1
+        booking_date = self.get_booking_start_date(lesson_request)
+        sessions = self.calculate_lesson_frequency(lesson_request)
+        new_identifier = self.get_last_identifier()
 
         # Now add each of the sessions, starting with the booking_date
         for i in range(0,sessions):
@@ -82,23 +57,7 @@ class AcceptRequestView(LoginRequiredMixin, View):
                     end=booking_date,
                     title = f"Tutor session between {lesson_request.student.first_name} {lesson_request.student.last_name} and {lesson_request.tutor_name}"
                 )
-                match lesson_request.frequency:
-                    case "Weekly":
-                        booking_date += timedelta(days=7)
-                    case "Biweekly":
-                        weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-                        day1 = weekdays.index(str(lesson_request.day))
-                        day2 = weekdays.index(str(lesson_request.day2))
-                        if booking_date.weekday() == day1:
-                            #Find the difference from day1 to day2
-                            dayDiff = (day2-day1 + 7) % 7
-                            booking_date += timedelta(days=dayDiff)
-                        else:
-                            #Find the difference from day2 to day1
-                            dayDiff = (day1 - booking_date.weekday() + 7) % 7
-                            booking_date += timedelta(days=dayDiff)
-                    case "Fortnightly":
-                        booking_date += timedelta(days=14)
+                booking_date = self.match_lesson_frequency(lesson_request, booking_date)
 
             except Exception as e:
                 return redirect('view_requests')
@@ -106,3 +65,70 @@ class AcceptRequestView(LoginRequiredMixin, View):
         lesson_request.delete()
         return redirect('view_requests')
 
+    def get_last_identifier(self):
+        """Retrieves the lesson_identifier of the last group of bookings."""
+
+        last_identifier = Booking.objects.aggregate(Max('lesson_identifier'))['lesson_identifier__max']
+        if last_identifier == None:
+            return 1
+        else:
+            return (last_identifier + 1)
+
+    def get_booking_start_date(self, lesson_request):
+        """Gets the start date of the booking."""
+
+        today = datetime.today()
+        current_year = today.year
+        current_month = today.month
+        first_term = lesson_request.term
+        return self.match_term(lesson_request, first_term, current_year, current_month)
+
+    def match_term(self, lesson_request, first_term, current_year, current_month):
+        """Matches the term of the request to a term that exists in the year."""
+
+        match first_term:
+            case "September":
+                booking_date = get_first_weekday(current_year, 9, lesson_request.day)
+            case "January" if current_month > 8:
+                booking_date = get_first_weekday(current_year + 1, 1, lesson_request.day)
+            case "January" if current_month < 6:
+                booking_date = get_first_weekday(current_year, 1, lesson_request.day)
+            case "May" if current_month > 8:
+                booking_date = get_first_weekday(current_year + 1, 5, lesson_request.day)
+            case "May" if current_month < 6:
+                booking_date = get_first_weekday(current_year, 5, lesson_request.day)
+        return booking_date
+
+    def calculate_lesson_frequency(self, lesson_request):
+        """Calculates how many lessons are required depending on the frequency of the request."""
+
+        match lesson_request.frequency:
+            case "Weekly":
+                return 15
+            case "Biweekly":
+                return 30
+            case "Fortnightly":
+                return 7
+
+    def match_lesson_frequency(self, lesson_request, booking_date):
+        """Matches the frequency of the request to put into the calendar."""
+
+        match lesson_request.frequency:
+            case "Weekly":
+                booking_date += timedelta(days=7)
+            case "Biweekly":
+                weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+                day1 = weekdays.index(str(lesson_request.day))
+                day2 = weekdays.index(str(lesson_request.day2))
+                if booking_date.weekday() == day1:
+                    # Find the difference from day1 to day2
+                    dayDiff = (day2 - day1 + 7) % 7
+                    booking_date += timedelta(days=dayDiff)
+                else:
+                    # Find the difference from day2 to day1
+                    dayDiff = (day1 - booking_date.weekday() + 7) % 7
+                    booking_date += timedelta(days=dayDiff)
+            case "Fortnightly":
+                booking_date += timedelta(days=14)
+
+        return booking_date
