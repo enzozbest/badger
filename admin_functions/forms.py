@@ -21,6 +21,7 @@ class AllocationForm(forms.Form):
     )
 
     venue = forms.ModelChoiceField(queryset=Venue.objects.none(), label="Choose a Venue", required=False)
+
     tutor = forms.ModelChoiceField(queryset=User.objects.none(), label="Choose a Tutor", required=False)
 
     def __init__(self, *args, **kwargs):
@@ -28,31 +29,40 @@ class AllocationForm(forms.Form):
         tutors = kwargs.pop('tutors', None)
         venues = kwargs.pop('venues')
         super().__init__(*args, **kwargs)
+        self._set_form_fields(student, venues, tutors)
 
-        # Manually populate some fields based on what the tutoring request specifies
+    def _set_form_fields(self, student, venues, tutors):
+        day2_data = self._get_day_data(2)
+        self._set_day1_field(student, day2_data)
+        self._set_venue_field(venues)
+        self._set_tutor_field(tutors)
+        day1_data = self._get_day_data(1)
+        self._set_day2_field(student, day1_data)
 
-        day2_data = self.data.get('day2')
-        if day2_data and day2_data == 'None':
-            day2_data = None
+    def _set_venue_field(self, venues):
+        self.fields['venue'].queryset = venues if venues else Venue.objects.none()
+        self.fields['venue'].widget.attrs.update({'onchange': 'this.form.submit()'})
 
+    def _set_day1_field(self, student: User, day2_data: str):
         self.fields[
             'day1'].queryset = student.availability.all() if not day2_data else student.availability.all().exclude(
             id=int(day2_data))
         self.fields['day1'].widget.attrs.update({'onchange': 'this.form.submit()'})
 
-        self.fields['venue'].queryset = venues if venues else Venue.objects.none()
-        self.fields['venue'].widget.attrs.update({'onchange': 'this.form.submit()'})
-
+    def _set_tutor_field(self, tutors):
         self.fields['tutor'].queryset = tutors if tutors else User.objects.none()
-        self.fields['tutor'].label_from_instance = self.get_tutor_label
+        self.fields['tutor'].label_from_instance = self._get_tutor_label
 
-        day1_data = self.data.get('day1')
-        if day1_data and day1_data == 'None':
-            day1_data = None
-
+    def _set_day2_field(self, student: User, day1_data: str):
         self.fields['day2'].queryset = student.availability.all().exclude(
             id=int(day1_data)) if day1_data else Day.objects.none()
         self.fields['day2'].widget.attrs.update({'onchange': 'this.form.submit()'})
 
-    def get_tutor_label(self, obj):
+    def _get_day_data(self, day_num: int):
+        day_data = self.data.get(f'day{day_num}')
+        if day_data and day_data == 'None':
+            day_data = None
+        return day_data
+
+    def _get_tutor_label(self, obj):
         return f'{obj.username} - {obj.first_name} {obj.last_name}'

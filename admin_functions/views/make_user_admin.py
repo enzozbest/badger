@@ -19,7 +19,6 @@ class MakeUserAdmin(LoginRequiredMixin, View):
                                       content=b'Method Not Allowed', status=405)
 
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
-
         userToChange = User.objects.get(pk=pk)
         first_name = userToChange.first_name
         last_name = userToChange.last_name
@@ -42,7 +41,6 @@ class ConfirmMakeUserAdmin(LoginRequiredMixin, View):
 
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
         requested_user_pk = pk
-
         user_to_change = get_object_or_404(User, pk=requested_user_pk)
         user_to_change.user_type = "Admin"
         user_to_change.save()
