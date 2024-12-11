@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
-
 import django.forms as forms
-from user_system.forms import get_knowledge_areas
+
+from user_system.forms.knowledge_area_form import get_knowledge_areas
 from .models import Request, Venue
-from user_system.models import Day
+
 
 class RequestForm(forms.ModelForm):
     """ Class representing a form to create a tutoring Request instance.
@@ -30,8 +30,9 @@ class RequestForm(forms.ModelForm):
     USER_DURATION_CHOICES = [('0.5', '30 minutes'), ('1', '1 hour'), ('1.5', '1 hour 30 minutes'), ('2', '2 hours')]
     duration = forms.ChoiceField(choices=USER_DURATION_CHOICES, label='Duration')
 
-    # Ensure that a warning is shown when a student tries to make a late request
     def is_late_request(self):
+        """Ensure that a warning is shown when a student tries to make a late request."""
+
         term = self.cleaned_data.get('term')
         todayDate = datetime.today()
         term_one = datetime(datetime.today().year, 9, 1)  # September of current year
@@ -54,5 +55,7 @@ class RequestForm(forms.ModelForm):
         fields = ['knowledge_area', 'term', 'frequency', 'duration', 'venue_preference', 'is_recurring']
 
 class RejectRequestForm(forms.Form):
+    """Class representing a form for when an admin rejects a request and provides a reason."""
+
     reason = forms.CharField(widget=forms.Textarea, label='Reason for rejection:')
 

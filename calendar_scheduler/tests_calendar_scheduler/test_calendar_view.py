@@ -1,15 +1,13 @@
-from datetime import date
+from datetime import date, timedelta
 
-from django.shortcuts import get_object_or_404
+from django.test import TestCase, override_settings
+from django.urls import reverse
+from schedule.models import Calendar
 
 from calendar_scheduler.models import Booking
-from schedule.models import Calendar
-from django.test import TestCase
-from user_system.models import User
-from django.urls import reverse
-from datetime import timedelta
 from calendar_scheduler.views.calendar import get_month_days, get_week_days
 from user_system.fixtures import create_test_users
+from user_system.models.user_model import User
 
 """ Classes to represent the calendar and lessons within the calendar
 
@@ -18,6 +16,7 @@ tests the helper methods in the calendar view (student and tutor view), and Cale
 calendar functionality.
 """
 
+@override_settings(USE_AWS_S3=False)
 class CalendarHelperTests(TestCase):
     # Tests that the months and their days are retrieved correctly.
     def test_get_month_days(self):
@@ -42,13 +41,15 @@ class CalendarHelperTests(TestCase):
         today = date.today()
         self.assertEqual(week_days[0], today - timedelta(days=today.weekday()))  # Start of the week
 
+
 class CalendarViewTests(TestCase):
     def setUp(self):
         # Create users
         create_test_users.create_test_users()
         self.tutor = User.objects.get(user_type=User.ACCOUNT_TYPE_TUTOR)
         self.student = User.objects.get(user_type=User.ACCOUNT_TYPE_STUDENT)
-        self.admin = User.objects.create_user(username="@admin", password="Password123", email="admin@example.com", user_type=User.ACCOUNT_TYPE_ADMIN)
+        self.admin = User.objects.create_user(username="@admin", password="Password123", email="admin@example.com",
+                                              user_type=User.ACCOUNT_TYPE_ADMIN)
 
         # Ensure the slug doesn't already exist
         self.calendar, created = Calendar.objects.get_or_create(
@@ -123,7 +124,7 @@ class CalendarViewTests(TestCase):
     # Test to respond if a calendar is not found for a student.
     def test_student_calendar_not_found(self):
         self.client.login(username=self.student.username, password='Password123')
-        Calendar.objects.filter(slug='tutor').delete()
+        Calendar.objects.filter(slug='student').delete()
         response = self.client.get(reverse('student_calendar'))
         self.assertEqual(response.status_code, 404)
 
@@ -138,7 +139,7 @@ class CalendarViewTests(TestCase):
     # Test if that calendar is not found for admin users.
     def test_calendar_not_found_admin(self):
         self.client.login(username="@admin", password='Password123')
-        Calendar.objects.filter(slug='tutor').delete()
+        Calendar.objects.filter(slug='student').delete()
         response = self.client.get(reverse('student_calendar'))
         self.assertEqual(response.status_code, 404)
 
@@ -177,7 +178,8 @@ class CalendarViewTests(TestCase):
         self.client.login(username=self.admin.username, password='Password123')
 
         # Create a tutor user (non-student)
-        student_user = User.objects.create_user(username='student', password='password', user_type=User.ACCOUNT_TYPE_STUDENT)
+        student_user = User.objects.create_user(username='student', password='password',
+                                                user_type=User.ACCOUNT_TYPE_STUDENT)
         url = reverse('admin_tutor_calendar', kwargs={'pk': student_user.pk})
 
         with self.assertRaises(ValueError):

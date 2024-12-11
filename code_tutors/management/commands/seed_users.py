@@ -5,7 +5,8 @@ from faker import Faker
 
 from code_tutors.management.helpers import availability_provider, programming_langs_provider
 from user_system.fixtures.create_test_users import create_test_users
-from user_system.models import KnowledgeArea, User
+from user_system.models.knowledge_area_model import KnowledgeArea
+from user_system.models.user_model import User
 
 
 class Command(BaseCommand):

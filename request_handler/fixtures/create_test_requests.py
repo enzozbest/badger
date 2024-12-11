@@ -1,7 +1,8 @@
 import json
 
 from request_handler.models import Request, Venue
-from user_system.models import Day, User
+from user_system.models.day_model import Day
+from user_system.models.user_model import User
 
 
 def create_test_requests():
@@ -21,7 +22,7 @@ def create_test_requests():
 
             student_json = request_json.pop('student', [])
             try:
-                student = User.objects.get(first_name=student_json)
+                student = User.objects.get(username=student_json)
                 request_json['student'] = student
             except User.DoesNotExist:
                 print("User not found!")

@@ -9,7 +9,9 @@ from invoicer.helpers.generate_invoice_id import generate_invoice_id
 from invoicer.models import get_latest_id_number
 from request_handler.models import Request, Venue
 from user_system.fixtures import create_test_users as create_fixtures
-from user_system.models import Day, KnowledgeArea, User
+from user_system.models.day_model import Day
+from user_system.models.knowledge_area_model import KnowledgeArea
+from user_system.models.user_model import User
 
 
 class TestGenerateInvoice(TestCase):
@@ -51,7 +53,7 @@ class TestGenerateInvoice(TestCase):
         self._assertions_for_local_invoice(generate_invoice(self.client, self.admin, self.request.id))
         self.client.force_login(self.admin)
         response = self.client.get(reverse('generate_invoice', kwargs={"tutoring_request_id": self.request.id}))
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 409)
 
     def _assertions_for_local_invoice(self, response: HttpResponse) -> None:
         with open(self.path, 'rb') as file:

@@ -1,7 +1,7 @@
 import django_filters
 from django.db.models import Q
 
-from user_system.models import User
+from user_system.models.user_model import User
 
 
 class UserFilter(django_filters.FilterSet):

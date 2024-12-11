@@ -1,12 +1,16 @@
+from functools import partial
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q, QuerySet
 from django.http import HttpResponseBadRequest
+from django.http.request import HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
 from admin_functions.forms import AllocationForm
 from request_handler.models import Request, User, Venue
-from user_system.models import Day, KnowledgeArea
+from user_system.models.day_model import Day
+from user_system.models.knowledge_area_model import KnowledgeArea
 
 
 class AllocateRequestView(LoginRequiredMixin, View):
@@ -22,94 +26,56 @@ class AllocateRequestView(LoginRequiredMixin, View):
 
     def get(self, http_request, request_id):
         lesson_request = get_object_or_404(Request, id=request_id)
-
         if lesson_request.allocated:
             return render(http_request, 'already_allocated_error.html', status=409)
 
-        student = lesson_request.student
-        day1 = http_request.GET.get("day1", None)
-        day2 = http_request.GET.get("day2", None)
-        venue = http_request.GET.get('venue', None)
-        venues = get_venue_preference(lesson_request.venue_preference)
-
+        student, day1, day2, venue, venues = get_required_data_get(lesson_request, http_request)
         day1 = int(day1) if day1 else None
         day2 = int(day2) if day2 else None
         venue_id = int(venue) if venue else None
 
         form_data = {"day1": day1, "day2": day2, "venue": venue_id}
-        if not day1 or (lesson_request.frequency == 'Biweekly' and not day2):
-            form = AllocationForm(http_request.GET, initial=form_data, student=student, venues=venues)
-        else:
-            suitable_tutors = get_suitable_tutors(request_id, day1, day2)
-            form = AllocationForm(http_request.GET, initial=form_data, student=student, venues=venues,
-                                  tutors=suitable_tutors)
-
-        venue_preferences = {"No Preference"} if len(venues) >= 2 else {
-            venue.venue for venue in venues if venue.venue != "No Preference"
-        }
-
+        form = create_form_get(lesson_request, venues, form_data, student, http_request.GET, day1, day2)
         return render(http_request, "allocate_request.html", {
             "form": form,
             "day1": day1,
             "day2": day2,
             "venue": venue,
             "lesson_request": lesson_request,
-            "venue_preferences": venue_preferences,
+            "venue_preferences": venue_preference_str(venues),
         })
 
-    def post(self, request, request_id):
+    def post(self, http_request, request_id):
         lesson_request = get_object_or_404(Request, id=request_id)
-
         if lesson_request.allocated:
-            return render(request, 'already_allocated_error.html', status=409)
+            return render(http_request, 'already_allocated_error.html', status=409)
 
-        venues = get_venue_preference(lesson_request.venue_preference)
-        day1 = request.POST.get("day1", None)
-        day2 = request.POST.get("day2", None)
-
-        day1_data = day1 if day1 and day1 != 'None' else None
-        day2_data = day2 if day2 and day2 != 'None' else None
-
+        day1_data = get_day_data(http_request, 1)
+        day2_data = get_day_data(http_request, 2)
         if not day1_data:
             return HttpResponseBadRequest("Missing required day1", status=400)
-
         if lesson_request.frequency == "Biweekly" and not day2_data:
             return HttpResponseBadRequest("Missing required day2", status=400)
 
-        day1_id = int(day1_data)
+        venues = get_venue_preference(lesson_request.venue_preference)
+        day1_id = int(day1_data) if day1_data else None
         day2_id = int(day2_data) if day2_data else None
-        suitable_tutors = get_suitable_tutors(request_id, day1_id, day2_id)
-        form = AllocationForm(request.POST, tutors=suitable_tutors, student=lesson_request.student, venues=venues)
-
-        if lesson_request.frequency != "Biweekly":
-            form.fields.pop('day2', None)
+        form = create_form_post(lesson_request, day1_id, day2_id, venues, http_request.POST)
 
         if form.is_valid():
             tutor = form.cleaned_data.get('tutor')
             venue = form.cleaned_data.get('venue')
-
-            if not tutor:
-                form.add_error('tutor', "You must select a tutor!")
-                return HttpResponseBadRequest("Missing required tutor")
-
-            if not venue:
-                form.add_error('venue', "You must select a venue!")
-                return HttpResponseBadRequest("Missing required venue")
-
-            day1 = Day.objects.get(id=day1_id) if day1_data else None
-            day2 = Day.objects.get(id=day2_id) if day2_data else None
+            if find_form_errors_post(form, tutor, venue): return HttpResponseBadRequest(form.errors)
+            day1 = Day.objects.get(id=day1_id) if day1_id else None
+            day2 = Day.objects.get(id=day2_id) if day2_id else None
             _allocate(lesson_request, tutor, venue, day1, day2)
             _update_availabilities(lesson_request, day1, day2)
             return redirect("view_requests")
 
-        venue_preferences = {"No Preference"} if len(venues) >= 2 else {
-            venue.venue for venue in venues if venue.venue != "No Preference"
-        }
-
-        return render(request, "allocate_request.html", {
+        return render(http_request, "allocate_request.html", {
             "form": form,
             "lesson_request": lesson_request,
-            "venue_preferences": venue_preferences,
+            "venue_preferences": venue_preference_str(venues),
         })
 
     def dispatch(self, request, *args, **kwargs):
@@ -125,6 +91,55 @@ class AllocateRequestView(LoginRequiredMixin, View):
         return super().dispatch(request, *args, **kwargs)
 
 
+# -HELPERS- #
+def get_required_data_get(lesson_request: Request, http_request: HttpRequest) -> tuple:
+    student = lesson_request.student
+    day1 = http_request.GET.get("day1", None)
+    day2 = http_request.GET.get("day2", None)
+    venue = http_request.GET.get('venue', None)
+    venues = get_venue_preference(lesson_request.venue_preference)
+    return student, day1, day2, venue, venues
+
+
+def venue_preference_str(venues):
+    return {"No Preference"} if len(venues) >= 2 else {
+        venue.venue for venue in venues if venue.venue != "No Preference"
+    }
+
+
+def create_form_post(lesson_request, day1_id, day2_id, venues, http_data):
+    suitable_tutors = get_suitable_tutors(lesson_request.id, day1_id, day2_id)
+    form = AllocationForm(http_data, tutors=suitable_tutors, student=lesson_request.student, venues=venues)
+    if lesson_request.frequency != "Biweekly":
+        form.fields.pop('day2', None)
+    return form
+
+
+def create_form_get(lesson_request, venues, form_data, student, http_data, day1_id=None, day2_id=None):
+    if not day1_id or (lesson_request.frequency == 'Biweekly' and not day2_id):
+        suitable_tutors = None
+    else:
+        suitable_tutors = get_suitable_tutors(lesson_request.id, day1_id, day2_id)
+
+    return AllocationForm(http_data, initial=form_data, student=student, venues=venues,
+                          tutors=suitable_tutors)
+
+
+def find_form_errors_post(form, tutor, venue):
+    if not tutor:
+        form.add_error('tutor', "Missing required tutor")
+        return True
+    if not venue:
+        form.add_error('venue', "Missing required venue")
+        return True
+    return False
+
+
+def get_day_data(http_request: HttpRequest, day_num: int):
+    day = http_request.POST.get(f"day{day_num}", None)
+    return day if (day and day != 'None') else None
+
+
 def get_venue_preference(venue_preference: QuerySet) -> QuerySet:
     if venue_preference.filter(venue='No Preference').exists():
         venues = Venue.objects.exclude(venue='No Preference')
@@ -135,11 +150,7 @@ def get_venue_preference(venue_preference: QuerySet) -> QuerySet:
 
 def get_suitable_tutors(request_id: int, day1_id: int, day2_id: int) -> QuerySet:
     lesson_request = get_object_or_404(Request, id=request_id)
-
-    if not day1_id:
-        return User.objects.none()
-
-    if lesson_request.frequency == 'Biweekly' and not day2_id:
+    if find_impediments(day1_id, lesson_request.frequency, day2_id):
         return User.objects.none()
 
     student = lesson_request.student
@@ -148,27 +159,33 @@ def get_suitable_tutors(request_id: int, day1_id: int, day2_id: int) -> QuerySet
     max_hourly_rate = student.student_max_rate
 
     if lesson_request.frequency == 'Biweekly':
-        suitable_tutors = User.objects.filter(
-            user_type="Tutor",
-            knowledgearea__in=knowledge_area_ids,
-            availability__in=Day.objects.filter(Q(id=day1_id) | Q(id=day2_id)),
-            hourly_rate__lte=max_hourly_rate,
-        ).distinct()
+        availability_query = partial(Day.objects.filter, Q(id=day1_id) | Q(id=day2_id))
     else:
-        suitable_tutors = User.objects.filter(
-            user_type="Tutor",
-            knowledgearea__in=knowledge_area_ids,
-            availability__in=Day.objects.filter(id=day1_id),
-            hourly_rate__lte=max_hourly_rate,
-        ).distinct()
+        availability_query = partial(Day.objects.filter, id=day1_id)
 
-    return suitable_tutors
+    return get_tutors(knowledge_area_ids, max_hourly_rate, availability_query)
+
+
+#
+def get_tutors(knowledge_area_ids, max_hourly_rate, availability_query):
+    return User.objects.filter(
+        user_type="Tutor",
+        knowledgearea__in=knowledge_area_ids,
+        availability__in=availability_query(),
+        hourly_rate__lte=max_hourly_rate,
+    ).distinct()
+
+
+def find_impediments(day1_id, frequency, day2_id) -> bool:
+    if (not day1_id) or (frequency == 'Biweekly' and not day2_id):
+        return True
+    return False
 
 
 def _allocate(lesson_request: Request, tutor: User, venue: Venue, day1: Day, day2: Day) -> None:
     weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     if lesson_request.frequency == 'Biweekly' and weekdays.index(day1.day) < weekdays.index(day2.day):
-        #Ensure day1 is before day2
+        # Ensure day1 is before day2
         lesson_request.day = day1
         lesson_request.day2 = day2
     elif lesson_request.frequency == 'Biweekly' and weekdays.index(day1.day) > weekdays.index(day2.day):
@@ -188,7 +205,6 @@ def _update_availabilities(lesson_request: Request, day1: Day, day2: Day) -> Non
     if lesson_request.frequency == 'Biweekly':
         lesson_request.student.availability.remove(day2)
         lesson_request.tutor.availability.remove(day2)
-
     lesson_request.student.availability.remove(day1)
     lesson_request.tutor.availability.remove(day1)
     lesson_request.student.save()

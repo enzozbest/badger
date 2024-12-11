@@ -11,7 +11,7 @@
     <p> Term: {{ request_instance.term }} </p>
     <form method="post" action="{% url 'confirm_delete_request' request_instance.id %}">
         {%  csrf_token %}
-        <button type="submit" class = "btn btn-danger"> Yes </button>
+        <button id="id_submit_button" type="submit" class = "btn btn-danger"> Yes </button>
         <a href="{% url 'view_requests' %}"> No </a>
     </form>
 </body>

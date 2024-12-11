@@ -1,11 +1,13 @@
+from datetime import date, datetime, timedelta
 from unittest.mock import patch
-from django.test import TestCase, Client
+
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
-from calendar_scheduler.views.cancel_lessons import CancelLessonsView, cancel_day, cancel_term, cancel_recurring
-from user_system.models import User
+
 from calendar_scheduler.models import Booking
-from datetime import datetime, timedelta, date
+from calendar_scheduler.views.cancel_lessons import cancel_day, cancel_recurring, cancel_term
 from user_system.fixtures import create_test_users
+from user_system.models.user_model import User
 
 """ Class to represent the cancelling of lessons
 
@@ -13,6 +15,8 @@ This class is used as a view for the website. It creates multiple bookings and a
 and by multiple users, as the functionality works in the cancel_lessons view.
 """
 
+
+@override_settings(USE_AWS_S3=False)
 class CancelLessonsViewTests(TestCase):
     def setUp(self):
         # Create users
@@ -21,29 +25,23 @@ class CancelLessonsViewTests(TestCase):
         self.tutor = User.objects.get(user_type=User.ACCOUNT_TYPE_TUTOR)
         self.student = User.objects.get(user_type=User.ACCOUNT_TYPE_STUDENT)
 
-        self.booking_sep = Booking.objects.create( # September term booking
+        self.booking_sep = Booking.objects.create(  # September term booking
             student=self.student,
             tutor=self.tutor,
-            start="2024-12-03 10:00:00",
-            end="2024-12-03 11:00:00",
             lesson_identifier="1",
             date=date(2024, 12, 3)
         )
 
-        self.booking_jan = Booking.objects.create( # January term booking
+        self.booking_jan = Booking.objects.create(  # January term booking
             student=self.student,
             tutor=self.tutor,
-            start="2025-03-03 10:00:00",
-            end="2025-03-03 11:00:00",
             lesson_identifier="2",
             date=date(2025, 3, 3)
         )
 
-        self.booking_may = Booking.objects.create( # May term booking
+        self.booking_may = Booking.objects.create(  # May term booking
             student=self.student,
             tutor=self.tutor,
-            start="2025-06-03 10:00:00",
-            end="2025-06-03 11:00:00",
             lesson_identifier="3",
             date=date(2025, 6, 3)
         )
@@ -51,11 +49,9 @@ class CancelLessonsViewTests(TestCase):
         self.booking_recurring = Booking.objects.create(  # Recurring booking
             student=self.student,
             tutor=self.tutor,
-            start="2025-02-03 10:00:00",
-            end="2025-07-03 11:00:00",
             lesson_identifier="4",
             date=date(2025, 2, 3),
-            is_recurring = True
+            is_recurring=True
         )
 
         self.booking = Booking.objects.create(
@@ -236,6 +232,8 @@ class CancelLessonsViewTests(TestCase):
 This class is used as a view for the website. It creates multiple bookings and attempts to delete them in multiple ways
 through an admin (and as other forbidden users), as the functionality works in the cancel_lessons view.
 """
+
+
 class AdminCancelLessonsViewTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -253,7 +251,7 @@ class AdminCancelLessonsViewTest(TestCase):
     # Test that the admin can see the cancellation page.
     def test_get_admin_cancel_lessons(self):
         # Perform a GET request as an admin
-        response = self.client.get('/admins/calendar/cancel/', {
+        response = self.client.get(f'{reverse("admin_calendar_cancel_lessons")}', {
             'day': self.booking_date.day,
             'month': self.booking_date.month,
             'year': self.booking_date.year,
@@ -263,7 +261,7 @@ class AdminCancelLessonsViewTest(TestCase):
 
     # Test that the admin can cancel a day lesson.
     def test_post_cancel_day(self):
-        response = self.client.post('/admins/calendar/cancel/', {
+        response = self.client.post(f'{reverse("admin_calendar_cancel_lessons")}', {
             'lesson': '1',
             'cancellation': 'day',
             'day': self.booking_date.day,
@@ -275,7 +273,7 @@ class AdminCancelLessonsViewTest(TestCase):
 
     # Test that the admin can cancel all the lessons in a term.
     def test_post_cancel_term(self):
-        response = self.client.post('/admins/calendar/cancel/', {
+        response = self.client.post(f'{reverse("admin_calendar_cancel_lessons")}', {
             'lesson': '1',
             'cancellation': 'term',
             'month': self.booking_date.month,
@@ -285,7 +283,7 @@ class AdminCancelLessonsViewTest(TestCase):
 
     # Test for an invalid cancellation type.
     def test_post_invalid_cancellation_type(self):
-        response = self.client.post('/admins/calendar/cancel/', {
+        response = self.client.post(f'{reverse("admin_calendar_cancel_lessons")}', {
             'lesson': '1',
             'cancellation': 'invalid',
         })
@@ -293,7 +291,7 @@ class AdminCancelLessonsViewTest(TestCase):
 
     # Test that an admin can cancel recurring lessons.
     def test_post_cancel_recurring(self):
-        response = self.client.post('/admins/calendar/cancel/', {
+        response = self.client.post(f'{reverse("admin_calendar_cancel_lessons")}', {
             'lesson': '1',
             'cancellation': 'recurring',
         })
@@ -308,7 +306,7 @@ class AdminCancelLessonsViewTest(TestCase):
             date=test_date_2,
             cancellation_requested=False
         )
-        response = self.client.get('/admins/calendar/cancel/', {
+        response = self.client.get(f'{reverse("admin_calendar_cancel_lessons")}', {
             'day': test_date_2.day,
             'month': test_date_2.month,
             'year': test_date_2.year,
@@ -320,7 +318,7 @@ class AdminCancelLessonsViewTest(TestCase):
     # Test the value error in the admin cancel lessons view.
     def test_post_cancel_day_value_error(self):
         invalid_date = date.today() + timedelta(days=10)
-        response = self.client.post('/admins/calendar/cancel/', {
+        response = self.client.post(f'{reverse("admin_calendar_cancel_lessons")}', {
             'lesson': '999999',  # Non-existent lesson_id
             'cancellation': 'day',
             'day': invalid_date.day,
@@ -333,13 +331,14 @@ class AdminCancelLessonsViewTest(TestCase):
     # Test the exception in the admin cancel lessons view.
     def test_post_generic_exception(self):
         with patch('calendar_scheduler.models.Booking.objects.get', side_effect=Exception("Unexpected error")):
-            response = self.client.post('/admins/calendar/cancel/', {
+            response = self.client.post(f'{reverse("admin_calendar_cancel_lessons")}', {
                 'lesson': '1',
                 'cancellation': 'day',
-                'day': self.booking_date.day+1,
+                'day': self.booking_date.day + 1,
                 'month': self.booking_date.month,
                 'year': self.booking_date.year,
             })
         expected_date = (self.booking_date + timedelta(days=1)).strftime('%Y-%m-%d')
         self.assertEqual(response.status_code, 500)
-        self.assertIn(f"Error processing cancellation: No booking found for lesson_id: 1 on {expected_date}", response.content.decode())
+        self.assertIn(f"Error processing cancellation: No booking found for lesson_id: 1 on {expected_date}",
+                      response.content.decode())

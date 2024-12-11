@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Edit Your Tutoring Request</title>
+    <title>Edit Your Request</title>
 </head>
 <body>
     <p>Fill in the details in the following form to change your Tutoring Request:</p>
     <form action="{% url 'edit_request' request_instance.id %}" method="POST">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Update">
+        <input id="id_submit_button" type="submit" value="Update">
     </form>
 </body>
 </html>

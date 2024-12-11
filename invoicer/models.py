@@ -1,7 +1,7 @@
 from django.db import models
 
 from invoicer.helpers.generate_invoice_id import generate_invoice_id
-from user_system.models import User
+from user_system.models.user_model import User
 
 
 class Invoice(models.Model):
@@ -18,7 +18,7 @@ class Invoice(models.Model):
     def save(self, *args, **kwargs):
         if not self.invoice_id:
             self.invoice_id = generate_invoice_id(self.student, get_latest_id_number(self.student))
-            
+
         super(Invoice, self).save(*args, **kwargs)
 
 
