@@ -16,7 +16,6 @@ tests the helper methods in the calendar view (student and tutor view), and Cale
 calendar functionality.
 """
 
-
 @override_settings(USE_AWS_S3=False)
 class CalendarHelperTests(TestCase):
     # Tests that the months and their days are retrieved correctly.
@@ -125,7 +124,7 @@ class CalendarViewTests(TestCase):
     # Test to respond if a calendar is not found for a student.
     def test_student_calendar_not_found(self):
         self.client.login(username=self.student.username, password='Password123')
-        Calendar.objects.filter(slug='tutor').delete()
+        Calendar.objects.filter(slug='student').delete()
         response = self.client.get(reverse('student_calendar'))
         self.assertEqual(response.status_code, 404)
 
@@ -140,7 +139,7 @@ class CalendarViewTests(TestCase):
     # Test if that calendar is not found for admin users.
     def test_calendar_not_found_admin(self):
         self.client.login(username="@admin", password='Password123')
-        Calendar.objects.filter(slug='tutor').delete()
+        Calendar.objects.filter(slug='student').delete()
         response = self.client.get(reverse('student_calendar'))
         self.assertEqual(response.status_code, 404)
 

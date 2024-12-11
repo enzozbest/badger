@@ -1,12 +1,6 @@
-from django.db import models
-from django.test import TestCase
-
 from admin_functions.helpers.mixins import SortingMixin
-
-
-class DummyModel(models.Model):
-    name = models.CharField(max_length=100)
-    age = models.IntegerField()
+from admin_functions.models import DummyModel
+from django.test import TestCase
 
 
 class DummyView(SortingMixin):
@@ -29,5 +23,5 @@ class SortingMixinTest(TestCase):
         self.assertQuerysetEqual(result, queryset.order_by(self.view.default_sort_field))
 
     def test_is_string_field_invalid_field_name(self):
-        result = self.view.is_string_field('invalid_field', DummyModel)
+        result = self.view._is_string_field('invalid_field', DummyModel)
         self.assertFalse(result)

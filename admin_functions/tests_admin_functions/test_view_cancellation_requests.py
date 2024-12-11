@@ -18,8 +18,6 @@ class ViewCancellationRequestsTestCase(TestCase):
         self.booking_sep = Booking.objects.create(  # September term booking
             student=self.student,
             tutor=self.tutor,
-            start="2024-12-03 10:00:00",
-            end="2024-12-03 11:00:00",
             lesson_identifier="1",
             date=date(2024, 12, 3),
             cancellation_requested=True
