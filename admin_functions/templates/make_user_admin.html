@@ -11,7 +11,7 @@
 <h1>Please click yes to confirm you would like to make {{first_name}} {{last_name}} an admin </h1>
     <form action="{% url 'confirm_make_admin' pk=pk %}" method="post">
         {% csrf_token %}
-        <button id="id_confirm_admin_{{ pk }}" type="submit">Yes</button>
+        <button type="submit">Yes</button>
     </form>
 </body>
 </html>

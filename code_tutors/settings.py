@@ -149,6 +149,6 @@ LOGO_PATH = BASE_DIR / 'static/logo.jpeg'
 INVOICE_OUTPUT_PATH = BASE_DIR / 'invoicer/invoices/pdfs'
 
 # AWS Configurations
-AWS_ACCOUNT_ID = 'ENTER-YOUR-ACCOUNT-ID-HERE'
+AWS_ACCOUNT_ID = '058264317710'
 AWS_YAML_CONFIG_PATH = BASE_DIR / 'code_tutors/aws/resources/config.yml'
-USE_AWS_S3 = False
+USE_AWS_S3 = True

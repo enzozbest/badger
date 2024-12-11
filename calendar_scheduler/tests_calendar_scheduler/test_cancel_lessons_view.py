@@ -1,7 +1,7 @@
 from datetime import date, datetime, timedelta
 from unittest.mock import patch
 
-from django.test import Client, TestCase, override_settings
+from django.test import Client, TestCase
 from django.urls import reverse
 
 from calendar_scheduler.models import Booking
@@ -16,7 +16,6 @@ and by multiple users, as the functionality works in the cancel_lessons view.
 """
 
 
-@override_settings(USE_AWS_S3=False)
 class CancelLessonsViewTests(TestCase):
     def setUp(self):
         # Create users

@@ -35,7 +35,7 @@
                     <td>{{ user.user_type }}</td>
                     <td>
                         {% if user.user_type != 'Admin' %}
-                            <a id="id_make_admin_{{ user.id }}" href="{% url 'make_admin' user.id %}">Make Administrator</a>
+                            <a href="{% url 'make_admin' user.id %}">Make Administrator</a>
                         {% endif %}
                     </td>
                     <td>

@@ -6,7 +6,6 @@ from faker import Faker
 from admin_functions.views.allocate_requests import _allocate, _update_availabilities, get_suitable_tutors, \
     get_venue_preference
 from code_tutors.management.helpers import programming_langs_provider, term_provider, user_provider, venue_provider
-from request_handler.fixtures.create_test_requests import create_test_requests
 from request_handler.models import Request
 
 
@@ -21,9 +20,9 @@ class Command(BaseCommand):
         self.faker.add_provider(venue_provider.VenueProvider)
         self.frequencies = ['Weekly', 'Fortnightly', 'Biweekly']
 
+
     def handle(self, *args, **options):
         self.__init__()
-        create_test_requests()
         self.create_requests()
         self.requests = Request.objects.all()
 

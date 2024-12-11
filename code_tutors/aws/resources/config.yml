@@ -1,9 +1,9 @@
 bucket_names:
-  invoicer: 'ENTER-BUCKET-NAME-HERE'
+  invoicer: 'seg-sgp-badger-2024'
 
 roles:
-  invoicer-s3: 'ENTER-ACCESS-ROLE-HERE'
+  invoicer-s3: 's3-badger-access-role'
 
-logo_name: 'ENTER-LOGO-NAME-HERE'
+logo_name: 'logo.jpeg'
 
 

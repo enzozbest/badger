@@ -53,7 +53,7 @@ class TestGenerateInvoice(TestCase):
         self._assertions_for_local_invoice(generate_invoice(self.client, self.admin, self.request.id))
         self.client.force_login(self.admin)
         response = self.client.get(reverse('generate_invoice', kwargs={"tutoring_request_id": self.request.id}))
-        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response.status_code, 204)
 
     def _assertions_for_local_invoice(self, response: HttpResponse) -> None:
         with open(self.path, 'rb') as file:
