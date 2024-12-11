@@ -78,8 +78,6 @@ class AcceptRequestView(LoginRequiredMixin, View):
                     duration=lesson_request.duration,
                     is_recurring=lesson_request.is_recurring,
                     date=booking_date.date(),
-                    start= booking_date,
-                    end=booking_date,
                     title = f"Tutor session between {lesson_request.student.first_name} {lesson_request.student.last_name} and {lesson_request.tutor_name}"
                 )
                 match lesson_request.frequency:
