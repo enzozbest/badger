@@ -1,75 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>View Requests</title>
-</head>
-<body>
-    <div>
-        <a href="{% url 'dashboard' %}">Click here to go to the main dashboard</a>
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="display-5 text-white">
+            Registered Users
+        </h1>
+        <a href="{% url 'admin_dash' %}" class="btn btn-outline-success">Go to the Administrator Dashboard</a>
     </div>
-
-    <h1>Showing {{ count }} out of {{ total }} users:</h1>
-
-    <!-- Filter Form -->
-    <form method="get">
-        {{ filter.form.as_p }}
-        {% for key, value in request.GET.items %}
-            {% if key not in filter.form.fields.keys and key != 'page' %}
-                <input type="hidden" name="{{ key }}" value="{{ value }}">
-            {% endif %}
-        {% endfor %}
-        <button type="submit">Go</button>
-    </form>
-
-    <!-- Table -->
-    <table>
-
-        {% include "partials/sorting_table_head.html" with valid_sorting_fields=valid_sorting_fields current_sort=current_sort %}
-        <tbody>
-            {% for user in users %}
-                <tr>
-                    <td>{{ user.first_name }}</td>
-                    <td>{{ user.last_name }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.user_type }}</td>
-                    <td>
-                        {% if user.user_type != 'Admin' %}
-                            <a id="id_make_admin_{{ user.id }}" href="{% url 'make_admin' user.id %}">Make Administrator</a>
-                        {% endif %}
-                    </td>
-                    <td>
-                    {% if user.user_type == 'Tutor' %}
-                        <a href="{% url 'admin_tutor_calendar' user.id %}">View Tutor Calendar</a>
-                    {% elif user.user_type == 'Student' %}
-                        <a href="{% url 'admin_student_calendar' user.id %}">View Student Calendar</a>
-                    {% endif %}
-                    </td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="6">No users found.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <!-- Pagination -->
-   <div class="pagination">
-    {% if is_paginated %}
-        {% if page_obj.has_previous %}
-            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">First</a>
-            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Previous</a>
-        {% endif %}
-
-        <span>Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
-
-        {% if page_obj.has_next %}
-            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next</a>
-            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ paginator.num_pages }}">Last</a>
-        {% endif %}
-    {% endif %}
+    {% include 'partials/sorting_table_head.html' %}
+    {% include 'partials/user_table.html' %}
+    {% include 'partials/_pagination.html' %}
 </div>
-
-</body>
-</html>
+{% endblock %}

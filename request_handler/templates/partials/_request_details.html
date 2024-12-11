@@ -1,0 +1,40 @@
+<form id="filter-form" method="get" class="bg-dark text-white p-3 rounded mb-4">
+    <p id="requests-summary" class="text-white">
+        Showing {{ count }} out of {{ total }} requests:
+    </p>
+    <div class="d-flex flex-wrap justify-content-start align-items-center mb-4">
+
+        <div id="filter-allocated" class="me-2 mb-2">
+            <select name="allocated" class="form-select form-select-sm">
+                <option value="">All</option>
+                <option value="true" {% if request.GET.allocated == "true" %}selected{% endif %}>Allocated</option>
+                <option value="false" {% if request.GET.allocated == "false" %}selected{% endif %}>Unallocated</option>
+            </select>
+        </div>
+
+        <div id="filter-sort" class="me-2 mb-2">
+            <select name="sort" class="form-select form-select-sm">
+                <option value="">Sort By</option>
+                <option value="id" {% if request.GET.sort == "id" %}selected{% endif %}>ID (Ascending)</option>
+                <option value="-id" {% if request.GET.sort == "-id" %}selected{% endif %}>ID (Descending)</option>
+                <option value="student__first_name" {% if request.GET.sort == "student__first_name" %}selected{% endif %}>Student Name (A-Z)</option>
+                <option value="-student__first_name" {% if request.GET.sort == "-student__first_name" %}selected{% endif %}>Student Name (Z-A)</option>
+                <option value="knowledge_area" {% if request.GET.sort == "knowledge_area" %}selected{% endif %}>Requested Area (A-Z)</option>
+                <option value="-knowledge_area" {% if request.GET.sort == "-knowledge_area" %}selected{% endif %}>Requested Area (Z-A)</option>
+            </select>
+        </div>
+
+        <div id="filter-search" class="flex-grow-1 me-2 mb-2">
+            <input 
+                type="text" 
+                name="search" 
+                class="form-control form-control-sm" 
+                placeholder="Search requests..." 
+                value="{{ request.GET.search }}">
+        </div>
+
+        <div id="filter-apply" class="mb-2">
+            <button type="submit" class="btn btn-outline-light btn-sm">Apply</button>
+        </div>
+    </div>
+</form>

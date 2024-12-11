@@ -1,42 +1,55 @@
-<body>
-    <h1>Cancellation requests</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Student</th>
-                <th>Tutor</th>
-                <th>Lesson date</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for i in lessons.all %}
-            <tr>
-                <td>{{ i.id }}</td>
-                <td>{{ i.student.first_name }}  {{ i.student.last_name }}</td>
-                <td>{{ i.tutor.first_name }}  {{ i.tutor.last_name }}</td>
-                <td>{{ i.date }}</td>
-                <td>
-                    <ul>
-                        <form method="POST" action="{% url 'admin_cancel_lessons' %}">
-                            {% csrf_token %}
-                            <button type="submit">Accept</button>
-                            <input type="hidden" name="date" value="{{ i.date }}">
-                            <input type="hidden" name="lesson" value="{{ i.id }}">
-                            <input type="hidden" name="cancellation" value="accept">
-                        </form>
-                        <form method="POST" action="{% url 'admin_cancel_lessons' %}">
-                            {% csrf_token %}
-                            <button type="submit">Reject</button>
-                            <input type="hidden" name="date" value="{{ i.date }}">
-                            <input type="hidden" name="lesson" value="{{ i.id }}">
-                            <input type="hidden" name="cancellation" value="reject">
-                        </form>
-                    </ul>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</body>
+{% extends 'base_content.html' %}
+{% block content %}
+<div id="cancellation-requests-container">
+    <div class="container mt-5">
+        <div id="cancellation-requests-header" class="d-flex justify-content-between align-items-center mb-3">
+            <h1 id="cancellation-requests-title" class="display-5 text-white">
+                Cancellation Requests
+            </h1>
+            <a id="admin-dashboard-link" href="{% url 'admin_dash' %}" class="btn btn-outline-success">Go to the Administrator Dashboard</a>
+        </div>
+        <div id="cancellation-requests-table-container" class="table-responsive shadow rounded border">
+            <table id="cancellation-requests-table" class="table table-dark table-hover text-white align-middle mb-0">
+                <thead id="cancellation-requests-table-head" class="thead-light bg-secondary">
+                    <tr id="cancellation-requests-table-header-row">
+                        <th>ID</th>
+                        <th>Student</th>
+                        <th>Tutor</th>
+                        <th>Lesson Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="cancellation-requests-table-body">
+                    {% for i in lessons.all %}
+                    <tr id="cancellation-request-row-{{ i.id }}">
+                        <td id="request-id-{{ i.id }}">{{ i.id }}</td>
+                        <td id="student-name-{{ i.id }}">{{ i.student.first_name }} {{ i.student.last_name }}</td>
+                        <td id="tutor-name-{{ i.id }}">{{ i.tutor.first_name }} {{ i.tutor.last_name }}</td>
+                        <td id="lesson-date-{{ i.id }}">{{ i.date }}</td>
+                        <td id="action-buttons-{{ i.id }}">
+                            <ul class="list-unstyled d-flex gap-2 mb-0">
+                                <form id="accept-request-form-{{ i.id }}" method="POST" action="{% url 'admin_cancel_lessons' %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button id="accept-request-btn-{{ i.id }}" type="submit" class="btn btn-success btn-sm">Accept</button>
+                                    <input type="hidden" name="date" value="{{ i.date }}">
+                                    <input type="hidden" name="lesson" value="{{ i.id }}">
+                                    <input type="hidden" name="cancellation" value="accept">
+                                </form>
+                                <form id="reject-request-form-{{ i.id }}" method="POST" action="{% url 'admin_cancel_lessons' %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button id="reject-request-btn-{{ i.id }}" type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                    <input type="hidden" name="date" value="{{ i.date }}">
+                                    <input type="hidden" name="lesson" value="{{ i.id }}">
+                                    <input type="hidden" name="cancellation" value="reject">
+                                </form>
+                            </ul>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% include 'partials/_pagination.html' %}
+{% endblock %}

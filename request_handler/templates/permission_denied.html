@@ -1,13 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Permission Denied</title>
-</head>
-<body>
-    <h1>Permission Denied</h1>
-    {% if user_type == 'Tutor' %} <p>Tutors cannot edit/delete requests made by students.</p>
-    {% else %} <p>You do not have permission to see this page</p>
-    {% endif %}
-</body>
-</html>
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container vh-100 d-flex justify-content-center align-items-center">
+    <div class="card bg-dark text-white shadow-lg rounded-4" style="max-width: 500px; width: 90%;">
+        <div class="card-header bg-danger text-white text-center rounded-top">
+            <h1 class="h5 mb-0">Permission Denied</h1>
+        </div>
+        <div class="card-body text-center p-4">
+            {% if user_type == 'Tutor' %}
+                <p class="fs-5">Tutors cannot edit or delete requests made by students.</p>
+            {% else %}
+                <p class="fs-5">You do not have permission to view this page.</p>
+            {% endif %}
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-light mt-3 px-4 py-2">
+                Go Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

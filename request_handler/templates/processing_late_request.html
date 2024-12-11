@@ -1,14 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Processing Late Request</title>
-    <!-- Meta refresh tag to redirect after 5 seconds -->
-    <meta http-equiv="refresh" content="5;url={% url 'request_success' %}">
-</head>
-<body>
-    <p>Warning! Selected term was less than 2 weeks away. Late requests may not always be granted.</p>
-    <p>Please contact an administrator if this was a mistake</p>
-    <p>Your request has been submitted. Redirecting in 5 seconds...</p>
-</body>
-</html>
+{% extends 'base_content.html' %}
+{% load static %}
+{% block content %}
+<div id="processing-request-container" class="container py-5 d-flex justify-content-center align-items-center">
+    <div class="row w-100 justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div id="processing-request-card" class="card bg-dark text-white shadow-lg rounded-4 border">
+                <div id="processing-request-body" class="card-body text-center p-5">
+                    <div id="warning-icon" class="mb-4">
+                        <i class="bi bi-exclamation-triangle-fill text-warning" style="font-size: 3.5rem;"></i>
+                    </div>
+                    <h5 id="processing-title" class="card-title display-6 mb-3">Processing Request</h5>
+                    <p id="warning-message" class="card-text fs-5 text-warning mb-4">
+                        Warning! Selected term was less than 2 weeks away. Late requests may not always be granted.
+                    </p>
+                    <p id="contact-admin-message" class="card-text fs-6 mb-4">Please contact an administrator if this was a mistake.</p>
+                    <p id="redirect-message" class="card-text fs-6">Your request has been submitted. Redirecting in <strong>5 seconds...</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<meta http-equiv="refresh" content="5;url={% url 'request_success' %}">
+{% endblock %}

@@ -1,13 +1,49 @@
+<!-- partials/navbar.html -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
   <div class="container">
-    <a class="navbar-brand" href="{% url 'dashboard' %}">
-      Task Manager
+    <!-- Navbar Brand -->
+    <a class="navbar-brand" href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}">
+      <img src="/static/images/icon7.png" alt="Icon" style="width: 50px; height: 50px; position: relative; left: -10px;">
+
+      CodeConnect
+      
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    {% if user.is_authenticated %}
-      {% include 'partials/menu.html' %}
-    {% endif %}
+
+    <!-- Navbar Links and Dropdown -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+
+        <!-- Account Button (Visible Only if Authenticated) -->
+        {% if user.is_authenticated %}
+          <!-- Dashboard Button -->
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+          </li>
+        <!-- My Requests Button -->
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'view_requests' %}">My Requests</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-person-circle"></i> {{ user.username }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+              <li><a class="dropdown-item" href="{% url 'profile' %}">Change Profile</a></li>
+              <li><a class="dropdown-item" href="{% url 'password' %}">Change Password</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{% url 'log_out' %}">Log Out</a></li>
+            </ul>
+          </li>
+        {% else %}
+          <!-- Show Log In and Sign Up links for unauthenticated users -->
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'log_in' %}">Log In</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'sign_up' %}">Sign Up</a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
   </div>
 </nav>

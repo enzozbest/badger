@@ -5,61 +5,54 @@
     <title>Request ID: {{request.pk}}</title>
 </head>
 <body>
-    
-      {% if user_type == 'Student'%}
-          <h2>View each of your tutoring requests below </h2>
-      {% elif user_type == 'Tutor' %} 
-          <h2>View requests allocated to you </h2>
-      {% else %} 
-          <h2>Showing {{request_count}} Requests: </h2>
-      {% endif %}
+{% if user_type == 'Student'%} <h2>View each of your tutoring requests below </h2>
+            {% elif user_type == 'Tutor' %} <h2>View requests allocated to you </h2>
+            {% else %} <h2>Showing {{request_count}} Requests: </h2>
+            {% endif %}
           
-      {% if request.late == True %}
+          {% if request.late == True %}
           <h3> LATE REQUEST</h3>
-      {% endif %}
+          {% endif %}
           
-      {% if user_type != 'Student' %}
-          <p>Student name: {{request.student.full_name}}</p>
-          <p>Student email address: {{request.student.email}}</p>
-      {% endif %}
+          {% if user_type != 'Student' %}
+            <p>Student name: {{request.student.full_name}}</p>
+            <p>Student email address: {{request.student.email}}</p>
+          {% endif %}
 
-      <p>Knowledge area: {{request.knowledge_area}}</p>
+          <p>Knowledge area: {{request.knowledge_area}}</p>
 
-      {% if user_type == 'Student' %}
-          <p>Availability:</p>
-      {% else %} 
-          <p>Student Availability:</p>
-      {% endif %}
-      
-      <ul>
-           {% for day in request.availability.all %}
-           <li>{{day}}</li>
-            {% endfor %}
-      </ul>
-
-      <p>Term: {{request.term}}</p>
-      <p>Frequency: {{request.frequency}}</p>
-      <p>Duration: {{request.duration}}</p>
-      <p>Venue preference:</p>
+          {% if user_type == 'Student' %}<p>Availability:</p>
+          {% else %} <p>Student Availability:</p>
+          {% endif %}
           <ul>
-              {% for venue in request.venue_preference.all %}
-              <li>{{venue}}</li>
-              {% endfor %}
+               {% for day in request.availability.all %}
+               <li>{{day}}</li>
+                {% endfor %}
           </ul>
-      {% if user_type != 'Tutor' %}
-          {%if request.allocated %} <p>Status: Allocated to a Tutor</p>
-          {% else %} <p>Status: Not allocated to a Tutor yet</p>
-          {% endif %}
 
-          {% if request.tutor %} <p>Tutor: {{request.tutor.full_name}}</p>
-          {% else %} <p>Tutor: -</p>
-          {% endif %}
-          <a href="{% url 'edit_request' request.id %}" class="text-danger">Update</a>
-          <a href="{% url 'confirm_delete_request' request.id %}" class="text-danger">Delete</a>
-          {% if user_type == 'Admin' %}
-              <a href="{% url 'allocate_request' request.id %}">Allocate</a>
-          {% endif %}
-      {% endif %}
+          <p>Term: {{request.term}}</p>
+          <p>Frequency: {{request.frequency}}</p>
+          <p>Duration: {{request.duration}}</p>
+          <p>Venue preference:</p>
+              <ul>
+                  {% for venue in request.venue_preference.all %}
+                  <li>{{venue}}</li>
+                  {% endfor %}
+              </ul>
+          {% if user_type != 'Tutor' %}
+            {%if request.allocated %} <p>Status: Allocated to a Tutor</p>
+            {% else %} <p>Status: Not allocated to a Tutor yet</p>
+            {% endif %}
+
+            {% if request.tutor %} <p>Tutor: {{request.tutor.full_name}}</p>
+            {% else %} <p>Tutor: -</p>
+            {% endif %}
+              <a href="{% url 'edit_request' request.id %}" class="text-danger">Update</a>
+              <a href="{% url 'confirm_delete_request' request.id %}" class="text-danger">Delete</a>
+              {% if user_type == 'Admin' %}
+                <a href="{% url 'allocate_request' request.id %}">Allocate</a>
+              {% endif %}
+            {% endif %}
 <hr>
 
 </body>
