@@ -6,15 +6,16 @@ from django.urls import reverse
 
 from calendar_scheduler.models import Booking
 from request_handler.models import Request, Venue
+from user_system.fixtures.create_test_users import create_test_users
 from user_system.models.day_model import Day
 from user_system.models.user_model import User
 
 
 class AcceptRequestViewTestCase(TestCase):
     def setUp(self):
-        self.tutor = User.objects.create_user(username="@tutor", email="tutor@example.com", password="Password123")
-        self.student = User.objects.create_user(username="@student", email="student@example.com",
-                                                password="Password123")
+        create_test_users()
+        self.tutor = User.objects.get(user_type=User.ACCOUNT_TYPE_TUTOR)
+        self.student = User.objects.get(user_type=User.ACCOUNT_TYPE_STUDENT)
         self.day_monday, created = Day.objects.get_or_create(day="Monday")
         self.day_friday, created = Day.objects.get_or_create(day="Friday")
         self.venue_online, created = Venue.objects.get_or_create(venue="Online")
@@ -30,20 +31,17 @@ class AcceptRequestViewTestCase(TestCase):
             duration=60,
             is_recurring=False,
             knowledge_area="Robotics",
-             venue=self.venue_online,
+            venue=self.venue_online,
         )
-        self.client.login(username="@tutor", password="Password123")
+        self.client.force_login(self.tutor)
 
     # Test that a booking is successfully created and the associated request is deleted.
     def test_successful_request_handling(self):
         response = self.client.post(reverse('accept_request', args=[self.lesson_request.id]))
-
         bookings = Booking.objects.filter(tutor=self.tutor)
         self.assertEqual(len(bookings), 15)  # Weekly = 15 sessions
-
         with self.assertRaises(Request.DoesNotExist):
             Request.objects.get(id=self.lesson_request.id)
-
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse('view_requests'))
 
@@ -52,7 +50,6 @@ class AcceptRequestViewTestCase(TestCase):
     def test_weekly_booking_frequency(self, mock_datetime):
         self.lesson_request.frequency = 'Weekly'
         self.lesson_request.save()
-
         mock_datetime.today.return_value = datetime(2024, 8, 1)
         # Ensure other datetime methods work normally
         mock_datetime.combine.side_effect = lambda d, t: datetime.combine(d, t)
@@ -64,15 +61,14 @@ class AcceptRequestViewTestCase(TestCase):
 
     # Test the lesson frequency for biweekly bookings.
     @patch('request_handler.views.accept_request.datetime')
-    def test_biweekly_booking_frequency(self,mock_datetime):
+    def test_biweekly_booking_frequency(self, mock_datetime):
         self.lesson_request.frequency = 'Biweekly'
         self.lesson_request.day2 = self.day_friday
-
         self.lesson_request.save()
 
         mock_datetime.today.return_value = datetime(2024, 8, 1)
         mock_datetime.combine.side_effect = lambda d, t: datetime.combine(d, t)
-        response = self.client.post(reverse('accept_request', kwargs={'request_id': self.lesson_request.id}))
+        self.client.post(reverse('accept_request', kwargs={'request_id': self.lesson_request.id}))
 
         # Check the number of sessions created
         bookings = Booking.objects.all()
@@ -85,12 +81,11 @@ class AcceptRequestViewTestCase(TestCase):
             if str(i.date) != dates[0]:
                 matches = False
             dates.pop(0)
-
-        self.assertEqual(matches, True)
+        self.assertTrue(matches)
 
     # Test the lesson frequency for biweekly bookings with the first date being before the second
     @patch('request_handler.views.accept_request.datetime')
-    def test_biweekly_booking_frequency_later_date(self,mock_datetime):
+    def test_biweekly_booking_frequency_later_date(self, mock_datetime):
         self.lesson_request.frequency = 'Biweekly'
         self.lesson_request.day = self.day_friday
         self.lesson_request.day2 = self.day_monday
@@ -100,7 +95,7 @@ class AcceptRequestViewTestCase(TestCase):
         mock_datetime.today.return_value = datetime(2024, 8, 1)
         mock_datetime.combine.side_effect = lambda d, t: datetime.combine(d, t)
         response = self.client.post(reverse('accept_request', kwargs={'request_id': self.lesson_request.id}))
-        
+
         # Check the number of sessions created
         bookings = Booking.objects.all()
         self.assertEqual(bookings.count(), 30)  # Biweekly frequency should create 30 sessions
@@ -118,7 +113,7 @@ class AcceptRequestViewTestCase(TestCase):
 
     # Test the lesson frequency for fortnightly bookings.
     @patch('request_handler.views.accept_request.datetime')
-    def test_fortnightly_booking_frequency(self,mock_datetime):
+    def test_fortnightly_booking_frequency(self, mock_datetime):
         self.lesson_request.frequency = 'Fortnightly'
         self.lesson_request.save()
 
@@ -130,9 +125,9 @@ class AcceptRequestViewTestCase(TestCase):
         bookings = Booking.objects.all()
         self.assertEqual(bookings.count(), 7)  # Fortnightly frequency should create 7 sessions
 
-    #Test lesson frequency and redirect for lesson requests with no matching frequency
+    # Test lesson frequency and redirect for lesson requests with no matching frequency
     @patch('request_handler.views.accept_request.datetime')
-    def test_lesson_frequency_no_match(self,mock_datetime):
+    def test_lesson_frequency_no_match(self, mock_datetime):
         self.lesson_request.frequency = 'Monthly'
         self.lesson_request.save()
         mock_datetime.today.return_value = datetime(2024, 8, 1)
@@ -140,13 +135,12 @@ class AcceptRequestViewTestCase(TestCase):
         response = self.client.post(reverse('accept_request', kwargs={'request_id': self.lesson_request.id}))
         # Check the number of sessions created
         bookings = Booking.objects.all()
-        self.assertEqual(bookings.count(), 0) 
+        self.assertEqual(bookings.count(), 0)
         self.assertRedirects(response, reverse('view_requests'), status_code=302, target_status_code=200)
-
 
     # Test the january term bookings in January
     @patch('request_handler.views.accept_request.datetime')
-    def test_january_request_in_january(self,mock_datetime):
+    def test_january_request_in_january(self, mock_datetime):
         self.lesson_request.term = 'January'
         self.lesson_request.save()
         mock_datetime.today.return_value = datetime(2025, 1, 1)
@@ -154,11 +148,12 @@ class AcceptRequestViewTestCase(TestCase):
         response = self.client.post(reverse('accept_request', kwargs={'request_id': self.lesson_request.id}))
         # Check the number of sessions created
         bookings = Booking.objects.all()
-        self.assertEqual(bookings.count(), 15)  
-    
-    # Test the january term bookings in September
+        self.assertEqual(bookings.count(), 15)
+
+        # Test the january term bookings in September
+
     @patch('request_handler.views.accept_request.datetime')
-    def test_january_requests_in_september(self,mock_datetime):
+    def test_january_requests_in_september(self, mock_datetime):
         self.lesson_request.term = 'January'
         self.lesson_request.save()
         mock_datetime.today.return_value = datetime(2024, 9, 1)
@@ -166,11 +161,12 @@ class AcceptRequestViewTestCase(TestCase):
         response = self.client.post(reverse('accept_request', kwargs={'request_id': self.lesson_request.id}))
         # Check the number of sessions created
         bookings = Booking.objects.all()
-        self.assertEqual(bookings.count(), 15)  
-    
-    # Test the May term bookings in September
+        self.assertEqual(bookings.count(), 15)
+
+        # Test the May term bookings in September
+
     @patch('request_handler.views.accept_request.datetime')
-    def test_may_requests_in_september(self,mock_datetime):
+    def test_may_requests_in_september(self, mock_datetime):
         self.lesson_request.term = 'May'
         self.lesson_request.save()
         mock_datetime.today.return_value = datetime(2024, 9, 1)
@@ -178,12 +174,12 @@ class AcceptRequestViewTestCase(TestCase):
         response = self.client.post(reverse('accept_request', kwargs={'request_id': self.lesson_request.id}))
         # Check the number of sessions created
         bookings = Booking.objects.all()
-        self.assertEqual(bookings.count(), 15)  
+        self.assertEqual(bookings.count(), 15)
 
+        # Test the May term bookings in May
 
-    # Test the May term bookings in May
     @patch('request_handler.views.accept_request.datetime')
-    def test_may_requests_in_may(self,mock_datetime):
+    def test_may_requests_in_may(self, mock_datetime):
         self.lesson_request.term = 'May'
         self.lesson_request.save()
         mock_datetime.today.return_value = datetime(2025, 5, 1)
@@ -191,12 +187,12 @@ class AcceptRequestViewTestCase(TestCase):
         response = self.client.post(reverse('accept_request', kwargs={'request_id': self.lesson_request.id}))
         # Check the number of sessions created
         bookings = Booking.objects.all()
-        self.assertEqual(bookings.count(), 15)  
+        self.assertEqual(bookings.count(), 15)
 
+        # Test a term that doesn't match
 
-    # Test a term that doesn't match
     @patch('request_handler.views.accept_request.datetime')
-    def test_term_has_no_match(self,mock_datetime):
+    def test_term_has_no_match(self, mock_datetime):
         self.lesson_request.term = 'December'
         self.lesson_request.save()
         mock_datetime.today.return_value = datetime(2024, 9, 1)
@@ -204,7 +200,7 @@ class AcceptRequestViewTestCase(TestCase):
         response = self.client.post(reverse('accept_request', kwargs={'request_id': self.lesson_request.id}))
         # Check the number of sessions created
         bookings = Booking.objects.all()
-        self.assertEqual(bookings.count(), 0) 
+        self.assertEqual(bookings.count(), 0)
         self.assertRedirects(response, reverse('view_requests'), status_code=302, target_status_code=200)
 
     # Test that an error during booking is caught and handled.
@@ -229,11 +225,11 @@ class AcceptRequestViewTestCase(TestCase):
         response = self.client.post(reverse('accept_request', args=[self.lesson_request.id]))
         self.assertEqual(response.status_code, 404)
 
-     #Test lesson request identifiers when there are previous requests
+    # Test lesson request identifiers when there are previous requests
     def test_pre_lesson_identifiers(self):
-        #Post the current lesson request
+        # Post the current lesson request
         self.client.post(reverse('accept_request', args=[self.lesson_request.id]))
-        #Now try to post another
+        # Now try to post another
         self.lesson_request = Request.objects.create(
             id=2,
             allocated=True,
