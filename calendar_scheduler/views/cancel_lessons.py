@@ -75,6 +75,7 @@ def check_close_cancellation(year, month, day, recurring, lesson):
     else:
         close_date = True
     context = {"day":day, "month":month, "year":year, "recurring":recurring, "lesson":lesson, "close_date": close_date}
+    return context
 
 """ These classes allow users to cancel lessons from the calendar.
 
