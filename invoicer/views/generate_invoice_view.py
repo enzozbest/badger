@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse
+from django.shortcuts import render
 
 from admin_functions.helpers.calculate_cost import calculate_cost
 from invoicer.helpers import invoice_generator as ig
@@ -22,12 +23,16 @@ def generate_invoice_for_request(http_request: HttpRequest, tutoring_request_id:
     :return: an appropriate HTTP response.
     """
 
+    if http_request.user.user_type == User.ACCOUNT_TYPE_STUDENT or http_request.user.user_type == User.ACCOUNT_TYPE_TUTOR:
+        return render(http_request, 'permission_denied.html', status=403)
+
     request_obj = Request.objects.get(id=tutoring_request_id)
 
     if request_obj.invoice is not None:
-        return HttpResponse(f"Invoice already generated. "
-                            f"Found at: {OUTPUT_PATH / f'{request_obj.invoice_id}'}" if LOCAL_STORE else f'AWS S3 at invoices/pdfs/{request_obj.invoice_id}.pdf',
-                            status=204)
+        LOCAL_STORE = not settings.USE_AWS_S3
+        return render(http_request, 'invoice_already_generated.html', {
+            "path": f"{OUTPUT_PATH / f'{request_obj.invoice_id}' if LOCAL_STORE else f'AWS S3 at invoices/pdfs/{request_obj.invoice_id}.pdf'}"},
+                      status=409)
 
     # Get necessary parameters for invoice generation:
     student = request_obj.student

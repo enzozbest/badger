@@ -11,7 +11,7 @@
     <form method="POST">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Submit Rejection</button>
+        <button id="id_reject_request" type="submit">Submit Rejection</button>
     </form>
 
     <a href="{% url 'view_requests' %}">Back to Requests</a>
