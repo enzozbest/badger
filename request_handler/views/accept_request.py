@@ -45,6 +45,8 @@ class AcceptRequestView(LoginRequiredMixin, View):
                 booking_date = get_first_weekday(current_year+1,5,lesson_request.day)
             case "May" if current_month<6:
                 booking_date = get_first_weekday(current_year,5,lesson_request.day)
+            case _:
+                return redirect('view_requests')
 
         sessions = 0
         match lesson_request.frequency:
@@ -54,6 +56,8 @@ class AcceptRequestView(LoginRequiredMixin, View):
                 sessions = 30
             case "Fortnightly":
                 sessions = 7
+            case _:
+                return redirect('view_requests')
 
         # Retrieves the lesson_identifier of the last group of bookings
         last_identifier = Booking.objects.aggregate(Max('lesson_identifier'))['lesson_identifier__max']
