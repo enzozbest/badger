@@ -46,20 +46,15 @@ class AllUsersView(LoginRequiredMixin, SortingMixin, ListView):
         return context
 
     def get(self, request, *args, **kwargs):
-        # Fetch the queryset
         self.object_list = self.get_queryset()
-
-        # Apply pagination manually
         paginator = Paginator(self.object_list, self.paginate_by)
         page = request.GET.get('page', 1)
         try:
             page_obj = paginator.page(page)
         except (PageNotAnInteger, EmptyPage):
-            # Redirect to the last page if out of range
             last_page = paginator.num_pages
             return HttpResponseRedirect(f"{reverse('view_all_users')}?page={last_page}")
 
-        # Set `object_list` for the context
         self.object_list = page_obj
         return super().get(request, *args, **kwargs)
 
