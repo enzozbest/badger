@@ -1,9 +1,11 @@
+import os
+from unittest import skipIf
+
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.shortcuts import reverse
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import Select
 
@@ -15,11 +17,10 @@ from user_system.models.day_model import Day
 from user_system.models.user_model import User
 
 
+@skipIf(os.environ.get('GITHUB_ACTIONS') == 'true', 'These tests require headed browsers to work properly')
 class TestFunctionalAdminFunctions(StaticLiveServerTestCase):
     def setUp(self):
-        options = Options()
-        options.add_argument("--headless")
-        self.driver = webdriver.Firefox(options=options)
+        self.driver = webdriver.Firefox()
 
         create_test_users()
         self.student = User.objects.get(user_type='Student')

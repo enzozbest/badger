@@ -1,9 +1,11 @@
+import os
+from unittest import skipIf
+
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.shortcuts import reverse
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.options import Options
 
 from calendar_scheduler.models import Booking
 from code_tutors.test_selenium_functional_tests import log_in_via_form, logout, wait, wait_for_clickable, \
@@ -14,6 +16,7 @@ from user_system.fixtures.create_test_users import create_test_users
 from user_system.models.user_model import User
 
 
+@skipIf(os.environ.get('GITHUB_ACTIONS') == 'true', 'These tests require headed browsers to work properly')
 class TestFunctionalCalendarScheduler(StaticLiveServerTestCase):
     def setUp(self):
         create_test_users()
@@ -29,9 +32,7 @@ class TestFunctionalCalendarScheduler(StaticLiveServerTestCase):
         self.allocated_request = Request.objects.get(allocated=True)
         self.unallocated_request = Request.objects.get(allocated=False)
 
-        options = Options()
-        options.add_argument("--headless")
-        self.driver = webdriver.Firefox(options=options)
+        self.driver = webdriver.Firefox()
 
     def tearDown(self):
         self.driver.quit()

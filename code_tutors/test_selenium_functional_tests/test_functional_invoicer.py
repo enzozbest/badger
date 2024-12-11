@@ -1,4 +1,5 @@
 import os
+from unittest import skipIf
 
 from django.conf import settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
@@ -7,7 +8,6 @@ from django.test import override_settings
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.options import Options
 
 from code_tutors.test_selenium_functional_tests import log_in_via_form, logout, wait, wait_for_clickable, \
     wait_for_element
@@ -19,6 +19,7 @@ from user_system.models.user_model import User
 
 
 @override_settings(USE_AWS_S3=False)
+@skipIf(os.environ.get('GITHUB_ACTIONS') == 'true', 'These tests require headed browsers to work properly')
 class TestFunctionalRegistration(StaticLiveServerTestCase):
     def setUp(self):
         create_test_users()
@@ -33,9 +34,7 @@ class TestFunctionalRegistration(StaticLiveServerTestCase):
         self.allocated_request = Request.objects.get(allocated=True)
         self.unallocated_request = Request.objects.get(allocated=False)
 
-        options = Options()
-        options.add_argument("--headless")
-        self.driver = webdriver.Firefox(options=options)
+        self.driver = webdriver.Firefox()
 
     def tearDown(self):
         self.driver.quit()
