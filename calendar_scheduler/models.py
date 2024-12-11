@@ -29,6 +29,8 @@ class Booking(models.Model):
     date = models.DateField(null=False, blank=False, default=datetime.date(1900, 1, 1))
     title = models.CharField(max_length=255, null=False, default="Tutor session")
     cancellation_requested = models.BooleanField(blank=False, default=False)
+    start = models.DateTimeField(null=True, blank=True)
+    end = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.student} is taught by {self.tutor} in the term {self.term}."
