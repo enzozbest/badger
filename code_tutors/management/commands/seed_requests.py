@@ -11,7 +11,7 @@ from request_handler.models import Request
 
 
 class Command(BaseCommand):
-    REQUEST_COUNT = 100
+    REQUEST_COUNT = 1000
 
     def __init__(self):
         self.faker = Faker('en_GB')

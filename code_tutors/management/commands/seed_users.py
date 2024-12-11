@@ -10,7 +10,7 @@ from user_system.models.user_model import User
 
 
 class Command(BaseCommand):
-    USER_COUNT = 300
+    USER_COUNT = 3000
     DEFAULT_PASSWORD = 'Password123'
     help = 'Seeds the database with sample data'
 

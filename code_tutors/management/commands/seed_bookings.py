@@ -11,7 +11,7 @@ from request_handler.models import Venue
 from datetime import timedelta
 
 class Command(BaseCommand):
-    BOOKING_COUNT = 50
+    BOOKING_COUNT = 500
 
     def __init__(self):
         self.faker = Faker('en_GB')
