@@ -1,10 +1,12 @@
+from datetime import date, datetime, time, timedelta
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Max
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
-from django.contrib.auth.mixins import LoginRequiredMixin
-from datetime import date,datetime,timedelta, time
-from request_handler.models import Request
+
 from calendar_scheduler.models import Booking
-from django.db.models import Max
+from request_handler.models import Request
 
 
 def get_first_weekday(year, month, target_day):
@@ -14,13 +16,13 @@ def get_first_weekday(year, month, target_day):
     """
     # Start with the first day of the month
     first_day = date(year, month, 1)
-    first_day_weekday = first_day.weekday() 
+    first_day_weekday = first_day.weekday()
     weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     day = weekdays.index(target_day.day)
     days_to_target = (day - first_day_weekday + 7) % 7
     target = first_day + timedelta(days=days_to_target)
-    lesson_time = time(12,0)
-    return datetime.combine(target,lesson_time)
+    lesson_time = time(12, 0)
+    return datetime.combine(target, lesson_time)
 
 
 class AcceptRequestView(LoginRequiredMixin, View):
@@ -38,11 +40,11 @@ class AcceptRequestView(LoginRequiredMixin, View):
         new_identifier = self.get_last_identifier()
 
         # Now add each of the sessions, starting with the booking_date
-        for i in range(0,sessions):
+        for i in range(0, sessions):
             try:
                 # Create a new Booking object based on the allocated request
                 Booking.objects.create(
-                    lesson_identifier = new_identifier,
+                    lesson_identifier=new_identifier,
                     tutor=request.user,
                     student=lesson_request.student,
                     knowledge_area=lesson_request.knowledge_area,
@@ -53,9 +55,9 @@ class AcceptRequestView(LoginRequiredMixin, View):
                     duration=lesson_request.duration,
                     is_recurring=lesson_request.is_recurring,
                     date=booking_date.date(),
-                    start= booking_date,
+                    start=booking_date,
                     end=booking_date,
-                    title = f"Tutor session between {lesson_request.student.first_name} {lesson_request.student.last_name} and {lesson_request.tutor_name}"
+                    title=f"Tutor session between {lesson_request.student.first_name} {lesson_request.student.last_name} and {lesson_request.tutor_name}"
                 )
                 booking_date = self.match_lesson_frequency(lesson_request, booking_date)
 
@@ -85,7 +87,6 @@ class AcceptRequestView(LoginRequiredMixin, View):
 
     def match_term(self, lesson_request, first_term, current_year, current_month):
         """Matches the term of the request to a term that exists in the year."""
-
         match first_term:
             case "September":
                 booking_date = get_first_weekday(current_year, 9, lesson_request.day)
@@ -97,6 +98,8 @@ class AcceptRequestView(LoginRequiredMixin, View):
                 booking_date = get_first_weekday(current_year + 1, 5, lesson_request.day)
             case "May" if current_month < 6:
                 booking_date = get_first_weekday(current_year, 5, lesson_request.day)
+            case _:
+                booking_date = None
         return booking_date
 
     def calculate_lesson_frequency(self, lesson_request):
@@ -109,6 +112,8 @@ class AcceptRequestView(LoginRequiredMixin, View):
                 return 30
             case "Fortnightly":
                 return 7
+            case _:
+                return 0
 
     def match_lesson_frequency(self, lesson_request, booking_date):
         """Matches the frequency of the request to put into the calendar."""
