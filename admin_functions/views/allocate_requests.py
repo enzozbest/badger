@@ -62,21 +62,18 @@ class AllocateRequestView(LoginRequiredMixin, View):
         day2_id = int(day2_data) if day2_data else None
         form = create_form_post(lesson_request, day1_id, day2_id, venues, http_request.POST)
 
-        if form.is_valid():
-            tutor = form.cleaned_data.get('tutor')
-            venue = form.cleaned_data.get('venue')
-            if find_form_errors_post(form, tutor, venue): return HttpResponseBadRequest(form.errors)
-            day1 = Day.objects.get(id=day1_id) if day1_id else None
-            day2 = Day.objects.get(id=day2_id) if day2_id else None
-            _allocate(lesson_request, tutor, venue, day1, day2)
-            _update_availabilities(lesson_request, day1, day2)
+        valid_form = form.is_valid()
+        if valid_form and process_allocation(form, lesson_request, day1_id, day2_id): 
+            return HttpResponseBadRequest(form.errors)
+        elif valid_form:
             return redirect("view_requests")
+        else:
+            return render(http_request, "allocate_request.html", {
+                "form": form,
+                "lesson_request": lesson_request,
+                "venue_preferences": venue_preference_str(venues),
+            })
 
-        return render(http_request, "allocate_request.html", {
-            "form": form,
-            "lesson_request": lesson_request,
-            "venue_preferences": venue_preference_str(venues),
-        })
 
     def dispatch(self, request, *args, **kwargs):
         """Customise the dispatch method of the LoginRequiredMixin
@@ -93,6 +90,7 @@ class AllocateRequestView(LoginRequiredMixin, View):
 
 # -HELPERS- #
 def get_required_data_get(lesson_request: Request, http_request: HttpRequest) -> tuple:
+    """ Returns the data provided through the get request """
     student = lesson_request.student
     day1 = http_request.GET.get("day1", None)
     day2 = http_request.GET.get("day2", None)
@@ -149,6 +147,9 @@ def get_venue_preference(venue_preference: QuerySet) -> QuerySet:
 
 
 def get_suitable_tutors(request_id: int, day1_id: int, day2_id: int) -> QuerySet:
+    """ Returns any tutors from the database which are suitable to be allocated to the request 
+    Depends on their day availability, knowledge_areas and hourly rates
+    """
     lesson_request = get_object_or_404(Request, id=request_id)
     if find_impediments(day1_id, lesson_request.frequency, day2_id):
         return User.objects.none()
@@ -158,15 +159,18 @@ def get_suitable_tutors(request_id: int, day1_id: int, day2_id: int) -> QuerySet
     knowledge_area_ids = KnowledgeArea.objects.filter(subject=knowledge_area).values_list('id', flat=True)
     max_hourly_rate = student.student_max_rate
 
-    if lesson_request.frequency == 'Biweekly':
-        availability_query = partial(Day.objects.filter, Q(id=day1_id) | Q(id=day2_id))
-    else:
-        availability_query = partial(Day.objects.filter, id=day1_id)
+    availability_query = get_availability(lesson_request, day1_id, day2_id)
 
     return get_tutors(knowledge_area_ids, max_hourly_rate, availability_query)
 
 
-#
+def get_availability(lesson_request, day1_id, day2_id):
+    if lesson_request.frequency == 'Biweekly':
+        return partial(Day.objects.filter, Q(id=day1_id) | Q(id=day2_id))
+    else:
+        return partial(Day.objects.filter, id=day1_id)
+
+
 def get_tutors(knowledge_area_ids, max_hourly_rate, availability_query):
     return User.objects.filter(
         user_type="Tutor",
@@ -210,3 +214,16 @@ def _update_availabilities(lesson_request: Request, day1: Day, day2: Day) -> Non
     lesson_request.student.save()
     lesson_request.tutor.save()
     lesson_request.save()
+
+
+def process_allocation(form, lesson_request, day1_id, day2_id):
+    tutor = form.cleaned_data.get('tutor')
+    venue = form.cleaned_data.get('venue')
+    if find_form_errors_post(form, tutor, venue):
+        return "Errors"
+    else:
+        day1 = Day.objects.get(id=day1_id) if day1_id else None
+        day2 = Day.objects.get(id=day2_id) if day2_id else None
+        _allocate(lesson_request, tutor, venue, day1, day2)
+        _update_availabilities(lesson_request, day1, day2)
+        return None
