@@ -14,7 +14,6 @@ def get_first_weekday(year, month, target_day):
 
     Returns a date object for the first occurrence of the specified weekday.
     """
-    # Start with the first day of the month
     first_day = date(year, month, 1)
     first_day_weekday = first_day.weekday()
     weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
