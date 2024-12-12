@@ -86,7 +86,8 @@ class CreateRequestView(LoginRequiredMixin, View):
                 student=http_request.user,
                 group_request_id=id,
                 term=term,
-                knowledge_area = form.cleaned_data['knowledge_area']
+                knowledge_area = form.cleaned_data['knowledge_area'],
+                frequency=form.cleaned_data['frequency']
                 
             )
             request_instance.save()
