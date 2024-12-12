@@ -9,12 +9,7 @@ from calendar_scheduler.views.cancel_lessons import cancel_day, cancel_recurring
 from user_system.fixtures import create_test_users
 from user_system.models.user_model import User
 
-""" Class to represent the cancelling of lessons
-
-This class is used as a view for the website. It creates multiple bookings and attempts to delete them in multiple ways
-and by multiple users, as the functionality works in the cancel_lessons view.
-"""
-
+""" Class to represent testing the cancelling of lessons."""
 
 @override_settings(USE_AWS_S3=False)
 class CancelLessonsViewTests(TestCase):
@@ -151,6 +146,19 @@ class CancelLessonsViewTests(TestCase):
         lessons_in_march = Booking.objects.filter(lesson_identifier="2", date__month=3)
         self.assertEqual(len(lessons_in_march), 0)
 
+    # Test that invalid months default to working as the first term of the year.
+    def test_invalid_months_in_request(self):
+        response = self.client.post(reverse('tutor_cancel_lessons'), {
+            'day': 3,
+            'month':20,
+            'year': 2025,
+            'lesson': '2',
+            'cancellation': 'term'
+        })
+
+        default_lessons = Booking.objects.filter(lesson_identifier="2", date__month=20)
+        self.assertEqual(len(default_lessons), 0)
+
     # Test the POST request for cancelling all lessons in the May term.
     def test_post_cancel_term_may(self):
         response = self.client.post(reverse('tutor_cancel_lessons'), {
@@ -227,12 +235,7 @@ class CancelLessonsViewTests(TestCase):
         self.assertFalse(Booking.objects.filter(lesson_identifier='1').exists())
 
 
-""" Class to represent the cancelling of lessons for admins
-
-This class is used as a view for the website. It creates multiple bookings and attempts to delete them in multiple ways
-through an admin (and as other forbidden users), as the functionality works in the cancel_lessons view.
-"""
-
+""" Class to test the cancelling of lessons for admins."""
 
 class AdminCancelLessonsViewTest(TestCase):
     def setUp(self):
@@ -342,3 +345,70 @@ class AdminCancelLessonsViewTest(TestCase):
         self.assertEqual(response.status_code, 500)
         self.assertIn(f"Error processing cancellation: No booking found for lesson_id: 1 on {expected_date}",
                       response.content.decode())
+
+"""Class to test the POST method of the cancel lessons view."""
+
+class TestPostMethod(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+        self.student = User.objects.create_user(username="@student_user", password="Password123", email="student@example.com")
+        self.student.user_type = User.ACCOUNT_TYPE_STUDENT
+        self.student.save()
+
+        self.tutor = User.objects.create_user(username="@tutor_user", password="Password123", email="tutor@example.com")
+        self.tutor.user_type = User.ACCOUNT_TYPE_TUTOR
+        self.tutor.save()
+
+        self.admin = User.objects.create_user(username="@admin_user", password="Password123", email="admin@example.com")
+        self.admin.user_type = User.ACCOUNT_TYPE_ADMIN
+        self.admin.save()
+
+        self.booking = Booking.objects.create(
+            lesson_identifier=1, student=self.student, tutor=self.tutor, cancellation_requested=True)
+
+    # Tests that a student user is redirected when cancelling.
+    def test_student_cancel_redirect(self):
+        self.client.login(username="@student_user", password="Password123")
+        response = self.client.post(reverse('student_cancel_lessons'))
+        self.assertRedirects(response, reverse('student_calendar'))
+
+    # Test that a tutor user is redirected when cancelling.
+    def test_tutor_cancel_redirect(self):
+        self.client.login(username="@tutor_user", password="Password123")
+        response = self.client.post(reverse('tutor_cancel_lessons'))
+        self.assertRedirects(response, reverse('tutor_calendar'))
+
+    # Test that an admin can accept the cancellation request.
+    def test_admin_accept_cancellation(self):
+        self.client.login(username="@admin_user", password="Password123")
+        response = self.client.post(reverse('admin_cancel_lessons'), {
+            'cancellation': 'accept',
+            'lesson': self.booking.id
+        })
+
+        self.assertFalse(Booking.objects.filter(id=self.booking.id).exists())
+        self.assertRedirects(response, reverse('view_cancellation_requests'))
+
+    # Test that an admin can reject a cancellation request.
+    def test_admin_reject_cancellation(self):
+        self.client.login(username="@admin_user", password="Password123")
+        response = self.client.post(reverse('admin_cancel_lessons'), {
+            'cancellation': 'reject',
+            'lesson': self.booking.id
+        })
+
+        self.booking.refresh_from_db()
+        self.assertFalse(self.booking.cancellation_requested)
+        self.assertRedirects(response, reverse('view_cancellation_requests'))
+
+    # Test that an invalid cancellation type is redirected (testing else statement)
+    def test_admin_invalid_cancellation(self):
+        self.client.login(username="@admin_user", password="Password123")
+        response = self.client.post(reverse('admin_cancel_lessons'), {
+            'cancellation': 'invalid',
+            'lesson': self.booking.id
+        })
+
+        self.booking.refresh_from_db()
+        self.assertRedirects(response, reverse('dashboard'))
