@@ -83,4 +83,4 @@ class TestPaymentStatus(TestCase):
         with open(self.path, 'rb') as file:
             self.assertIsNotNone(file)
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.content, b"Invoice generated successfully!")
+        self.assertTemplateUsed(response, "invoice_generated.html")
