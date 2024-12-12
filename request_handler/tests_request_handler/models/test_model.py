@@ -5,7 +5,8 @@ from django.test import TestCase
 class RequestModelTest(TestCase):
     def setUp(self):
         from user_system.models.user_model import User
-        from request_handler.models import Request, Venue
+        from request_handler.models.request_model import Request
+        from request_handler.models.venue_model import Venue
 
         self.user = User.objects.create_user(username='@johndoe', email='johndoe@example.org', password='Password123')
         self.online = Venue.objects.create(venue='Online')
@@ -65,6 +66,8 @@ class RequestModelTest(TestCase):
 
     def test_allocated(self):
         self.request.allocated = True
+        self.request.save()
+        self.request.refresh_from_db()
         str(self.request)
         self.assertEqual(self.request.allocated_string, "Yes")
 

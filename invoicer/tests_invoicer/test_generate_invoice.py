@@ -7,7 +7,10 @@ from django.test import TestCase, override_settings
 
 from invoicer.helpers.generate_invoice_id import generate_invoice_id
 from invoicer.models import get_latest_id_number
-from request_handler.models import Request, Venue
+from request_handler.models.venue_model import Venue
+
+Venue
+from request_handler.models.request_model import Request
 from user_system.fixtures import create_test_users as create_fixtures
 from user_system.models.day_model import Day
 from user_system.models.knowledge_area_model import KnowledgeArea
@@ -59,7 +62,7 @@ class TestGenerateInvoice(TestCase):
         with open(self.path, 'rb') as file:
             self.assertIsNotNone(file)
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.content, b"Invoice generated successfully!")
+        self.assertTemplateUsed(response, "invoice_generated.html")
 
 
 def generate_invoice(client, admin, request_id) -> HttpResponse:

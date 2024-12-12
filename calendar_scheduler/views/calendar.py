@@ -11,7 +11,8 @@ from calendar_scheduler.models import Booking
 from user_system.models.user_model import User
 
 def get_month_days(year: int, month: int):
-    ''' Returns all the days for a particular month as a list, per the year and month parameters '''
+    """ Returns all the days for a particular month as a list, per the year and month parameters."""
+
     # Get the first day of the month and the total days in the month
     first_day = datetime(year, month, 1)
     last_day = datetime(year, month + 1, 1) if month != 12 else datetime(year + 1, 1, 1)
@@ -39,7 +40,7 @@ def get_month_days(year: int, month: int):
     return month_days
 
 def get_month_name(month_number: int):
-    ''' Returns the name of the month corresponding to the passed number e.g. get_month_name(4) returns April '''
+    """ Returns the name of the month corresponding to the passed number e.g. get_month_name(4) returns April."""
     MONTHS = {
         1: "January", 2: "February", 3: "March", 4: "April",
         5: "May", 6: "June", 7: "July", 8: "August",
@@ -48,13 +49,13 @@ def get_month_name(month_number: int):
     return MONTHS.get(month_number, "Invalid month")
 
 def get_week_days():
-    ''' Returns the week days of the current week '''
+    """ Returns the week days of the current week """
     today = date.today()
     start_of_week = today - timedelta(days=today.weekday())
     return [start_of_week + timedelta(days=i) for i in range(7)]
 
 def compute_months(month:int, year:int):
-    """ Caclulates the previous and next months and years for the calendar display
+    """ Calculates the previous and next months and years for the calendar display
     This allows users to click between each month on the calendar
     """
     # Ensure month/year remain valid
@@ -74,7 +75,7 @@ def compute_months(month:int, year:int):
     return [prev_month, prev_year, next_month, next_year], month, year
 
 def produce_month_events(request: HttpRequest, year: int, month: int, user_for_calendar: User):
-    ''' Collates all the events for the given month into an events list'''
+    """ Collates all the events for the given month into an events list."""
     events = []
     for day in range(1, 31):
         try:

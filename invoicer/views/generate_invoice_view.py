@@ -7,7 +7,7 @@ from admin_functions.helpers.calculate_cost import calculate_cost
 from invoicer.helpers import invoice_generator as ig
 from invoicer.helpers.generate_invoice_id import generate_invoice_id
 from invoicer.models import Invoice, get_latest_id_number
-from request_handler.models import Request
+from request_handler.models.request_model import Request
 from user_system.models.user_model import User
 
 LOCAL_STORE = not settings.USE_AWS_S3
@@ -48,8 +48,7 @@ def generate_invoice_for_request(http_request: HttpRequest, tutoring_request_id:
     request_obj.save()
     ig.generate_invoice(request_obj)
 
-    return HttpResponse("Invoice generated successfully!", status=201)
-
+    return render(http_request, 'invoice_generated.html', status=201)
 
 def create_invoice_object(student: User, invoice_id: str, total_cost: float) -> Invoice:
     return Invoice.objects.create(invoice_id=invoice_id,

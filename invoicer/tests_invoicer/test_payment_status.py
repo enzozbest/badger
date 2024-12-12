@@ -8,7 +8,7 @@ from django.test import TestCase, override_settings
 from invoicer.helpers.generate_invoice_id import generate_invoice_id
 from invoicer.models import get_latest_id_number
 from request_handler.fixtures.create_test_requests import create_test_requests
-from request_handler.models import Request
+from request_handler.models.request_model import Request
 from user_system.fixtures.create_test_users import create_test_users
 from user_system.models.user_model import User
 
@@ -83,4 +83,4 @@ class TestPaymentStatus(TestCase):
         with open(self.path, 'rb') as file:
             self.assertIsNotNone(file)
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.content, b"Invoice generated successfully!")
+        self.assertTemplateUsed(response, "invoice_generated.html")

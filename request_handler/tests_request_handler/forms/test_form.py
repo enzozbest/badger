@@ -5,8 +5,11 @@ from django.forms import ModelMultipleChoiceField
 from django.test import TestCase
 
 from request_handler.forms import RequestForm
-from request_handler.models import Venue
+from request_handler.models.venue_model import Venue
+
+Venue
 from user_system.models.day_model import Day
+
 
 class TestRequestForm(TestCase):
     def setUp(self):

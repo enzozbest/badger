@@ -11,7 +11,10 @@ from calendar_scheduler.models import Booking
 from code_tutors.test_selenium_functional_tests import log_in_via_form, logout, wait, wait_for_clickable, \
     wait_for_element
 from request_handler.fixtures.create_test_requests import create_test_requests
-from request_handler.models import Request, Venue
+from request_handler.models.venue_model import Venue
+
+Venue
+from request_handler.models.request_model import Request
 from user_system.fixtures.create_test_users import create_test_users
 from user_system.models.user_model import User
 

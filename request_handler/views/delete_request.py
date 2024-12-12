@@ -4,7 +4,7 @@ from django.http import Http404, HttpRequest, HttpResponse, HttpResponseNotAllow
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
-from request_handler.models import Request
+from request_handler.models.request_model import Request
 
 
 class DeleteRequestView(LoginRequiredMixin, View):
@@ -40,7 +40,7 @@ class DeleteRequestView(LoginRequiredMixin, View):
                 return render(wsgi_request, 'permission_denied.html', status=403)
         except Http404:
             pass
-        
+
         return super().dispatch(wsgi_request, *args, **kwargs)
 
 

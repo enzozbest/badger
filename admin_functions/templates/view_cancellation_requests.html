@@ -8,6 +8,30 @@
             </h1>
             <a id="admin-dashboard-link" href="{% url 'admin_dash' %}" class="btn btn-outline-success">Go to the Administrator Dashboard</a>
         </div>
+
+        <form id="filter-form" method="get" class="bg-dark text-white p-3 rounded mb-4">
+
+            <div class="d-flex flex-wrap justify-content-start align-items-center mb-4">
+                <div id="filter-sort" class="flex-grow-1 me-2 mb-2">
+                    <select name="sort" class="form-select form-select-sm">
+                        <option value="">Sort By</option>
+                        <option value="id" {% if request.GET.sort == "id" %}selected{% endif %}>ID (Ascending)</option>
+                        <option value="-id" {% if request.GET.sort == "-id" %}selected{% endif %}>ID (Descending)</option>
+                        <option value="student__first_name" {% if request.GET.sort == "student__first_name" %}selected{% endif %}>Student Name (A-Z)</option>
+                        <option value="-student__first_name" {% if request.GET.sort == "-student__first_name" %}selected{% endif %}>Student Name (Z-A)</option>
+                        <option value="tutor__first_name" {% if request.GET.sort == "tutor__first_name" %}selected{% endif %}>Tutor Name (A-Z)</option>
+                        <option value="-tutor__first_name" {% if request.GET.sort == "-tutor__first_name" %}selected{% endif %}>Tutor Name (Z-A)</option>
+                    </select>
+                </div>
+        
+        
+                <div id="filter-apply" class="mb-2">
+                    <button type="submit" class="btn btn-outline-light btn-sm">Apply</button>
+                </div>
+            </div>
+        </form>
+        
+
         <div id="cancellation-requests-table-container" class="table-responsive shadow rounded border">
             <table id="cancellation-requests-table" class="table table-dark table-hover text-white align-middle mb-0">
                 <thead id="cancellation-requests-table-head" class="thead-light bg-secondary">
@@ -20,9 +44,9 @@
                     </tr>
                 </thead>
                 <tbody id="cancellation-requests-table-body">
-                    {% for i in lessons.all %}
+                    {% for i in cancelled %}
                     <tr id="cancellation-request-row-{{ i.id }}">
-                        <td id="request-id-{{ i.id }}">{{ i.id }}</td>
+                        <td id="request-id-{{ i.id }}">#{{ i.id }}</td>
                         <td id="student-name-{{ i.id }}">{{ i.student.first_name }} {{ i.student.last_name }}</td>
                         <td id="tutor-name-{{ i.id }}">{{ i.tutor.first_name }} {{ i.tutor.last_name }}</td>
                         <td id="lesson-date-{{ i.id }}">{{ i.date }}</td>
