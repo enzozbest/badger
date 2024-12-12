@@ -20,7 +20,7 @@ class ViewCancellationRequests(LoginRequiredMixin, ListView, SortingMixin):
 
     def get_queryset(self):
         """Method that queries a cancelled bookings"""
-        queryset = super().get_queryset().filter(cancellation_requested=True)
+        queryset = super().get_queryset().filter(cancellation_requested=True).order_by('pk')
         return queryset
 
     def dispatch(self, request, *args, **kwargs):
@@ -30,6 +30,5 @@ class ViewCancellationRequests(LoginRequiredMixin, ListView, SortingMixin):
             return render(request, 'permission_denied.html', status=403)
         return super().dispatch(request, *args, **kwargs)
 
-
-def post(self, request: HttpRequest) -> HttpResponse:
-    return HttpResponseNotAllowed("This URL only accepts GET requests.", status=405, content=b'Not Allowed')
+    def post(self, request: HttpRequest) -> HttpResponse:
+        return HttpResponseNotAllowed("This URL only accepts GET requests.", status=405, content=b'Not Allowed')

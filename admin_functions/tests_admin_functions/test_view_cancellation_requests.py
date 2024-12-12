@@ -30,12 +30,13 @@ class ViewCancellationRequestsTestCase(TestCase):
 
     def test_unauthenticated_user_cannot_view_requests(self):
         response = self.client.get(reverse('view_cancellation_requests'), follow=True)
-        self.assertRedirects(response, reverse('log_in'), status_code=302, target_status_code=200)
+        self.assertRedirects(response, f"{reverse('log_in')}?next={reverse('view_cancellation_requests')}",
+                             status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'log_in.html')
 
     def test_post_requests_not_accepted(self):
         self.client.login(username=self.admin.username, password='Password123')
-        response = self.client.post(reverse('view_cancellation_requests'))
+        response = self.client.post(f"{reverse('view_cancellation_requests')}")
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response.content, b'Not Allowed')
 
