@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 
-from request_handler.models import Request, User
+from request_handler.models.request_model import Request
+from user_system.models.user_model import User
 
 
 def calculate_cost(tutor: User, request_id: int) -> float:

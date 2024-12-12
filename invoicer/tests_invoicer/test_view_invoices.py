@@ -7,7 +7,7 @@ from django.test import TestCase, override_settings
 from invoicer.helpers.generate_invoice_id import generate_invoice_id
 from invoicer.models import Invoice, get_latest_id_number
 from request_handler.fixtures.create_test_requests import create_test_requests
-from request_handler.models import Request
+from request_handler.models.request_model import Request
 from user_system.fixtures.create_test_users import create_test_users
 from user_system.models.user_model import User
 

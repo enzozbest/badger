@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 
 from calendar_scheduler.models import Booking
-from request_handler.models import Request
+from request_handler.models.request_model import Request
 
 
 def get_first_weekday(year, month, target_day):
@@ -14,7 +14,6 @@ def get_first_weekday(year, month, target_day):
 
     Returns a date object for the first occurrence of the specified weekday.
     """
-    # Start with the first day of the month
     first_day = date(year, month, 1)
     first_day_weekday = first_day.weekday()
     weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]

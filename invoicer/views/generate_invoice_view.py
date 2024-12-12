@@ -7,7 +7,7 @@ from admin_functions.helpers.calculate_cost import calculate_cost
 from invoicer.helpers import invoice_generator as ig
 from invoicer.helpers.generate_invoice_id import generate_invoice_id
 from invoicer.models import Invoice, get_latest_id_number
-from request_handler.models import Request
+from request_handler.models.request_model import Request
 from user_system.models.user_model import User
 
 LOCAL_STORE = not settings.USE_AWS_S3
