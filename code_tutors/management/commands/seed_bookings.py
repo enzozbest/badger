@@ -84,18 +84,15 @@ class Command(BaseCommand):
         if not data['is_recurring']:
             self.create_terms_bookings(data,data['term'])
         else:
-            print('recurring start term ',data['term'])
             term = data['term']
             self.create_terms_bookings(data,term)
             if term == "September":
                 term = "January"
                 self.date = get_first_weekday(2025, 1, data['day']).date()
-                print(self.date)
                 self.create_terms_bookings(data,term)
             if term == "January":
                 term = "May"
                 self.date = get_first_weekday(2025, 5, data['day']).date()
-                print(self.date)
                 self.create_terms_bookings(data,term)
 
     def create_terms_bookings(self,data, lesson_term):
@@ -113,11 +110,10 @@ class Command(BaseCommand):
                     case "Fortnightly":
                         self.date += timedelta(days=14)
         except Exception as e:
-            print(e)
+            pass
 
     def create_booking(self, data, freq, lesson_term):
         try:
-            print(self.date)
             booking_object = Booking.objects.create(
                 student=data['student'],
                 tutor=data['tutor'],
@@ -134,4 +130,4 @@ class Command(BaseCommand):
                 lesson_identifier=self.lesson_identifier,
             )
         except Exception as e:
-            print(e)
+            pass

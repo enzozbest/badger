@@ -42,7 +42,6 @@ class AcceptRequestView(LoginRequiredMixin, View):
             booking_date = self.get_booking_start_date(lesson_request)
             result = self.create_bookings(sessions, new_identifier, request, lesson, booking_date)
             if result != "":
-                print(result)
                 return redirect('view_requests')
             else:
                 lesson.delete()
@@ -125,6 +124,7 @@ class AcceptRequestView(LoginRequiredMixin, View):
         return lessons
 
     def create_bookings(self, sessions, new_identifier, request, lesson_request, booking_date):
+        """ Creates the individual booking objects which are grouped toge"""
         # Now add each of the sessions, starting with the booking_date
         for i in range(0, sessions):
             try:

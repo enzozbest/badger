@@ -50,7 +50,10 @@ class CreateRequestView(LoginRequiredMixin, View):
         return super().dispatch(request, *args, **kwargs)
 
     def get_last_group_id(self):
-        
+        """ Returns the last group id + 1 used in the Request model
+        Group ids are used to group together recurring requests
+        If this is the first request, then we return 1
+        """
         last_identifer = Request.objects.aggregate(Max('group_request_id'))['group_request_id__max']
         if last_identifer == None:
             return 1
@@ -69,6 +72,7 @@ class CreateRequestView(LoginRequiredMixin, View):
         return terms
 
     def create_request(self, form, http_request, term, id):
+        """ Creates the request object for database storage"""
         try:
             request_instance = Request(
                 student=http_request.user,
@@ -93,6 +97,5 @@ class CreateRequestView(LoginRequiredMixin, View):
                 return "Success"
 
         except Exception as e:
-            print(e)
             return e
             

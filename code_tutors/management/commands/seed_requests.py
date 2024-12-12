@@ -64,12 +64,9 @@ class Command(BaseCommand):
                 if term == "September":
                     term = "January"
                     self.create_request(data, group_id, term)
-                    print("january term")
                 if term == "January":
                     term = "May"
-                    self.create_request(data, group_id, term)
-                    print("may term")
-                
+                    self.create_request(data, group_id, term)                
         except Exception as e:
             pass
 
