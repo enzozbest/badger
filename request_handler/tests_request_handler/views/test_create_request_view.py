@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from request_handler.models.venue_model import Venue
+from request_handler.models.request_model import Request
 from user_system.fixtures.create_test_users import create_test_users
 from user_system.models.day_model import Day
 from user_system.models.user_model import User
@@ -52,6 +53,20 @@ class TestViews(TestCase):
         }
         self.client.post(self.url, data)
         self.assertRaises(ValueError)
+
+    def test_recurring_request_september(self):
+        self.client.force_login(self.student)
+        data = {
+            'term': 'September',
+            'knowledge_area': 'Scala',
+            'frequency': 'Biweekly',
+            'duration': '1',
+            'venue_preference': [self.online.pk],
+            'is_recurring':True
+        }
+        response = self.client.post(self.url, data, follow=True)
+        self.assertRedirects(response, reverse('processing_late_request'), status_code=302, target_status_code=200)
+        self.assertEqual(Request.objects.all().count(),1)
 
     def test_tutor_cannot_create_request_get(self):
         self.client.login(username='@janedoe', password='Password123')
@@ -111,3 +126,25 @@ class TestViews(TestCase):
         self.assertContains(response, 'There was an error submitting this form! Database error')
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'create_request.html')
+
+    def test_existing_group_ids(self):
+        self.client.force_login(self.student)
+        data = {
+            'term': 'January',
+            'knowledge_area': 'Scala',
+            'frequency': 'Biweekly',
+            'duration': '1',
+            'venue_preference': [self.online.pk],
+        }
+        self.client.post(self.url, data, follow=True)
+
+        #Post another request to check that the group id is set correctly
+        data = {
+            'term': 'May',
+            'knowledge_area': 'C++',
+            'frequency': 'Weekly',
+            'duration': '2',
+            'venue_preference': [self.online.pk],
+        }
+        response = self.client.post(self.url, data, follow=True)
+        self.assertRedirects(response, reverse('request_success'), status_code=302, target_status_code=200)

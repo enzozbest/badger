@@ -50,6 +50,7 @@ class CreateRequestView(LoginRequiredMixin, View):
         return super().dispatch(request, *args, **kwargs)
 
     def get_last_group_id(self):
+        
         last_identifer = Request.objects.aggregate(Max('group_request_id'))['group_request_id__max']
         if last_identifer == None:
             return 1
