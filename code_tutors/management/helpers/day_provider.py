@@ -1,4 +1,5 @@
 from faker.providers import BaseProvider
+
 from user_system.models.day_model import Day
 
 
