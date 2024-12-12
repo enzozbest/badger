@@ -14,7 +14,7 @@ def cancel_day(id, day):
         return HttpResponseNotFound(f"Booking with lesson_identifier={id} and date={day} doesn't seem to exist.")
 
 def cancel_term(id,month):
-    ''' Cancels all lessons for a term, where the term is determined by the month of requested cancelation '''
+    ''' Cancels all lessons for a term, where the term is determined by the month of requested cancellation '''
     months = []
     match month:
         case "9"|"10"|"11"|"12":
@@ -23,6 +23,8 @@ def cancel_term(id,month):
             months = [1,2,3,4]
         case "5"|"6"|"7":
             months = [5,6,7]
+        case _:
+            months = [9,10,11,12] # Default to the first term of the year
 
     for current_month in months:
         lessons = Booking.objects.filter(lesson_identifier=id, date__month=current_month)
@@ -97,7 +99,7 @@ class CancelLessonsView(LoginRequiredMixin,View):
         context = check_close_cancellation(year,month,day, recurring, lesson)
         if request.user.is_tutor:
             return render(request,'tutor_cancel_lessons.html', context)
-        elif request.user.is_student:
+        else: # request.user.is_student:
             return render(request,'student_cancel_lessons.html', context)
 
     def post(self, request: HttpRequest) -> HttpResponse:
@@ -120,6 +122,8 @@ class CancelLessonsView(LoginRequiredMixin,View):
             lesson.cancellation_requested = False
             lesson.save()
             return redirect('view_cancellation_requests')
+        else:
+            return redirect('dashboard')
 
 class AdminCancelLessonsView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest) -> HttpResponse:
@@ -156,7 +160,7 @@ class AdminCancelLessonsView(LoginRequiredMixin, View):
 
         return redirect('view_all_users') # change this maybe
 
-    # repetitive so will need refactoring
+
     def cancel_single_lesson_admin(self, lesson_id, cancel_one_day):
         booking = Booking.objects.filter(lesson_identifier=lesson_id, date=cancel_one_day)
         if not booking:

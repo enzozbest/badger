@@ -2,7 +2,7 @@ import datetime
 
 from django.db import models
 
-from request_handler.models import Venue
+from request_handler.models.venue_model import Venue
 from user_system.models.day_model import Day
 from user_system.models.user_model import User
 
@@ -11,6 +11,7 @@ from user_system.models.user_model import User
 This Model represents a booking accepted by the tutor. It contains all the necessary details to be displayed when a 
 student or tutor wants to view their booked lessons.
 """
+
 
 class Booking(models.Model):
     lesson_identifier = models.IntegerField(blank=False, null=False, default=-1)

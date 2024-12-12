@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
+
 import django.forms as forms
 
 from user_system.forms.knowledge_area_form import get_knowledge_areas
-from .models import Request, Venue
+from .models import Venue
+from .models.request_model import Request
 
 
 class RequestForm(forms.ModelForm):
@@ -32,30 +34,31 @@ class RequestForm(forms.ModelForm):
 
     def is_late_request(self):
         """Ensure that a warning is shown when a student tries to make a late request."""
-
         term = self.cleaned_data.get('term')
-        todayDate = datetime.today()
-        term_one = datetime(datetime.today().year, 9, 1)  # September of current year
-        if todayDate.month >= 8:
-            term_two = datetime(datetime.today().year + 1, 1, 1)  # January of following year
-            term_three = datetime(datetime.today().year + 1, 5, 1)  # May of following year
-        else:
-            term_two = datetime(datetime.today().year, 1, 1)  # January of current year
-            term_three = datetime(datetime.today().year, 5, 1)  # May of current year
+        today_date = datetime.today()
+        term_one, term_two, term_three = get_term_dates(today_date)
 
-        late = False
-        if term and ((term == "September" and todayDate > term_one - timedelta(weeks=2)) or
-                     (term == "January" and todayDate > term_two - timedelta(weeks=2)) or
-                     (term == "May" and todayDate > term_three - timedelta(weeks=2))):
-            late = True
-        return late
+        return term and ((term == "September" and today_date > term_one - timedelta(weeks=2)) or
+                         (term == "January" and today_date > term_two - timedelta(weeks=2)) or
+                         (term == "May" and today_date > term_three - timedelta(weeks=2)))
 
     class Meta:
         model = Request
         fields = ['knowledge_area', 'term', 'frequency', 'duration', 'venue_preference', 'is_recurring']
 
+
+def get_term_dates(today):
+    term_one = datetime(today.year, 9, 1)  # September of current year
+    if today.month >= 8:
+        term_two = datetime(today.year + 1, 1, 1)  # January of following year
+        term_three = datetime(today.year + 1, 5, 1)  # May of following year
+    else:
+        term_two = datetime(today.year, 1, 1)  # January of current year
+        term_three = datetime(today.year, 5, 1)  # May of current year
+    return term_one, term_two, term_three
+
+
 class RejectRequestForm(forms.Form):
     """Class representing a form for when an admin rejects a request and provides a reason."""
 
     reason = forms.CharField(widget=forms.Textarea, label='Reason for rejection:')
-

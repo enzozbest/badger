@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
 from request_handler.forms import RequestForm
-from request_handler.models import Request
+from request_handler.models.request_model import Request
 
 
 class EditRequestView(LoginRequiredMixin, View):

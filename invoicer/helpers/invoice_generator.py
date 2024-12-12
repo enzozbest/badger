@@ -9,7 +9,7 @@ from admin_functions.helpers.calculate_cost import calculate_num_lessons
 from code_tutors.aws import s3
 from code_tutors.aws.resources import yaml_loader
 from invoicer.models import Invoice
-from request_handler.models import Request
+from request_handler.models.request_model import Request
 
 _LOGO_PATH = settings.LOGO_PATH
 _OUTPUT_PATH = settings.INVOICE_OUTPUT_PATH
@@ -66,30 +66,28 @@ def generate_invoice(request_obj: Request) -> None:
         pdf = canvas.Canvas(buffer, pagesize=A4)
 
     width, height = A4
-    
+
     # Header
     pdf.drawImage(_LOGO_PATH, x=width - 150, y=height - 80, width=100, height=40, preserveAspectRatio=True, mask='auto')
     pdf.setFont("Helvetica-Bold", 16)
     pdf.drawString(20, height - 60, "Code Connect Tutors")
-    
 
     pdf.setLineWidth(1)  # Set line thickness
-    pdf.line(20 + 28, height - 90, width - 28, height - 90)  
-    
-    
+    pdf.line(20 + 28, height - 90, width - 28, height - 90)
+
     # Tutor Details
     pdf.setFont("Helvetica-Bold", 12)
     pdf.drawString(20, height - 120, "Tutor details")
     pdf.setFont("Helvetica", 10)
     pdf.drawString(40, height - 140, f"Tutor Name: {request_obj.tutor.full_name}")
     pdf.drawString(40, height - 160, f"Tutor Email: {request_obj.tutor.email}")
-    
+
     # Student Details
     pdf.setFont("Helvetica-Bold", 12)
     pdf.drawString(20, height - 200, "Student details")
     pdf.setFont("Helvetica", 10)
     pdf.drawString(40, height - 220, f"Student Name: {request_obj.student.full_name}")
-    
+
     # Transfer Overview
     pdf.setFont("Helvetica-Bold", 12)
     pdf.drawString(20, height - 260, "Transfer overview")
@@ -98,7 +96,7 @@ def generate_invoice(request_obj: Request) -> None:
     pdf.drawString(40, height - 300, f"Lessons Booked: {calculate_num_lessons(request_obj.frequency)}")
     pdf.drawString(40, height - 320, f"Total Cost: £{invoice.total:.2f}")
     pdf.drawString(40, height - 340, "Status: Completed")
-    
+
     # Footer
     pdf.setFont("Helvetica", 8)
     pdf.setFillColorRGB(0.5, 0.5, 0.5)  # Light gray
@@ -106,9 +104,8 @@ def generate_invoice(request_obj: Request) -> None:
     pdf.drawCentredString(width / 2, 40, "For support, contact support@codeconnect.com")
     pdf.setFillColorRGB(0, 0, 0)  # Reset color
 
-
     pdf.save()
 
     save_or_upload_pdf(buffer, invoice, path)
 
-    buffer.close()  # !!DO NOT REMOVE!!
+    buffer.close()

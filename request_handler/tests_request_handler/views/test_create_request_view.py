@@ -4,12 +4,13 @@ from unittest.mock import patch
 from django.test import TestCase
 from django.urls import reverse
 
-from request_handler.models import Venue
+from request_handler.models.venue_model import Venue
 from user_system.fixtures.create_test_users import create_test_users
-from user_system.models.user_model import User
 from user_system.models.day_model import Day
+from user_system.models.user_model import User
 
 INVALID_REQUEST_ID = 999
+
 
 class TestViews(TestCase):
     def setUp(self):
@@ -96,7 +97,7 @@ class TestViews(TestCase):
         response = self.client.post(url, data, follow=True)
         self.assertRedirects(response, reverse('processing_late_request'), status_code=302, target_status_code=200)
 
-    @patch('request_handler.models.Request.save', side_effect=Exception("Database error"))
+    @patch('request_handler.models.request_model.Request.save', side_effect=Exception("Database error"))
     def test_post_handles_exception(self, mock_save):
         self.client.force_login(self.student)
         data = {

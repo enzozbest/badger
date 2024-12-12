@@ -4,7 +4,7 @@ from django.test import TestCase
 from admin_functions.forms import AllocationForm
 from admin_functions.views.allocate_requests import get_venue_preference
 from request_handler.fixtures.create_test_requests import create_test_requests
-from request_handler.models import Request
+from request_handler.models.request_model import Request
 from user_system.fixtures.create_test_users import create_test_users
 from user_system.models.user_model import User
 
