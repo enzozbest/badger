@@ -87,4 +87,12 @@ class Migration(migrations.Migration):
             name='start',
             field=models.DateTimeField(blank=True, null=True),
         ),
+        migrations.RemoveField(
+            model_name='booking',
+            name='end',
+        ),
+        migrations.RemoveField(
+            model_name='booking',
+            name='start',
+        ),
     ]
