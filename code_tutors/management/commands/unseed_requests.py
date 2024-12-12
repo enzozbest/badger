@@ -1,6 +1,6 @@
 from django.core.management import BaseCommand
 
-from request_handler.models import Request
+from request_handler.models.request_model import Request
 
 
 class Command(BaseCommand):

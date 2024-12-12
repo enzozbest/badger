@@ -1,7 +1,7 @@
 import django_filters
 from django.db.models import Q
 
-from request_handler.models import Request
+from request_handler.models.request_model import Request
 
 
 class RequestFilter(django_filters.FilterSet):
@@ -11,7 +11,7 @@ class RequestFilter(django_filters.FilterSet):
     Requests can be searched by either: student first name, student last name, knowledge area, or allocation status. All
     of those include partial matches.
     """
-    
+
     allocated = django_filters.BooleanFilter(
         label="Allocation Status",
         field_name="allocated",

@@ -1,6 +1,8 @@
 import django.forms as forms
 
-from request_handler.models import Venue
+from request_handler.models.venue_model import Venue
+
+Venue
 from user_system.models.day_model import Day
 from user_system.models.user_model import User
 

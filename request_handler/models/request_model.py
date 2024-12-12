@@ -1,20 +1,11 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import QuerySet
 
 from invoicer.models import Invoice
+from request_handler.models.venue_model import Venue
 from user_system.models.day_model import Day
 from user_system.models.user_model import User
-
-class Venue(models.Model):
-    """ Class representing a venue for tutoring sessions.
-
-    This Model is necessary for the ManyToMany relationships in Request to work, as they must be between model instances.
-    Modes are represented in the database as a string (In person, Online, No preference) and an automatically assigned id (primary key).
-    """
-    venue = models.CharField(max_length=10)
-
-    def __str__(self):
-        return self.venue
 
 
 class Request(models.Model):
@@ -29,7 +20,8 @@ class Request(models.Model):
     allocated = models.BooleanField(default=False, blank=True)
     allocated_string = 'No'
     tutor_name_string = '-'
-    tutor = models.ForeignKey(User, default=None, null=True, on_delete=models.SET_NULL, blank=True, related_name='tutor')
+    tutor = models.ForeignKey(User, default=None, null=True, on_delete=models.SET_NULL, blank=True,
+                              related_name='tutor')
     knowledge_area = models.CharField(max_length=255, blank=False)
     venue_preference = models.ManyToManyField(Venue, blank=False, related_name='student_venue_preference')
     term = models.CharField(max_length=255)
@@ -51,37 +43,35 @@ class Request(models.Model):
 
     @property
     def tutor_name(self):
-        return f'{self.tutor.first_name} {self.tutor.last_name}' if self.tutor else None
+        return self.tutor.full_name if self.tutor else None
 
     def __str__(self):
-        venue = "No venue preference set!"
-
-        if self.pk and self.venue_preference.exists():
-            preferences = self.venue_preference.all()
-            venue = ', '.join(str(pref) for pref in preferences)
-
-        self.allocated_string = 'No'
-        if self.allocated:
-            self.allocated_string = 'Yes'
-
-        self.tutor_name_string = '-'
-        if self.tutor:
-            self.tutor_name_string = self.tutor_name
-
+        self.allocated_string = self.get_allocation_str()
         return (f'Student: {self.student_email}'
                 f'\n Knowledge Area: {self.knowledge_area}'
                 f'\n Term: {self.term}'
                 f'\n Frequency: {self.frequency}'
                 f'\n Duration: {self.duration}'
-                f'\n Venue Preference: {venue}'
+                f'\n Venue Preference: {get_venue_preference_str(self.pk, self.venue_preference)}'
                 f'\n Allocated?: {self.allocated_string}'
-                f'\n Tutor: {self.tutor_name_string}'
+                f'\n Tutor: {self.tutor_name if self.tutor else "-"}'
                 f'\n Late: {self.late}'
                 f'\n Recurring?: {self.is_recurring}'
                 )
+
+    def get_allocation_str(self):
+        if self.allocated:
+            return 'Yes'
+        return 'No'
 
     def clean(self):
         super().clean()
         if self.pk and not self.venue_preference.exists():
             raise ValidationError({"venue_preference": "No venue preference set!"})
-        
+
+
+def get_venue_preference_str(pk, venue_preference: QuerySet):
+    if pk and venue_preference.exists():
+        preferences = venue_preference.all()
+        return ', '.join(str(pref) for pref in preferences)
+    return 'No venue preference set!'

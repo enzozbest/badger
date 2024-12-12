@@ -5,7 +5,7 @@ from django.urls import reverse
 from schedule.models import Calendar
 
 from calendar_scheduler.models import Booking
-from calendar_scheduler.views.calendar import get_month_days, get_week_days
+from calendar_scheduler.views.calendar import get_month_days, get_week_days, produce_month_events
 from user_system.fixtures import create_test_users
 from user_system.models.user_model import User
 
@@ -18,6 +18,7 @@ calendar functionality.
 
 @override_settings(USE_AWS_S3=False)
 class CalendarHelperTests(TestCase):
+
     # Tests that the months and their days are retrieved correctly.
     def test_get_month_days(self):
         # Test for a standard month (e.g., November 2024)
@@ -67,6 +68,24 @@ class CalendarViewTests(TestCase):
             date=date.today(),
             lesson_identifier='2'
         )
+
+    # Test exception block in produce_month_events method
+    def test_exception_in_produce_month_events(self):
+        class MockRequest:
+            user = self.student
+        mock_request = MockRequest()
+
+        year = 2024
+        month = 2
+        events = None
+        try:
+            events = produce_month_events(mock_request, year, month, user_for_calendar=None)
+        except ValueError:
+            self.fail("produce_month_events raised ValueError unexpectedly!")
+
+        self.assertIsInstance(events, list) # Function should return a list
+        self.assertEqual(events, []) # No events expected
+        self.assertLessEqual(len(events), 29) # Ensure the loop ran only for valid days
 
     # Test that the month is updated correctly if the previous button is clicked.
     def test_month_less_than_one(self):

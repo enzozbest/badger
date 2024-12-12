@@ -7,7 +7,7 @@ from django.test import TestCase
 from code_tutors.aws import s3
 from invoicer.tests_invoicer.test_generate_invoice import generate_invoice, generate_invoice_id
 from request_handler.fixtures.create_test_requests import create_test_requests
-from request_handler.models import Request
+from request_handler.models.request_model import Request
 from user_system.fixtures.create_test_users import create_test_users
 from user_system.models.user_model import User
 
