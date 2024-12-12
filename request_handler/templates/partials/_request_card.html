@@ -2,12 +2,14 @@
     <div class="card h-100 bg-dark text-white rounded-3 shadow-sm border  ">
         <div class="card-body">
             <div class="p-3 bg-dark d-flex align-items-center">
-                <a href="{% url 'confirm_delete_request' request.id %}" 
+                {% if not request.invoice %}
+                    <a href="{% url 'confirm_delete_request' request.id %}" 
                     class="position-absolute text-danger" 
                     style="left: 1rem; top: 1rem;" 
                     title="Delete Request">
                         <i class="fas fa-trash"></i>
-                </a>
+                    </a>
+                {% endif %}
                 
                 <div id="request-id-{{ request.id }}" class="text-muted small position-absolute" style="right: 1rem; top: 1rem;">
                     #{{ request.id }}
@@ -92,13 +94,17 @@
             <div class="d-flex flex-wrap justify-content-center gap-2">
                 {% if not request.allocated %}
                     {% if user.user_type == 'Admin' %}
-                        <a id="id_allocation_button_{{ request.id }}" href="{% url 'allocate_request' request.id %}" class="btn btn-outline-warning btn-sm">Allocate</a>
-                        <a href="{% url 'edit_request' request.id %}" class="btn btn-outline-info btn-sm">Update</a>
-                        <a id="id_reject_{{ request.id }}" href="{% url 'reject_request' request.id %}" class="btn btn-outline-danger btn-sm">Reject</a>
+                        {% if not request.rejected_request %}
+                            <a id="id_allocation_button_{{ request.id }}" href="{% url 'allocate_request' request.id %}" class="btn btn-outline-warning btn-sm">Allocate</a>
+                            <a href="{% url 'edit_request' request.id %}" class="btn btn-outline-info btn-sm">Update</a>
+                            <a id="id_reject_{{ request.id }}" href="{% url 'reject_request' request.id %}" class="btn btn-outline-danger btn-sm">Reject</a>
+                        {% endif %}
                     {% elif user.user_type == 'Student' %}
                         <a href="{% url 'edit_request' request.id %}" class="btn btn-outline-info btn-sm">Update</a>
                     {% endif %}
                 {% endif %}
+
+            
 
 
                 {% if request.invoice %}
