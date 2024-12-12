@@ -108,4 +108,4 @@ def generate_invoice(request_obj: Request) -> None:
 
     save_or_upload_pdf(buffer, invoice, path)
 
-    buffer.close()  # !!DO NOT REMOVE!!
+    buffer.close()

@@ -82,7 +82,6 @@ class Command(BaseCommand):
 
     def try_create_bookings(self, data):
         try:
-
             freq = self.frequencies[randint(0, 2)]
             session_counts = {"Weekly": 15, "Biweekly": 30, "Fortnightly": 7}
             sessions = session_counts.get(freq, 0)

@@ -1,6 +1,5 @@
 from faker.providers import BaseProvider
-
-Day
+from request_handler.models.day_model import Day
 
 
 class DayProvider(BaseProvider):
