@@ -48,8 +48,7 @@ def generate_invoice_for_request(http_request: HttpRequest, tutoring_request_id:
     request_obj.save()
     ig.generate_invoice(request_obj)
 
-    return HttpResponse("Invoice generated successfully!", status=201)
-
+    return render(http_request, 'invoice_generated.html', status=201)
 
 def create_invoice_object(student: User, invoice_id: str, total_cost: float) -> Invoice:
     return Invoice.objects.create(invoice_id=invoice_id,
