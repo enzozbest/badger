@@ -56,7 +56,7 @@ class Command(BaseCommand):
     def try_create_request(self, data):
         try:
             self.create_request(data)
-        except Exception as e:
+        except Exception:
             pass
 
     def create_request(self, data):

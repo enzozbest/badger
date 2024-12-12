@@ -5,10 +5,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from calendar_scheduler.models import Booking
-from request_handler.models.venue_model import Venue
-
-Venue
 from request_handler.models.request_model import Request
+from request_handler.models.venue_model import Venue
 from user_system.fixtures.create_test_users import create_test_users
 from user_system.models.day_model import Day
 from user_system.models.user_model import User
@@ -227,6 +225,13 @@ class AcceptRequestViewTestCase(TestCase):
 
         response = self.client.post(reverse('accept_request', args=[self.lesson_request.id]))
         self.assertEqual(response.status_code, 404)
+
+    def test_corner_case_for_match_frequency(self):
+        self.lesson_request.frequency = "INVALID"
+        self.lesson_request.save()
+        self.client.force_login(self.tutor)
+        response = self.client.post(reverse('accept_request', args=[self.lesson_request.id]))
+        self.assertRedirects(response, reverse('view_requests'), status_code=302, target_status_code=200)
 
     # Test lesson request identifiers when there are previous requests
     def test_pre_lesson_identifiers(self):

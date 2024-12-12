@@ -56,11 +56,7 @@ class UserForm(forms.ModelForm):
     def clean(self):
         """Form mixing for new_password and password_confirmation fields."""
         super().clean()
-        new_password = self.cleaned_data.get('new_password')
-        password_confirmation = self.cleaned_data.get('password_confirmation')
-        if new_password != password_confirmation:
-            self.add_error('password_confirmation', 'Confirmation does not match password.')
-
+    
     class Meta:
         """Form options."""
         model = User
