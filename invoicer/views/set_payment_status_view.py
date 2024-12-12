@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 
 from invoicer.models import Invoice
 
@@ -25,4 +25,4 @@ def set_payment_status(http_request: HttpRequest, invoice_id: str, payment_statu
     invoice = get_object_or_404(Invoice, invoice_id=invoice_id)
     invoice.payment_status = bool(payment_status)
     invoice.save()
-    return HttpResponse("Payment status updated successfully", status=200)
+    return render(http_request, 'payment_status_updated.html', status=200)

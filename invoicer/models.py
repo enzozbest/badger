@@ -18,7 +18,6 @@ class Invoice(models.Model):
     def save(self, *args, **kwargs):
         if not self.invoice_id:
             self.invoice_id = generate_invoice_id(self.student, get_latest_id_number(self.student))
-
         super(Invoice, self).save(*args, **kwargs)
 
 
@@ -26,7 +25,7 @@ def get_latest_id_number(student: User):
     """Function to get the last invoice ID number for a given Student."""
     latest_number = 0
     try:
-        latest_number = Invoice.objects.filter(student=student).latest('invoice_id').invoice_id[0:2:-1]
+        latest_number = Invoice.objects.filter(student=student).latest('invoice_id').invoice_id[-2:].lstrip('-')
     except Invoice.DoesNotExist as e:
         pass
     return latest_number

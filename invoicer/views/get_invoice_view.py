@@ -4,8 +4,7 @@ from django.http import FileResponse, HttpRequest, HttpResponse, HttpResponseRed
 from django.shortcuts import get_object_or_404
 
 from code_tutors.aws import s3
-from invoicer.helpers.generate_invoice_id import generate_invoice_id
-from invoicer.models import Invoice, get_latest_id_number
+from invoicer.models import Invoice
 
 
 @login_required
@@ -35,6 +34,6 @@ def get_invoice(http_request: HttpRequest, invoice_id: str) -> HttpResponse | Fi
         return HttpResponseRedirect(url, content=url)
     else:
         return FileResponse(open(
-            f'{settings.INVOICE_OUTPUT_PATH}/{generate_invoice_id(invoice.student, get_latest_id_number(invoice.student))}.pdf',
+            f'{settings.INVOICE_OUTPUT_PATH}/{invoice.invoice_id}.pdf',
             'rb')
             , as_attachment=True, filename=f'{invoice.invoice_id}.pdf', status=200)
