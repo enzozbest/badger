@@ -6,8 +6,6 @@ from django.test import TestCase
 
 from request_handler.forms import RequestForm
 from request_handler.models.venue_model import Venue
-
-Venue
 from user_system.models.day_model import Day
 
 
