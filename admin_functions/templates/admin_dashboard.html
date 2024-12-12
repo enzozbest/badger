@@ -1,6 +1,6 @@
 {% extends 'base_content.html' %}
 {% block content %}
-<div id="admin-dashboard-container" class="container mt-5">
+<div id="admin-dashboard-container" class="container mb-5 mt-0">
   <div id="admin-dashboard-header" class="row justify-content-center">
     <div id="admin-dashboard-title" class="col-12 text-center">
       <h1 class="display-5 text-white">
@@ -11,6 +11,33 @@
       </p>
     </div>
   </div>
+
+  <div id="admin-dashboard-stats" class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-12">
+        <div class="card shadow-lg border-0 bg-dark text-light p-4">
+          <div class="row text-center align-items-center">
+            <div class="col-md-4 border-end">
+              <h6 class="text-uppercase text-secondary mb-2">Rejected Requests</h6>
+              <p class="display-6 text-danger fw-bold mb-0">{{ rejected_allocations_count }}</p>
+              <small class="text-muted">Requests rejected by administrator</small>
+            </div>
+            <div class="col-md-4 border-end">
+              <h6 class="text-uppercase text-secondary mb-2">Allocated Without Invoices</h6>
+              <p class="display-6 text-warning fw-bold mb-0">{{ allocated_without_invoices_count }}</p>
+              <small class="text-muted">Allocated requests pending invoices</small>
+            </div>
+            <div class="col-md-4">
+              <h6 class="text-uppercase text-secondary mb-2">Unallocated Requests</h6>
+              <p class="display-6 text-primary fw-bold mb-0">{{ unallocated_requests_count }}</p>
+              <small class="text-muted">Requests yet to be allocated</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <div id="admin-dashboard-cards" class="row mt-5 justify-content-center">
     <div id="view-users-card" class="col-md-6 col-lg-4 mb-4">
