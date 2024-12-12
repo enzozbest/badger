@@ -1,7 +1,7 @@
 from user_system.models.user_model import User
 
 
-def generate_invoice_id(student: User, latest_number: int) -> str:
+def generate_invoice_id(student: User, latest_number: str) -> str:
     """Function to generate an invoice id for a given student.
 
     Invoice IDs take the form XXXYYY-00, where XXX are the 3 first letters of the student's first name, YYY are the 3 first
