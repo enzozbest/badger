@@ -56,17 +56,21 @@ class Command(BaseCommand):
     def try_create_request(self, data):
         try:
             group_id = Request.objects.count()
-            if not data['recurring']:
+            print(data['is_recurring'])
+            if not data['is_recurring']:
                 self.create_request(data, group_id, data['term'])
             else:
-                term = data['recurring']
+                term = data['term']
                 self.create_request(data, group_id, term)
                 if term == "September":
                     term = "January"
                     self.create_request(data, group_id, term)
+                    print("january term")
                 if term == "January":
                     term = "May"
                     self.create_request(data, group_id, term)
+                    print("may term")
+                
         except Exception as e:
             pass
 
@@ -79,7 +83,8 @@ class Command(BaseCommand):
             term=request_term,
             frequency=data['frequency'],
             duration=data['duration'],
-            group_id=id
+            group_request_id=id,
+            is_recurring=data['is_recurring']
         )
         if data['venue_preference'] and isinstance(data['venue_preference'], list):
             req_object.venue_preference.set(data['venue_preference'])
