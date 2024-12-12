@@ -1,7 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import render
-from request_handler.models import Request
+
+from request_handler.models.request_model import Request
 
 
 @login_required
@@ -18,7 +19,7 @@ def admin_dash(request: HttpRequest) -> HttpResponse:
 
     if request.method == 'POST':
         return HttpResponseNotAllowed("[GET]", status=405, content=b'Not Allowed')
-    
+
     # Count rejected allocations
     rejected_allocations_count = Request.objects.filter(rejected_request=True).count()
     allocated_without_invoices_count = Request.objects.filter(allocated=True, invoice__isnull=True).count()
