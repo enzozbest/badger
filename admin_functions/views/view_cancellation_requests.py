@@ -10,7 +10,19 @@ class ViewCancellationRequests(View):
         if request.user.user_type != 'Admin':
             return render(request, 'permission_denied.html', status=403)
         
+        sort = request.GET.get('sort', '')
+        
         requested_lessons = Booking.objects.filter(cancellation_requested=True)
+
+        if sort:
+            try:
+                requested_lessons = requested_lessons.order_by(sort)
+            except Exception as e:
+                # Handle invalid sorting keys (optional logging)
+                print(f"Invalid sort key: {sort}. Error: {e}")
+
+
+
         return render(request, 'view_cancellation_requests.html', context={'lessons':requested_lessons})
     
     def post(self, request: HttpRequest) -> HttpResponse:
