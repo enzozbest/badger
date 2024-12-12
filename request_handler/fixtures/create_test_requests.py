@@ -1,9 +1,7 @@
 import json
 
-from request_handler.models.venue_model import Venue
-
-Venue
 from request_handler.models.request_model import Request
+from request_handler.models.venue_model import Venue
 from user_system.models.day_model import Day
 from user_system.models.user_model import User
 

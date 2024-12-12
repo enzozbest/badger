@@ -59,7 +59,6 @@ class AcceptRequestView(LoginRequiredMixin, View):
                     title=f"Tutor session between {lesson_request.student.first_name} {lesson_request.student.last_name} and {lesson_request.tutor_name}"
                 )
                 booking_date = self.match_lesson_frequency(lesson_request, booking_date)
-
             except Exception as e:
                 return redirect('view_requests')
 
@@ -116,7 +115,6 @@ class AcceptRequestView(LoginRequiredMixin, View):
 
     def match_lesson_frequency(self, lesson_request, booking_date):
         """Matches the frequency of the request to put into the calendar."""
-
         match lesson_request.frequency:
             case "Weekly":
                 booking_date += timedelta(days=7)
@@ -134,5 +132,7 @@ class AcceptRequestView(LoginRequiredMixin, View):
                     booking_date += timedelta(days=dayDiff)
             case "Fortnightly":
                 booking_date += timedelta(days=14)
+            case _:
+                raise ValueError('This frequency is invalid')
 
         return booking_date

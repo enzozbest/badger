@@ -2,10 +2,8 @@ from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
 
-from request_handler.models.venue_model import Venue
-
-Venue
 from request_handler.models.request_model import Request
+from request_handler.models.venue_model import Venue
 from user_system.fixtures.create_test_users import create_test_users
 from user_system.models.user_model import User
 
