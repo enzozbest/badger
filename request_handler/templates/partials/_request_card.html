@@ -94,9 +94,9 @@
             <div class="d-flex flex-wrap justify-content-center gap-2">
                 {% if not request.allocated %}
                     {% if user.user_type == 'Admin' %}
-                        <a id="id_allocation_button_{{ request.id }}" href="{% url 'allocate_request' request.id %}" class="btn btn-outline-warning btn-sm">Allocate</a>
-                        <a href="{% url 'edit_request' request.id %}" class="btn btn-outline-info btn-sm">Update</a>
                         {% if not request.rejected_request %}
+                            <a id="id_allocation_button_{{ request.id }}" href="{% url 'allocate_request' request.id %}" class="btn btn-outline-warning btn-sm">Allocate</a>
+                            <a href="{% url 'edit_request' request.id %}" class="btn btn-outline-info btn-sm">Update</a>
                             <a id="id_reject_{{ request.id }}" href="{% url 'reject_request' request.id %}" class="btn btn-outline-danger btn-sm">Reject</a>
                         {% endif %}
                     {% elif user.user_type == 'Student' %}
