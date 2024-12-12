@@ -6,8 +6,8 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    if not (3, 8) <= sys.version_info < (3, 12):
-        raise RuntimeError("This application requires Python >=3.8 and <3.12")
+    if not (3, 10) <= sys.version_info < (3, 11):
+        raise RuntimeError("This application requires Python 3.10.*")
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'code_tutors.settings')
     try:

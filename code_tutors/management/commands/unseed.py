@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
@@ -22,10 +23,11 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS('Database unseeding completed successfully!'))
 
-        self.stdout.write('Deleting all invoices from S3...')
-        credentials = _get_credentials()
         try:
-            _delete('invoices/pdfs/*.pdf', get_bucket_name('invoicer'), credentials=credentials)
-            self.stdout.write(self.style.SUCCESS('Invoices successfully deleted from S3!'))
+            if settings.USE_AWS_S3:
+                self.stdout.write('Deleting all invoices from S3...')
+                credentials = _get_credentials()
+                _delete('invoices/pdfs', get_bucket_name('invoicer'), credentials=credentials)
+                self.stdout.write(self.style.SUCCESS('Invoices successfully deleted from S3!'))
         except Exception:
             self.stdout.write(self.style.ERROR('Invoices could not be deleted from S3!'))

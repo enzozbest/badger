@@ -13,6 +13,9 @@ class RequestForm(forms.ModelForm):
     This class is used as the form displayed to a student user when they wish to make a request for tutoring. They can fill
     in all the fields and a Request instance containing that information will be created and stored in the database.
     """
+    def __init__(self, *args, **kwargs):
+        super(RequestForm, self).__init__(*args, **kwargs)
+        self.fields['is_recurring'].label = 'Would you like your sessions to continue across the year?'
 
     venue_preference = forms.ModelMultipleChoiceField(
         queryset=Venue.objects.all(),
