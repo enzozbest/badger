@@ -23,46 +23,22 @@ class CreateRequestView(LoginRequiredMixin, View):
     def post(self, http_request: HttpRequest) -> HttpResponse:
         form = RequestForm(http_request.POST)
         if form.is_valid():
-
             #Get last group id to use for all of the new requests if recurring
             id = self.get_last_group_id()
-            preform = form.save(commit=False)
+            form.save(commit=False)
+            terms = self.get_terms_to_process(form.cleaned_data['term'], form.cleaned_data['is_recurring'])
 
-            if form.cleaned_data['is_recurring']:
-                term = form.cleaned_data['term']
+            for term in terms:
                 response = self.create_request(form, http_request, term, id)
-                print(response)
-                if response != "Late" and response != "Success":
-                    form.add_error(error=f'There was an error submitting this form! {response}', field='term')
-                print(term)
-                if term == "September":
-                    term = "January"
-                    response = self.create_request(form, http_request, term, id)
-                    if response != "Late" and response != "Success":
-                        form.add_error(error=f'There was an error submitting this form! {response}', field='term')
-                    print(term)
-                print(response)
-                if term == "January":
-                    term = "May"
-                    response = self.create_request(form, http_request, term, id)
-                    if response != "Late" and response != "Success":
-                        form.add_error(error=f'There was an error submitting this form! {response}', field='term')
-                    print(term)
-                print(response)
+
+                if response not in ("Late", "Success"):
+                    form.add_error(field='term', error=f'There was an error submitting this form! {response}')
+                    return render(http_request, 'create_request.html', {'form': form})
+
                 if response == "Late":
                     return redirect('processing_late_request')
-                elif response == "Success":
-                    return redirect('request_success')
-            else:
-                term = form.cleaned_data['term']
-                response = self.create_request(form, http_request, term, id)
-                
-                if response == "Late":
-                    return redirect('processing_late_request')
-                elif response == "Success":
-                    return redirect('request_success')
-                else:
-                    form.add_error(error=f'There was an error submitting this form! {response}', field='term')
+
+            return redirect('request_success')
 
         return render(http_request, 'create_request.html', {'form': form})
 
@@ -79,6 +55,17 @@ class CreateRequestView(LoginRequiredMixin, View):
             return 1
         else:
             return (last_identifer + 1)
+
+    def get_terms_to_process(self, initial_term, is_recurring):
+        """Determine the terms to process based on recurrence."""
+        terms = [initial_term]
+
+        if is_recurring:
+            term_sequence = {"September": "January", "January": "May"}
+            while terms[-1] in term_sequence:
+                terms.append(term_sequence[terms[-1]])
+
+        return terms
 
     def create_request(self, form, http_request, term, id):
         try:
