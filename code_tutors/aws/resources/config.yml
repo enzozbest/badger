@@ -5,5 +5,3 @@ roles:
   invoicer-s3: 'ENTER-ACCESS-ROLE-HERE'
 
 logo_name: 'ENTER-LOGO-NAME-HERE'
-
-

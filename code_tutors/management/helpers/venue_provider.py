@@ -2,8 +2,6 @@ from faker.providers import BaseProvider
 
 from request_handler.models.venue_model import Venue
 
-Venue
-
 
 class VenueProvider(BaseProvider):
     def venue(self):
