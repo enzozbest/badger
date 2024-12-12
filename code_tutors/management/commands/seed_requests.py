@@ -56,7 +56,6 @@ class Command(BaseCommand):
     def try_create_request(self, data):
         try:
             group_id = Request.objects.count()
-            print(data['is_recurring'])
             if not data['is_recurring']:
                 self.create_request(data, group_id, data['term'])
             else:

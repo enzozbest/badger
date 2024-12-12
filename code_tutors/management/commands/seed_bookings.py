@@ -9,8 +9,7 @@ from code_tutors.management.helpers import day_provider, programming_langs_provi
 from request_handler.models.venue_model import Venue
 from request_handler.views.accept_request import get_first_weekday
 
-Venue
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 
 class Command(BaseCommand):
@@ -81,12 +80,27 @@ class Command(BaseCommand):
             return
 
     def try_create_bookings(self, data):
+        if not data['is_recurring']:
+            self.create_terms_bookings(data,data['term'])
+        else:
+            term = data['term']
+            self.create_terms_bookings(data,term)
+            if term == "September":
+                term = "January"
+                self.date = get_first_weekday(2025, 1, data['day']).date()
+                self.create_terms_bookings(data,term)
+            if term == "January":
+                term = "May"
+                self.date = get_first_weekday(2025, 5, data['day']).date()
+                self.create_terms_bookings(data,term)
+
+    def create_terms_bookings(self,data, lesson_term):
         try:
             freq = self.frequencies[randint(0, 2)]
             session_counts = {"Weekly": 15, "Biweekly": 30, "Fortnightly": 7}
             sessions = session_counts.get(freq, 0)
             for i in range(0, sessions):
-                self.create_booking(data, freq)
+                self.create_booking(data, freq, lesson_term)
                 match freq:
                     case "Weekly":
                         self.date += timedelta(days=7)
@@ -97,13 +111,13 @@ class Command(BaseCommand):
         except Exception as e:
             pass
 
-    def create_booking(self, data, freq):
+    def create_booking(self, data, freq, lesson_term):
         try:
             booking_object = Booking.objects.create(
                 student=data['student'],
                 tutor=data['tutor'],
                 knowledge_area=data['knowledge_area'],
-                term=data['term'],
+                term=lesson_term,
                 frequency=freq,
                 duration=data['duration'],
                 is_recurring=data['is_recurring'],
