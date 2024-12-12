@@ -17,11 +17,23 @@ from request_handler.models.request_model import Request
 from user_system.fixtures.create_test_users import create_test_users
 from user_system.models.user_model import User
 
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
 
 @skipIf(os.environ.get('GITHUB_ACTIONS') == 'true', 'These tests require headed browsers to work properly')
 class TestFunctionalRequestHandler(StaticLiveServerTestCase):
     def setUp(self):
-        self.driver = webdriver.Firefox()
+        # Create a temporary Firefox profile
+        profile = FirefoxProfile()  # This creates a default profile you can customize if needed
+
+        # Set up options and associate the profile
+        options = Options()
+        options.profile = profile
+
+        # Set up the Firefox WebDriver with the profile
+        service = Service(executable_path='/snap/bin/geckodriver')  # Replace with the actual path to geckodriver
+        self.driver = webdriver.Firefox(service=service, options=options)
         self.driver.maximize_window()
 
         create_test_users()

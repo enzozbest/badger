@@ -37,31 +37,15 @@ class AcceptRequestView(LoginRequiredMixin, View):
         booking_date = self.get_booking_start_date(lesson_request)
         sessions = self.calculate_lesson_frequency(lesson_request)
         new_identifier = self.get_last_identifier()
+        grouped_lessons = self.get_grouped_lessons(lesson_request.group_request_id)
 
-        # Now add each of the sessions, starting with the booking_date
-        for i in range(0, sessions):
-            try:
-                # Create a new Booking object based on the allocated request
-                Booking.objects.create(
-                    lesson_identifier=new_identifier,
-                    tutor=request.user,
-                    student=lesson_request.student,
-                    knowledge_area=lesson_request.knowledge_area,
-                    venue=lesson_request.venue,
-                    day=lesson_request.day,
-                    term=lesson_request.term,
-                    frequency=lesson_request.frequency,
-                    duration=lesson_request.duration,
-                    is_recurring=lesson_request.is_recurring,
-                    date=booking_date.date(),
-                    title=f"Tutor session between {lesson_request.student.first_name} {lesson_request.student.last_name} and {lesson_request.tutor_name}"
-                )
-                booking_date = self.match_lesson_frequency(lesson_request, booking_date)
-
-            except Exception as e:
+        for lesson in grouped_lessons:
+            result = self.create_bookings(sessions, new_identifier, request, lesson, booking_date)
+            if result != "":
+                print(result)
                 return redirect('view_requests')
-
-        lesson_request.delete()
+            else:
+                lesson.delete()
         return redirect('view_requests')
 
     def get_last_identifier(self):
@@ -114,14 +98,18 @@ class AcceptRequestView(LoginRequiredMixin, View):
 
     def match_lesson_frequency(self, lesson_request, booking_date):
         """Matches the frequency of the request to put into the calendar."""
-
+        print(lesson_request.frequency)
         match lesson_request.frequency:
             case "Weekly":
                 booking_date += timedelta(days=7)
+                print("1")
             case "Biweekly":
+                print(lesson_request.day)
+                print(lesson_request.day2)
                 weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
                 day1 = weekdays.index(str(lesson_request.day))
                 day2 = weekdays.index(str(lesson_request.day2))
+                print("2")
                 if booking_date.weekday() == day1:
                     # Find the difference from day1 to day2
                     dayDiff = (day2 - day1 + 7) % 7
@@ -130,7 +118,47 @@ class AcceptRequestView(LoginRequiredMixin, View):
                     # Find the difference from day2 to day1
                     dayDiff = (day1 - booking_date.weekday() + 7) % 7
                     booking_date += timedelta(days=dayDiff)
+                    print("3")
             case "Fortnightly":
                 booking_date += timedelta(days=14)
+                print("4")
 
         return booking_date
+
+    def get_grouped_lessons(self,id):
+        lessons = Request.objects.filter(group_request_id=id).all()
+        return lessons
+
+    def create_bookings(self, sessions, new_identifier, request, lesson_request, booking_date):
+        print(sessions)
+        print(new_identifier)
+        print(request)
+        print(lesson_request)
+        print(lesson_request.day)
+        print(booking_date)
+        print(request.user)
+        # Now add each of the sessions, starting with the booking_date
+        for i in range(0, sessions):
+            try:
+                print("helo")
+                # Create a new Booking object based on the allocated request
+                Booking.objects.create(
+                    lesson_identifier=new_identifier,
+                    tutor=request.user,
+                    student=lesson_request.student,
+                    knowledge_area=lesson_request.knowledge_area,
+                    venue=lesson_request.venue,
+                    day=lesson_request.day,
+                    term=lesson_request.term,
+                    frequency=lesson_request.frequency,
+                    duration=lesson_request.duration,
+                    is_recurring=lesson_request.is_recurring,
+                    date=booking_date.date(),
+                    title=f"Tutor session between {lesson_request.student.first_name} {lesson_request.student.last_name} and {lesson_request.tutor_name}"
+                )
+                print("sf")
+                booking_date = self.match_lesson_frequency(lesson_request, booking_date)
+                print("hdfsdfds")
+            except Exception as e:
+                return e
+        return ""
