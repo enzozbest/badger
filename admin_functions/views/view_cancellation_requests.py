@@ -23,7 +23,6 @@ class ViewCancellationRequests(View):
             try:
                 requested_lessons = requested_lessons.order_by(sort)
             except Exception as e:
-                # Handle invalid sorting keys (optional logging)
                 print(f"Invalid sort key: {sort}. Error: {e}")
 
 
