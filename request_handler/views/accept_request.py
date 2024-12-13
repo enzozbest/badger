@@ -33,14 +33,23 @@ def match_lesson_frequency(lesson_request, booking_date):
             weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
             day1 = weekdays.index(str(lesson_request.day))
             day2 = weekdays.index(str(lesson_request.day2))
-            if booking_date.weekday() == day1:
-                # Find the difference from day1 to day2
-                dayDiff = (day2 - day1 + 7) % 7
-                booking_date += timedelta(days=dayDiff)
+            current_day = booking_date.weekday()
+
+            # Determine the closest day to the current date
+            days_to_day1 = (day1 - current_day + 7) % 7
+            days_to_day2 = (day2 - current_day + 7) % 7
+
+             # Alternate between day1 and day2
+            if days_to_day1 == 0:  # Currently on day1
+                booking_date += timedelta(days=(day2 - day1 + 7) % 7)
+            elif days_to_day2 == 0:  # Currently on day2
+                booking_date += timedelta(days=(day1 - day2 + 7) % 7)
             else:
-                # Find the difference from day2 to day1
-                dayDiff = (day1 - booking_date.weekday() + 7) % 7
-                booking_date += timedelta(days=dayDiff)
+                # If not on either day, go to the closest day
+                if days_to_day1 < days_to_day2:
+                    booking_date += timedelta(days=days_to_day1)
+                else:
+                    booking_date += timedelta(days=days_to_day2)
         case "Fortnightly":
             booking_date += timedelta(days=14)
         case _:
