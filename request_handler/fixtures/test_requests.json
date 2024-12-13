@@ -12,7 +12,8 @@
     "venue_preference": "Online",
     "day": null,
     "venue": null,
-    "invoice": null
+    "invoice": null,
+    "group_request_id":5
   },
   {
     "student": "@charlie",
