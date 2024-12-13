@@ -4,8 +4,8 @@ from unittest.mock import patch
 from django.test import TestCase
 from django.urls import reverse
 
-from request_handler.models.venue_model import Venue
 from request_handler.models.request_model import Request
+from request_handler.models.venue_model import Venue
 from user_system.fixtures.create_test_users import create_test_users
 from user_system.models.day_model import Day
 from user_system.models.user_model import User
@@ -62,11 +62,11 @@ class TestViews(TestCase):
             'frequency': 'Biweekly',
             'duration': '1',
             'venue_preference': [self.online.pk],
-            'is_recurring':True
+            'is_recurring': True
         }
         response = self.client.post(self.url, data, follow=True)
         self.assertRedirects(response, reverse('processing_late_request'), status_code=302, target_status_code=200)
-        self.assertEqual(Request.objects.all().count(),1)
+        self.assertEqual(Request.objects.all().count(), 3)
 
     def test_tutor_cannot_create_request_get(self):
         self.client.login(username='@janedoe', password='Password123')
@@ -138,7 +138,7 @@ class TestViews(TestCase):
         }
         self.client.post(self.url, data, follow=True)
 
-        #Post another request to check that the group id is set correctly
+        # Post another request to check that the group id is set correctly
         data = {
             'term': 'May',
             'knowledge_area': 'C++',
