@@ -33,11 +33,14 @@ The administration interface is available at [*Admin Interface*](http://badger20
 
 ## Installation instructions
 
-To install the software and use it in your local development environment, you must first set up and activate a local (
-virtual) development environment. From the root of the project:
+To install the software and use it in your local development environment, you must first ensure you have Python 3.10.*
+installed in your system. Our application has been developed using Python 3.10 and has not been tested with any other
+versions.
+
+To begin, set up and activate a local (virtual) development environment. From the root of the project:
 
 ```
-$ python3 -m venv venv
+$ python3.10 -m venv venv
 $ source venv/bin/activate
 ```
 
@@ -85,29 +88,22 @@ $ set SECRET_ACCESS_KEY=your-secret-access-key-here
 $ set AWS_REGION_NAME=your-aws-region-name-here 
 ```
 
-If you made any changes to the default configurations, update database migrations before continuing:
-
-```
-$ python3 manage.py makemigrations --merge
-$ python3 manage.py makemigrations
-```
-
 Then, migrate the database:
 
 ```
-$ python3 manage.py migrate
+$ python3.10 manage.py migrate
 ```
 
 Seed the development database with:
 
 ```
-$ python3 manage.py seed
+$ python3.10 manage.py seed
 ```
 
 Run all tests with:
 
 ```
-$ python3 manage.py test
+$ python3.10 manage.py test
 ```
 
 All tests should pass, and coverage is at 100% if the variable USE_AWS_S3 in code_tutors/settings.py is set. Note that
