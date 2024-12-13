@@ -27,16 +27,17 @@ class CreateRequestView(LoginRequiredMixin, View):
             id = self.get_last_group_id()
             form.save(commit=False)
             terms = self.get_terms_to_process(form.cleaned_data['term'], form.cleaned_data['is_recurring'])
-
+            has_late = False
             for term in terms:
                 response = self.create_request(form, http_request, term, id)
 
                 if response not in ("Late", "Success"):
                     form.add_error(field='term', error=f'There was an error submitting this form! {response}')
                     return render(http_request, 'create_request.html', {'form': form})
-
                 if response == "Late":
-                    return redirect('processing_late_request')
+                    has_late = True
+            if has_late:
+                return redirect('processing_late_request')
 
             return redirect('request_success')
 
@@ -79,7 +80,8 @@ class CreateRequestView(LoginRequiredMixin, View):
                 group_request_id=id,
                 term=term,
                 knowledge_area = form.cleaned_data['knowledge_area'],
-                frequency=form.cleaned_data['frequency']
+                frequency=form.cleaned_data['frequency'],
+                is_recurring=form.cleaned_data['is_recurring']
                 
             )
             request_instance.save()
