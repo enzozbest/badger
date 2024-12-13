@@ -132,7 +132,7 @@
                 {% endif %}
 
                 
-                {% if user.is_tutor and request.allocated and request.tutor == user %}
+                {% if user.is_tutor and request.allocated and request.tutor == user and not request.rejected_request %}
                     <form method="post" action="{% url 'accept_request' request.id %}" class="d-inline">
                         {% csrf_token %}
                         <button id="id_accept_request_{{ request.id }}" type="submit" class="btn btn-outline-success btn-sm">Accept Request</button>
