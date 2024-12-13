@@ -63,7 +63,7 @@ class AcceptRequestView(LoginRequiredMixin, View):
         grouped_lessons = self.get_grouped_lessons(lesson_request.group_request_id)
 
         for lesson in grouped_lessons:
-            booking_date = self.get_booking_start_date(lesson_request)
+            booking_date = self.get_booking_start_date(lesson)
             result = self.create_bookings(sessions, new_identifier, request, lesson, booking_date)
             if result != "":
                 return redirect('view_requests')
