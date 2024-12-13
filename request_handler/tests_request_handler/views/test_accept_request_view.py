@@ -20,6 +20,7 @@ class AcceptRequestViewTestCase(TestCase):
         self.student = User.objects.get(user_type=User.ACCOUNT_TYPE_STUDENT)
         self.day_monday, created = Day.objects.get_or_create(day="Monday")
         self.day_friday, created = Day.objects.get_or_create(day="Friday")
+        self.day_tuesday, crearted = Day.objects.get_or_create(day="Tuesday")
         self.venue_online, created = Venue.objects.get_or_create(venue="Online")
 
         self.lesson_request = Request.objects.create(
@@ -266,3 +267,4 @@ class AcceptRequestViewTestCase(TestCase):
         date = datetime(2025,5,4,12,0,0)
         with self.assertRaises(ValueError):
             match_lesson_frequency(self.lesson_request,date)
+    

@@ -42,14 +42,8 @@ def match_lesson_frequency(lesson_request, booking_date):
              # Alternate between day1 and day2
             if days_to_day1 == 0:  # Currently on day1
                 booking_date += timedelta(days=(day2 - day1 + 7) % 7)
-            elif days_to_day2 == 0:  # Currently on day2
+            else:  # Currently on day2
                 booking_date += timedelta(days=(day1 - day2 + 7) % 7)
-            else:
-                # If not on either day, go to the closest day
-                if days_to_day1 < days_to_day2:
-                    booking_date += timedelta(days=days_to_day1)
-                else:
-                    booking_date += timedelta(days=days_to_day2)
         case "Fortnightly":
             booking_date += timedelta(days=14)
         case _:
