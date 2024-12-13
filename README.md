@@ -29,6 +29,7 @@ self-contained. Our system has the following apps:
 ## Deployed version of the application
 
 The deployed version of the application can be found at [*badger2024.ddns.net*](http://badger2024.ddns.net).
+The administration interface is available at [*Admin Interface*](http://badger2024.ddns.net/admin).
 
 ## Installation instructions
 
@@ -109,7 +110,9 @@ Run all tests with:
 $ python3 manage.py test
 ```
 
-All tests should pass, and coverage is at 100% if the variable USE_AWS_S3 in code_tutors/settings.py is set. Note that if you do not use AWS (i.e. you do not have it set up locally and/or the variable is not set), AWS-related tests will be skipped and this may impact the coverage report! 
+All tests should pass, and coverage is at 100% if the variable USE_AWS_S3 in code_tutors/settings.py is set. Note that
+if you do not use AWS (i.e. you do not have it set up locally and/or the variable is not set), AWS-related tests will be
+skipped and this may impact the coverage report!
 
 ## Sources
 
