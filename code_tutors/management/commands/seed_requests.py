@@ -56,6 +56,8 @@ class Command(BaseCommand):
     def try_create_request(self, data):
         try:
             group_id = Request.objects.count()
+            if data['term'] == 'May':
+                data['is_recurring'] = False
             if not data['is_recurring']:
                 self.create_request(data, group_id, data['term'])
             else:
@@ -66,8 +68,8 @@ class Command(BaseCommand):
                     self.create_request(data, group_id, term)
                 if term == "January":
                     term = "May"
-                    self.create_request(data, group_id, term)                
-        except Exception as e:
+                    self.create_request(data, group_id, term)
+        except Exception:
             pass
 
     def create_request(self, data, id, request_term):
