@@ -36,6 +36,7 @@ class CreateRequestView(LoginRequiredMixin, View):
                     return render(http_request, 'create_request.html', {'form': form})
                 if response == "Late":
                     has_late = True
+            #Redirect at the end if it's late
             if has_late:
                 return redirect('processing_late_request')
 
