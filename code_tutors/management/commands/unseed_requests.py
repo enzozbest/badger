@@ -1,4 +1,4 @@
-from django.core.management import BaseCommand
+from django.core.management import BaseCommand, call_command
 
 from request_handler.models.request_model import Request
 
@@ -10,3 +10,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         Request.objects.all().delete()
+        call_command('unseed_bookings')  # There can be no bookings if there are no requests
