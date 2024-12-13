@@ -36,6 +36,7 @@ class Request(models.Model):
                                 related_name='request_invoice')
     rejected_request = models.BooleanField(default=False)
     rejection_reason = models.TextField(blank=True, null=True)
+    group_request_id = models.IntegerField(blank=False, null=False, default=-1)
 
     @property
     def student_email(self):

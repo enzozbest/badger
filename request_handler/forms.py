@@ -44,6 +44,7 @@ class RequestForm(forms.ModelForm):
         return term and ((term == "September" and today_date > term_one - timedelta(weeks=2)) or
                          (term == "January" and today_date > term_two - timedelta(weeks=2)) or
                          (term == "May" and today_date > term_three - timedelta(weeks=2)))
+    
 
     class Meta:
         model = Request

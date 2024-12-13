@@ -9,8 +9,7 @@ from code_tutors.management.helpers import day_provider, programming_langs_provi
 from request_handler.models.venue_model import Venue
 from request_handler.views.accept_request import get_first_weekday
 
-Venue
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 
 class Command(BaseCommand):
@@ -51,6 +50,7 @@ class Command(BaseCommand):
         duration = str(randint(1, 3)) + 'h'
         venue = Venue.objects.get(id=(self.faker.venue()[0]))
         day = self.faker.days()
+        day2 = self.faker.days()
         if term == "September":
             self.date = get_first_weekday(2024, 9, day).date()
         elif term == 'January':
@@ -62,13 +62,13 @@ class Command(BaseCommand):
         recurring = True if randint(0, 1) else False
         self.try_create_bookings(
             {'knowledge_area': knowledge_area, 'term': term, 'duration': duration, 'student': student,
-             'tutor': tutor, 'is_recurring': recurring, 'venue': venue, 'title': title, 'day': day
-             })
+            'tutor': tutor, 'is_recurring': recurring, 'venue': venue, 'title': title, 'day': day, 'day2':day2
+            })
 
-    def determine_biweekly_date(self, day):
+    def determine_biweekly_date(self, day, day2):
         weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
         day1 = weekdays.index(day)
-        day2 = weekdays.index(day)
+        day2 = weekdays.index(day2)
         if self.date.weekday() == day1:
             # Find the difference from day1 to day2
             dayDiff = (day2 - day1 + 7) % 7
@@ -81,29 +81,44 @@ class Command(BaseCommand):
             return
 
     def try_create_bookings(self, data):
+        if not data['is_recurring']:
+            self.create_terms_bookings(data,data['term'])
+        else:
+            term = data['term']
+            self.create_terms_bookings(data,term)
+            if term == "September":
+                term = "January"
+                self.date = get_first_weekday(2025, 1, data['day']).date()
+                self.create_terms_bookings(data,term)
+            if term == "January":
+                term = "May"
+                self.date = get_first_weekday(2025, 5, data['day']).date()
+                self.create_terms_bookings(data,term)
+
+    def create_terms_bookings(self,data, lesson_term):
         try:
             freq = self.frequencies[randint(0, 2)]
             session_counts = {"Weekly": 15, "Biweekly": 30, "Fortnightly": 7}
             sessions = session_counts.get(freq, 0)
             for i in range(0, sessions):
-                self.create_booking(data, freq)
+                self.create_booking(data, freq, lesson_term)
                 match freq:
                     case "Weekly":
                         self.date += timedelta(days=7)
                     case "Biweekly":
-                        self.determine_biweekly_date(data["day"])
+                        self.determine_biweekly_date(data["day"].day, data["day2"].day)
                     case "Fortnightly":
                         self.date += timedelta(days=14)
         except Exception as e:
             pass
 
-    def create_booking(self, data, freq):
+    def create_booking(self, data, freq, lesson_term):
         try:
             booking_object = Booking.objects.create(
                 student=data['student'],
                 tutor=data['tutor'],
                 knowledge_area=data['knowledge_area'],
-                term=data['term'],
+                term=lesson_term,
                 frequency=freq,
                 duration=data['duration'],
                 is_recurring=data['is_recurring'],

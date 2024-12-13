@@ -22,7 +22,6 @@ class UserForm(forms.ModelForm):
 
         if 'instance' in kwargs:
             self.fields['user_type'].initial = kwargs['instance'].user_type
-
         self._display_fields()
 
     # Validates hourly rate to make sure it is 0 or positive
@@ -56,7 +55,7 @@ class UserForm(forms.ModelForm):
     def clean(self):
         """Form mixing for new_password and password_confirmation fields."""
         super().clean()
-    
+
     class Meta:
         """Form options."""
         model = User

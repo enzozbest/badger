@@ -7,12 +7,13 @@
     "frequency": "Weekly",
     "allocated": false,
     "tutor": null,
-    "is_recurring": true,
+    "is_recurring": false,
     "late": false,
     "venue_preference": "Online",
     "day": null,
     "venue": null,
-    "invoice": null
+    "invoice": null,
+    "group_request_id":5
   },
   {
     "student": "@charlie",
@@ -22,11 +23,12 @@
     "frequency": "Weekly",
     "allocated": true,
     "tutor": "Jane Doe",
-    "is_recurring": true,
+    "is_recurring": false,
     "late": false,
     "venue_preference": "Online",
     "day": "Tuesday",
     "venue": "Online",
-    "invoice": null
+    "invoice": null,
+    "group_request_id":10
   }
 ]
