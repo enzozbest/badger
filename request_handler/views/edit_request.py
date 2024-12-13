@@ -22,8 +22,11 @@ class EditRequestView(LoginRequiredMixin, View):
         if not request.POST.getlist('venue_preference'):
             form.add_error('venue_preference', "No venue preference set!")
 
+        form.fields['term'].required = False
+        term = request_instance.term
         if form.is_valid():
             request_instance = form.save(commit=False)
+            request_instance.term = term
             request_instance.save()
             form.save_m2m()
 
@@ -37,13 +40,9 @@ class EditRequestView(LoginRequiredMixin, View):
                     pass  # Create recurring requests here (how?)
                 for group_request in group:
                     term = group_request.term
-                    group_form = RequestForm(request.POST, instance=group_request)
-                    try:
-                        group_request = group_form.save(commit=False)
-                    except Exception as e:
-                        print(e)
-                        # return redirect('view_requests')
-
+                    group_form = RequestForm(request.POST, {'term': term}, instance=group_request)
+                    group_form.fields['term'].required = False
+                    group_request = group_form.save(commit=False)
                     group_request.save()
                     group_form.save_m2m()
                     group_request.term = term
