@@ -12,12 +12,13 @@ class EditRequestView(LoginRequiredMixin, View):
 
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         form, request_instance = self.get_form_and_instance(pk)
+        if request_instance.is_recurring:
+            form.fields['term'].disabled = True
         return render(request, 'edit_request.html', {'form': form, 'request_instance': request_instance})
 
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
         form, request_instance = self.get_form_and_instance(pk)
         form = RequestForm(request.POST, instance=request_instance)
-
         if not request.POST.getlist('venue_preference'):
             form.add_error('venue_preference', "No venue preference set!")
 
@@ -25,6 +26,28 @@ class EditRequestView(LoginRequiredMixin, View):
             request_instance = form.save(commit=False)
             request_instance.save()
             form.save_m2m()
+
+            group = Request.objects.filter(group_request_id=request_instance.group_request_id).exclude(
+                id=request_instance.id)
+            request_instance.refresh_from_db()
+            if not request_instance.is_recurring:
+                group.all().delete()
+            else:
+                if not group.exists():
+                    pass  # Create recurring requests here (how?)
+                for group_request in group:
+                    term = group_request.term
+                    group_form = RequestForm(request.POST, instance=group_request)
+                    try:
+                        group_request = group_form.save(commit=False)
+                    except Exception as e:
+                        print(e)
+                        # return redirect('view_requests')
+
+                    group_request.save()
+                    group_form.save_m2m()
+                    group_request.term = term
+                    group_request.save()
             return redirect('view_requests')
         return render(request, 'edit_request.html', {'form': form, 'request_instance': request_instance})
 
