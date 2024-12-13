@@ -17,6 +17,7 @@ def reject_request(request, request_id):
         if form.is_valid():
             req.rejected_request = True
             req.rejection_reason = form.cleaned_data['reason']
+            req.group_request_id = -1
             req.save()
             return redirect('view_requests')
     else:

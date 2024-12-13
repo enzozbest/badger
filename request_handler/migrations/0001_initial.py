@@ -59,5 +59,15 @@ class Migration(migrations.Migration):
                  models.ManyToManyField(related_name='student_venue_preference', to='request_handler.venue')),
             ],
         ),
-        migrations.RunPython(populate_venues)
+        migrations.RunPython(populate_venues),
+        migrations.AddField(
+            model_name='request',
+            name='group_request_id',
+            field=models.IntegerField(default=-1),
+        ),
+        migrations.AlterField(
+            model_name='request',
+            name='rejected_request',
+            field=models.BooleanField(default=False),
+        ),
     ]

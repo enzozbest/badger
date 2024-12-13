@@ -188,6 +188,9 @@ def find_impediments(day1_id, frequency, day2_id) -> bool:
     return False
 
 
+def get_grouped_requests(id):
+    return Request.objects.filter(group_request_id=id).all()
+
 def _allocate(lesson_request: Request, tutor: User, venue: Venue, day1: Day, day2: Day) -> None:
     weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     if lesson_request.frequency == 'Biweekly' and weekdays.index(day1.day) < weekdays.index(day2.day):
@@ -226,6 +229,8 @@ def process_allocation(form, lesson_request, day1_id, day2_id):
     else:
         day1 = Day.objects.get(id=day1_id) if day1_id else None
         day2 = Day.objects.get(id=day2_id) if day2_id else None
-        _allocate(lesson_request, tutor, venue, day1, day2)
-        _update_availabilities(lesson_request, day1, day2)
+        requests = get_grouped_requests(lesson_request.group_request_id)
+        for request in requests:
+            _allocate(request, tutor, venue, day1, day2)
+            _update_availabilities(request, day1, day2)
         return None

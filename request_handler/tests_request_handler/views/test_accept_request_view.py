@@ -7,6 +7,7 @@ from django.urls import reverse
 from calendar_scheduler.models import Booking
 from request_handler.models.request_model import Request
 from request_handler.models.venue_model import Venue
+from request_handler.views.accept_request import match_lesson_frequency
 from user_system.fixtures.create_test_users import create_test_users
 from user_system.models.day_model import Day
 from user_system.models.user_model import User
@@ -19,6 +20,7 @@ class AcceptRequestViewTestCase(TestCase):
         self.student = User.objects.get(user_type=User.ACCOUNT_TYPE_STUDENT)
         self.day_monday, created = Day.objects.get_or_create(day="Monday")
         self.day_friday, created = Day.objects.get_or_create(day="Friday")
+        self.day_tuesday, crearted = Day.objects.get_or_create(day="Tuesday")
         self.venue_online, created = Venue.objects.get_or_create(venue="Online")
 
         self.lesson_request = Request.objects.create(
@@ -35,7 +37,7 @@ class AcceptRequestViewTestCase(TestCase):
             venue=self.venue_online,
         )
         self.client.force_login(self.tutor)
-
+    
     # Test that a booking is successfully created and the associated request is deleted.
     def test_successful_request_handling(self):
         response = self.client.post(reverse('accept_request', args=[self.lesson_request.id]))
@@ -258,3 +260,11 @@ class AcceptRequestViewTestCase(TestCase):
             Request.objects.get(id=self.lesson_request.id)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse('view_requests'))
+
+    def test_match_term_default_case(self):
+        self.lesson_request.frequency = "INVALID"
+        self.lesson_request.save()
+        date = datetime(2025,5,4,12,0,0)
+        with self.assertRaises(ValueError):
+            match_lesson_frequency(self.lesson_request,date)
+    
